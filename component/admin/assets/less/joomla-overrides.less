@@ -1,0 +1,48 @@
+body.com_jevents {
+  > .container-fluid.container-main {
+    margin:0px !important;
+    padding: 0px !important;
+  }
+  > .subhead-collapse {
+    margin-bottom: 0px !important;
+  }
+  #jev_adminui {
+    top: 0;
+    position: absolute;
+    width: 100%;
+    margin-top: 30px;
+  }
+  li {
+    line-height: 20px;
+  }
+}
+
+@media (min-width:768px) {
+  .content-header {
+    margin-top:40px;
+  }
+}
+
+@media (max-width:767px) {
+  body.com_jevents {
+    padding: 0px;
+    > nav.navbar {
+      padding: 0 20px;
+    }
+    #jev_adminui {
+      position: relative !important;
+      margin-top: -79px;
+      .main-header {
+        > a {
+          width: 100%;
+          max-width: 100%;
+          .logo-lg {
+
+            max-width: 100%;
+            width: 100%;
+          }
+        }
+      }
+    }
+  }
+}

@@ -194,5 +194,113 @@ $mainspan = 10;
 			<input type="hidden" name="filter_order" value="<?php echo $order; ?>" />
 			<input type="hidden" name="filter_order_Dir" value="<?php echo $orderdir; ?>" />
 		</div>
+<!-- New FLAT Admin UI -->
+	<div id="jev_adminui" class="jev_adminui skin-blue sidebar-mini">
+		<header class="main-header">
+
+			<?php
+			$header_items = array();
+
+			$header_items[] =  '<li class="dropdown">
+                  <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="true">Dropdown <span class="caret"></span></a>
+                  <ul class="dropdown-menu" role="menu">
+                    <li><a href="#">Action</a></li>
+                    <li><a href="#">Another action</a></li>
+                    <li><a href="#">Something else here</a></li>
+                    <li class="divider"></li>
+                    <li><a href="#">Separated link</a></li>
+                    <li class="divider"></li>
+                    <li><a href="#">One more separated link</a></li>
+                  </ul>
+                </li>';
+			echo JEventsHelper::addAdminHeader($header_items); ?>
+		</header>
+		<!-- =============================================== -->
+		<!-- Left side column. contains the sidebar -->
+		<aside class="main-sidebar">
+			<!-- sidebar: style can be found in sidebar.less -->
+			<?php echo JEventsHelper:: addAdminSidebar(); ?>
+			<!-- /.sidebar -->
+		</aside>
+		<!-- =============================================== -->
+		<!-- Content Wrapper. Contains page content -->
+		<div class="content-wrapper" style="min-height: 1096px;">
+			<!-- Content Header (Page header) -->
+			<section class="content-header">
+				<h1>
+					Manage Events
+					<small>Select an event below to edit</small>
+				</h1>
+			</section>
+
+			<!-- Main content -->
+			<section class="content events_list">
+
+				<!-- Default box -->
+				<div class="box">
+					<div class="box-body">
+							<!-- /.box-header -->
+							<div class="box-body no-padding">
+								<table class="table table-striped">
+									<tbody><tr>
+										<th style="width: 10px"><?php echo JHtml::_('grid.checkall'); ?></th>
+										<th><?php echo JHTML::_('grid.sort', 'JEV_ICAL_SUMMARY', 'title', $orderdir, $order, "icalevent.list"); ?></th>
+										<th><?php echo JText::_('REPEATS'); ?></th>
+										<th><?php echo JText::_('JEV_EVENT_CREATOR'); ?></th>
+										<th><?php echo JText::_('JEV_PUBLISHED'); ?></th>
+									</tr>
+									<?php
+									$k = 0;
+									$nullDate = $db->getNullDate();
+
+									for ($i = 0, $n = count($this->rows); $i < $n; $i++)
+									{
+									$row = &$this->rows[$i];
+									?>
+									<tr class="row<?php echo $k; ?>">
+										<td width="20" class="jev_gr_cb">
+											<?php echo JHtml::_('grid.id', $i, $row->ev_id()); ?>
+										</td>
+										<td >
+											<a href="#edit" onclick="return listItemTask('cb<?php echo $i; ?>','icalevent.edit')" title="<?php echo JText::_('JEV_CLICK_TO_EDIT'); ?>"><?php echo $row->title(); ?></a>
+										</td>
+										<td align="center">
+											<?php
+											if ($row->hasrepetition())
+											{
+												?>
+												<a href="javascript: void(0);" onclick="return listItemTask('cb<?php echo $i; ?>','icalrepeat.list')" class="btn btn-micro">
+													<span class="icon-list"> </span>
+												</a>
+											<?php } ?>
+										</td>
+
+										<td align="center"><?php echo $row->creatorName(); ?></td>
+										<td align="center"><?php echo $row->created(); ?></td>
+										<td align="center"><?php echo $row->modified; ?></td>
+										<td align="center"><?php echo $row->_groupname; ?></td>
+									</tr>
+										<?php
+										$k = 1 - $k;
+									}?>
+									</tbody></table>
+							</div>
+						</div><!-- /.box-body -->
+					<div class="box-footer">
+
+					</div><!-- /.box-footer-->
+				</div><!-- /.box -->
+
+			</section><!-- /.content -->
+		</div>
+		<!-- /.content-wrapper -->
+		<footer class="main-footer">
+			<?php echo JEventsHelper::addAdminFooter(); ?>
+		</footer>
+		<!-- /.control-sidebar -->
+		<!-- Add the sidebar's background. This div must be placed
+               immediately after the control sidebar -->
+		<div class="control-sidebar-bg" style="position: fixed; height: auto;"></div>
+	</div>
 </form>
 <br />

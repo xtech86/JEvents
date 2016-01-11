@@ -1,4 +1,13 @@
+body.admin.view-.layout-.task-.itemid- {
+  .btn.btn-subhead, .subhead-collapse {
+    display: none;
+  }
+  #jev_adminui {
+    top: 0px;
+  }
+}
 body.com_jevents {
+
   > .container-fluid.container-main {
     margin:0px !important;
     padding: 0px !important;
@@ -6,12 +15,75 @@ body.com_jevents {
   > .subhead-collapse {
     margin-bottom: 0px !important;
   }
+
+  > header.header {
+    display: none !important;
+  }
+  .subhead-fixed {
+    top: 32px;
+    z-index: 1021;
+  }
+
   #jev_adminui {
-    top: 0;
+    top: 45px;
     position: absolute;
     width: 100%;
     margin-top: 30px;
+
+    #system-message-container {
+      &.j-toggle-main {
+        float: none;
+        width: 100%;
+        margin-left: 0px;
+        padding: 15px;
+
+        .alert {
+          &.alert-success {
+            h4 {
+              color: #FFF;
+              font-size: 18px;
+              font-weight: 400;
+              line-height: 1.1;
+            }
+            .alert-message {
+              font-size: 14px;
+            }
+          }
+
+        }
+      }
+    }
+    .box-body .summary {
+      a.ashow_repeats {
+        clear: both;
+        display: block;
+        i {
+          font-size: 8px;
+          margin-left: 5px;
+        }
+      }
+    }
+    tr {
+      td {
+        .admin_d_and_t {
+          margin: 0px;
+        }
+      }
+    }
+
+    .pagination {
+      &.pagination-toolbar {
+        text-align: center;
+        margin-top: 5px;
+      }
+    }
+
+    .row {
+      margin: 0px;
+
+    }
   }
+
   li {
     line-height: 20px;
   }
@@ -19,7 +91,7 @@ body.com_jevents {
 
 @media (min-width:768px) {
   .content-header {
-    margin-top:40px;
+    margin-top:52px;
   }
 }
 

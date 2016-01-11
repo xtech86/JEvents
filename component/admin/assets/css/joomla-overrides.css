@@ -1,3 +1,10 @@
+body.admin.view-.layout-.task-.itemid- .btn.btn-subhead,
+body.admin.view-.layout-.task-.itemid- .subhead-collapse {
+  display: none;
+}
+body.admin.view-.layout-.task-.itemid- #jev_adminui {
+  top: 0px;
+}
 body.com_jevents > .container-fluid.container-main {
   margin: 0px !important;
   padding: 0px !important;
@@ -5,18 +12,58 @@ body.com_jevents > .container-fluid.container-main {
 body.com_jevents > .subhead-collapse {
   margin-bottom: 0px !important;
 }
+body.com_jevents > header.header {
+  display: none !important;
+}
+body.com_jevents .subhead-fixed {
+  top: 32px;
+  z-index: 1021;
+}
 body.com_jevents #jev_adminui {
-  top: 0;
+  top: 45px;
   position: absolute;
   width: 100%;
   margin-top: 30px;
+}
+body.com_jevents #jev_adminui #system-message-container.j-toggle-main {
+  float: none;
+  width: 100%;
+  margin-left: 0px;
+  padding: 15px;
+}
+body.com_jevents #jev_adminui #system-message-container.j-toggle-main .alert.alert-success h4 {
+  color: #FFF;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1.1;
+}
+body.com_jevents #jev_adminui #system-message-container.j-toggle-main .alert.alert-success .alert-message {
+  font-size: 14px;
+}
+body.com_jevents #jev_adminui .box-body .summary a.ashow_repeats {
+  clear: both;
+  display: block;
+}
+body.com_jevents #jev_adminui .box-body .summary a.ashow_repeats i {
+  font-size: 8px;
+  margin-left: 5px;
+}
+body.com_jevents #jev_adminui tr td .admin_d_and_t {
+  margin: 0px;
+}
+body.com_jevents #jev_adminui .pagination.pagination-toolbar {
+  text-align: center;
+  margin-top: 5px;
+}
+body.com_jevents #jev_adminui .row {
+  margin: 0px;
 }
 body.com_jevents li {
   line-height: 20px;
 }
 @media (min-width: 768px) {
   .content-header {
-    margin-top: 40px;
+    margin-top: 52px;
   }
 }
 @media (max-width: 767px) {

@@ -10,6 +10,9 @@
 .skin-blue-light {
   //Navbar
   .main-header {
+    .navbar-static-top {
+      bavkground-color: #367fa9;
+    }
     .navbar {
       .navbar-variant(@light-blue; #fff);
       .sidebar-toggle {
@@ -18,6 +21,7 @@
           background-color: darken(@light-blue, 5%);
         }
       }
+
       @media (max-width: @screen-header-collapse) {
         .dropdown-menu {
           li {

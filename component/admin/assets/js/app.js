@@ -744,3 +744,10 @@ function _init() {
     });
   };
 }(jQuery));
+
+//A little bit of JS to re-set the system messages in Joomla
+jQuery( document ).ready(function (jQuery) {
+  if( jQuery('#system-message-container').html().length > 5) {
+    jQuery("#system-message-container").detach().insertBefore('#jev_adminui section.content');
+    jQuery("#system-message-container .alert").addClass("callout callout-success lead") }
+});

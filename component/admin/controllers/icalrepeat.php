@@ -53,7 +53,6 @@ class AdminIcalrepeatController extends JControllerLegacy
 
 		JArrayHelper::toInteger($cid);
 
-
 		if (is_array($cid) && count($cid) > 0)
 			$id = $cid[0];
 		else

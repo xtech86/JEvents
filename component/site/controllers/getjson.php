@@ -49,8 +49,8 @@ class GetjsonController extends JControllerLegacy
 		$this->datamodel = new JEventsDataModel();
 
 		list($year, $month, $day) = JEVHelper::getYMD();
-		$start = $jinput->get('start', "$year-$month-$day");
-		$end = $jinput->get('end', "$year-$month-$day");
+		$start = $jinput->getString('start', "$year-$month-$day");
+		$end = $jinput->getString('end', "$year-$month-$day");
 		$limitstart = 0;
 		$limit = 0;
 
@@ -82,7 +82,7 @@ class GetjsonController extends JControllerLegacy
 		}
 
 		// Get the document object.
-		$document = & JFactory::getDocument();
+		$document =  JFactory::getDocument();
 
 		// Set the MIME type for JSON output.
 		$document->setMimeEncoding('application/json');

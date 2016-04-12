@@ -441,7 +441,7 @@ class AdminIcaleventController extends JControllerAdmin
 			$this->view->setModel($model, true);
 		}
 
-		$cid = $jinput->get('cid', array(0), null);
+		$cid = $jinput->get('cid', array(0), "array");
 		JArrayHelper::toInteger($cid);
 		if (is_array($cid) && count($cid) > 0)
 			$id = $cid[0];
@@ -680,6 +680,7 @@ class AdminIcaleventController extends JControllerAdmin
 				throw new Exception( JText::_('ALERTNOTAUTH'), 403);
 				return false;
 			}
+                        $this->view->assign("row",$row);
 
 		}
 		else {
@@ -703,7 +704,7 @@ class AdminIcaleventController extends JControllerAdmin
 
 	function savetranslation ()
 	{
-		JSession::checkToken('default') or jexit('Invalid Token');
+		JSession::checkToken('request') or jexit('Invalid Token');
 
 		$jinput = JFactory::getApplication()->input;
 
@@ -767,7 +768,7 @@ class AdminIcaleventController extends JControllerAdmin
 
 	function deletetranslation ()
 	{
-		JSession::checkToken('default') or jexit('Invalid Token');
+		JSession::checkToken('request') or jexit('Invalid Token');
 
 		$jinput = JFactory::getApplication()->input;
 
@@ -891,7 +892,7 @@ class AdminIcaleventController extends JControllerAdmin
 					$day = $event->dup();
 					$jinput->set("year", $year);
 					$jinput->set("month", $month);
-					$jinput->set("day".$day);
+					$jinput->set("day", $day);
 				}
 				if ($event && $event->state())
 				{
@@ -1017,6 +1018,10 @@ class AdminIcaleventController extends JControllerAdmin
 		$evid = intval($event->ev_id());
 		$testevent = $this->queryModel->getEventById($evid, 1, "icaldb");
 		$rp_id = $testevent->rp_id();
+                if (!$rp_id){
+                    JFactory::getApplication()->enqueueMessage(JText::_("JEV_CANNOT_DISPLAY_SAVED_EVENT_ON_THIS_MENU_ITEM", "WARNING"));
+                    return;
+                }
 		list($year, $month, $day) = JEVHelper::getYMD();
 
 		if (JFactory::getApplication()->isAdmin())
@@ -1227,7 +1232,7 @@ class AdminIcaleventController extends JControllerAdmin
 	{
 		$jinput = JFactory::getApplication()->input;
 
-		$cid = $jinput->get('cid', array(0));
+		$cid = $jinput->get('cid', array(0), "array");
 		JArrayHelper::toInteger($cid);
 		$this->toggleICalEventPublish($cid, 1);
 
@@ -1237,7 +1242,7 @@ class AdminIcaleventController extends JControllerAdmin
 	{
 		$jinput = JFactory::getApplication()->input;
 
-		$cid = $jinput->get('cid', array(0));
+		$cid = $jinput->get('cid', array(0), "array");
 		JArrayHelper::toInteger($cid);
 		$this->toggleICalEventPublish($cid, 0);
 	}
@@ -1251,7 +1256,7 @@ class AdminIcaleventController extends JControllerAdmin
 
 		$jinput = JFactory::getApplication()->input;
 
-		$cid = $jinput->get('cid', array(0));
+		$cid = $jinput->get('cid', array(0), "array");
 		JArrayHelper::toInteger($cid);
 
 		// front end passes the id as evid
@@ -1642,8 +1647,8 @@ class AdminIcaleventController extends JControllerAdmin
 		}
 
 		$user = JFactory::getUser();
-		$where[] = "\n ev.access " . (version_compare(JVERSION, '1.6.0', '>=') ? ' IN (' . JEVHelper::getAid($user) . ')' : ' <=  ' . JEVHelper::getAid($user));
-		$where[] = "\n icsf.access " . (version_compare(JVERSION, '1.6.0', '>=') ? ' IN (' . JEVHelper::getAid($user) . ')' : ' <=  ' . JEVHelper::getAid($user));
+		$where[] = "\n ev.access " . ' IN (' . JEVHelper::getAid($user) . ')' ;
+		$where[] = "\n icsf.access " . ' IN (' . JEVHelper::getAid($user) . ')' ;
 
 		$hidepast = intval(JFactory::getApplication()->getUserStateFromRequest("hidepast", "hidepast", 1));
 		if ($hidepast)

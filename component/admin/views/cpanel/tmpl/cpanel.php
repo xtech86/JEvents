@@ -13,6 +13,7 @@ $params = JComponentHelper::getParams(JEV_COM_COMPONENT);
 $version = JEventsVersion::getInstance();
 
 JEVHelper::stylesheet('jev_cp.css', 'administrator/components/' . JEV_COM_COMPONENT . '/assets/css/');
+
 ?>
 <div id="jev_adminui" class="jev_adminui skin-blue sidebar-mini">
 	<header class="main-header">
@@ -66,9 +67,6 @@ JEVHelper::stylesheet('jev_cp.css', 'administrator/components/' . JEV_COM_COMPON
 					<!-- /.info-box -->
 				</div>
 				<!-- /.col -->
-
-				<!-- fix for small devices only -->
-				<div class="clearfix visible-sm-block"></div>
 
 				<div class="span3">
 					<div class="info-box">

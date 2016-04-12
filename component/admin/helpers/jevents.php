@@ -176,12 +176,90 @@ STYLE;
     public static function addAdminSidebar($components = array(), $params = array())
     {
 
+        // Links to addons
+
+        // Managed Locations
+
+        $db = JFactory::getDbo ();
+        $db->setQuery ( "SELECT enabled FROM #__extensions WHERE element = 'com_jevlocations' AND type='component' " );
+        $is_enabled = $db->loadResult();
+
+        if ($is_enabled) {
+            $link = "index.php?option=com_jevlocations";
+            JFactory::getLanguage()->load("com_jevlocations", JPATH_ADMINISTRATOR);
+                //$this->_quickiconButtonWHover($link, "cpanel/LocationsCool.png", "cpanel/LocationsHot.png", JText::_('COM_JEVLOCATIONS'), "/administrator/components/" . JEV_COM_COMPONENT . "/assets/images/");
+        }
+
+        // Managed People
+
+        $db = JFactory::getDbo ();
+        $db->setQuery ( "SELECT enabled FROM #__extensions WHERE element = 'com_jevpeople' AND type='component' " );
+        $is_enabled = $db->loadResult ();
+        if ($is_enabled) {
+            $link = "index.php?option=com_jevpeople";
+            JFactory::getLanguage()->load("com_jevpeople", JPATH_ADMINISTRATOR);
+            //$this->_quickiconButtonWHover($link, "cpanel/PeopleCool.png", "cpanel/PeopleHot.png", JText::_('COM_JEVPEOPLE'), "/administrator/components/" . JEV_COM_COMPONENT . "/assets/images/");
+        }
+
+        // RSVP Pro
+
+        $db = JFactory::getDbo ();
+        $db->setQuery ( "SELECT enabled FROM #__extensions WHERE element = 'com_rsvppro' AND type='component' " );
+        $is_enabled = $db->loadResult ();
+        if ($is_enabled) {
+            $link = "index.php?option=com_rsvppro";
+            JFactory::getLanguage()->load("com_rsvppro", JPATH_ADMINISTRATOR);
+            //$this->_quickiconButtonWHover($link, "cpanel/RSVPCool.png", "cpanel/RSVPHot.png", JText::_('COM_RSVPPRO'), "/administrator/components/" . JEV_COM_COMPONENT . "/assets/images/");
+        }
+
+        // Custom Fields
+
+        $db = JFactory::getDbo ();
+        $db->setQuery ( "SELECT * FROM #__extensions WHERE element = 'jevcustomfields' AND type='plugin' AND folder='jevents' " );
+        $extension = $db->loadObject();
+        // Stop if user is not authorised to manage JEvents
+        $customfields = '';
+        if ($extension && $extension->enabled && JEVHelper::isAdminUser()) {
+            $manifestCache = json_decode($extension->manifest_cache);
+            $link = "index.php?option=com_jevents&task=plugin.jev_customfields.overview";
+            JFactory::getLanguage()->load("plg_jevents_jevcustomfields", JPATH_ADMINISTRATOR);
+            $customfields = '<li><a href="' . $link . '"><i class="fa fa-file-text-o"></i> <span>' . JText::_('JEV_CUSTOM_FIELDS') . '</span></a></li>';
+        }
+
+        $jinput = JFactory::getApplication()->input;
+
+        $task = $jinput->getCmd("task", "cpanel.cpanel");
+
+        $config_tabs = ($task == 'params.edit' ? "data-toggle=\"tab\" href=\"" : "href=\"index.php?option=com_jevents&task=params.edit");
+
+        //Lets checkout what club themes are installed
+        $themes = '';
+
+        //Fetch the Club themes
+        $haslayouts = false;
+
+        $first = false;
+        foreach (JEV_CommonFunctions::getJEventsViewList() as $viewfile) {
+            $config = JPATH_SITE . "/components/" . JEV_COM_COMPONENT . "/views/" . $viewfile . "/config.xml";
+            if (file_exists($config)) {
+
+                if (!$first) {
+                    $first = $viewfile;
+                    $class = ' class="active"';
+                } else {
+                    $class = '';
+                }
+                $haslayouts = true;
+                $themes .= '<li ' . $class . '><a ' . $config_tabs . '#' . $viewfile . '"><i class="fa fa-circle-o"></i>'. $viewfile .'</a></li>';
+            }
+        }
 
         $sidebar_html = '<section class="sidebar" style="height: auto;">
+
 			<!-- sidebar menu: : style can be found in sidebar.less -->
 			<ul class="sidebar-menu">
 				<li class="header">Events Management</li>
-				<li class="active treeview">
+				<li class="' . ($task == '' || $task == 'cpanel.cpanel' || $task == 'icalevent.list' || $task == 'icalevent.edit' ? 'active' : '') . ' treeview">
 					<a href="#">
 						<i class="fa fa-dashboard"></i> <span>Events</span> <i class="fa fa-angle-left pull-right"></i>
 					</a>
@@ -192,7 +270,31 @@ STYLE;
 
 					</ul>
 				</li>
-				<li class="treeview">
+				<li class="' . ($task == 'params.edit' ? 'active' : '') . ' treeview">
+                  <a href="#">
+                    <i class="fa fa-cogs"></i> <span>Configuration</span>
+                    <i class="fa fa-angle-left pull-right"></i>
+                  </a>
+                  <ul class="treeview-menu ' . ($task == 'params.edit' ? 'menu-open' : '') . '" >
+
+                    <li class="' . ($task == 'params.edit' ? 'active' : '') . '">
+                      <a href="#"><i class="fa fa-cog"></i> JEvents Core <i class="fa fa-angle-left pull-right"></i></a>
+                      <ul class="treeview-menu">
+                        <li class="difficulty1"><a '.$config_tabs.'#JEV_TAB_COMPONENT"><i class="fa fa-circle-o"></i> Component</a></li>
+                        <li class="difficulty1"><a '.$config_tabs.'#JEV_PERMISSIONS"><i class="fa fa-circle-o"></i> Permissions</a></li>
+                        <li class="difficulty1"><a '.$config_tabs.'#JEV_EVENT_EDITING"><i class="fa fa-circle-o"></i> Event Editing</a></li>
+                        <li class="difficulty1"><a '.$config_tabs.'#JEV_EVENT_DETAIL_VIEW"><i class="fa fa-circle-o"></i> Event Detail View</a></li>
+                        <li class="difficulty1"><a '.$config_tabs.'#JEV_MAIN_MONTHLY_CALENDAR"><i class="fa fa-circle-o"></i> Monthly Calendar View</a></li>
+                        <li class="difficulty1"><a '.$config_tabs.'#JEV_YEAR_CATEGORY_VIEW"><i class="fa fa-circle-o"></i> Year/Category View</a></li>
+                        <li class="difficulty2"><a '.$config_tabs.'#JEV_ICAL_CALENDAR"><i class="fa fa-circle-o"></i> iCal Import/Export</a></li>
+                        <li class="difficulty2"><a '.$config_tabs.'#JEV_TAB_RSS"><i class="fa fa-circle-o"></i> RSS</a></li>
+                        <li class="difficulty3"><a '.$config_tabs.'#ROBOT_SEF_OPTIONS"><i class="fa fa-circle-o"></i> SEF/Performance</a></li>
+                        <li class="difficulty3"><a '.$config_tabs.'#JEV_MODULE_CONFIG"><i class="fa fa-circle-o"></i> Module Config</a></li>
+                      </ul>
+                    </li>
+                  </ul>
+                </li>
+				<li class="' . ($task == 'defaults.list&' ? 'active' : '') . ' treeview">
 					<a href="#">
 						<i class="fa fa-files-o"></i>
 						<span>Custom Layouts</span> <i class="fa fa-angle-left pull-right"></i>
@@ -203,17 +305,21 @@ STYLE;
 						<li><a href="index.php?option=com_jevents&task=defaults.list&filter_layout_type=jevpeople"><i class="fa fa-circle-o"></i> Managed People</a></li>
 						<li><a href="index.php?option=com_jevents&task=defaults.list&filter_layout_type=jevlocations"><i class="fa fa-circle-o"></i> Managed Locations</a></li>
 					</ul>
-				</li>
-				<li class="treeview">
+				</li>';
+
+        if ($haslayouts) {
+            $sidebar_html .= '
+            <li class="' . ($task == 'params.edit#club-layouts' ? 'active' : '') . ' treeview">
 					<a href="#">
 						<i class="fa fa-laptop"></i> <span>Club Themes</span> <i class="fa fa-angle-left pull-right"></i>
 					</a>
-					<ul class="treeview-menu">
-						<li><a href="pages/layout/top-nav.html"><i class="fa fa-circle-o"></i> Iconic</a></li>
-						<li><a href="pages/layout/boxed.html"><i class="fa fa-circle-o"></i> Ruthin</a></li>
-						<li><a href="pages/layout/fixed.html"><i class="fa fa-circle-o"></i> FlatPlus</a></li>
-					</ul>
+					<ul class="treeview-menu">' . $themes . '</ul>
 				</li>
+				';
+        }
+
+        $sidebar_html .= '<!-- Custom Fields -->
+				    ' . $customfields . '
 			</ul>
 		</section>';
 
@@ -237,7 +343,7 @@ STYLE;
 
 //Get the current user for user display.
         $user = JFactory::getUser();
-        $header_html = '<a href="index2.html" class="logo">
+        $header_html = '<a href="index.php?option=com_jevents&task=cpanel.cpanel" class="logo">
 			<!-- mini logo for sidebar mini 50x50 pixels -->
 			<span class="logo-mini"><img src="components/'.JEV_COM_COMPONENT.'/assets/images/JeventsTransparent_icon.png" alt="JEvents Icon" /></span>
 			<!-- logo for regular state and mobile devices -->

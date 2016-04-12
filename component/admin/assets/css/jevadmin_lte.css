@@ -7,7 +7,7 @@ extend ' .close' has no matches
  *   License: Open source - MIT
  *           Please visit http://opensource.org/licenses/MIT for more information
 !*/
-@import url(https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic);
+@import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic');
 /*
  * Skin: Blue
  * ----------
@@ -153,11 +153,20 @@ extend ' .close' has no matches
 .skin-blue.layout-top-nav .main-header > .logo:hover {
   background-color: #3b8ab8;
 }
-body.admin.view-.layout-.task-.itemid- .btn.btn-subhead,
-body.admin.view-.layout-.task-.itemid- .subhead-collapse {
+body.admin.view-.layout-.task- .btn.btn-subhead,
+body.admin.com_jevents.view-.layout-.task-cpanel\.cpanel .btn.btn-subhead,
+body.view-.layout-.task- .btn.btn-subhead .btn.btn-subhead,
+body.admin.com_jevents.view-.layout-.task-cpanel\.cpanel .btn.btn-subhead .btn.btn-subhead,
+body.admin.view-.layout-.task- .subhead-collapse,
+body.admin.com_jevents.view-.layout-.task-cpanel\.cpanel .subhead-collapse,
+body.view-.layout-.task- .btn.btn-subhead .subhead-collapse,
+body.admin.com_jevents.view-.layout-.task-cpanel\.cpanel .btn.btn-subhead .subhead-collapse {
   display: none;
 }
-body.admin.view-.layout-.task-.itemid- #jev_adminui {
+body.admin.view-.layout-.task- #jev_adminui,
+body.admin.com_jevents.view-.layout-.task-cpanel\.cpanel #jev_adminui,
+body.view-.layout-.task- .btn.btn-subhead #jev_adminui,
+body.admin.com_jevents.view-.layout-.task-cpanel\.cpanel .btn.btn-subhead #jev_adminui {
   top: 0px;
 }
 body.com_jevents > .container-fluid.container-main {
@@ -195,6 +204,22 @@ body.com_jevents #jev_adminui #system-message-container.j-toggle-main .alert.ale
 body.com_jevents #jev_adminui #system-message-container.j-toggle-main .alert.alert-success .alert-message {
   font-size: 14px;
 }
+body.com_jevents #jev_adminui #system-message-container.j-toggle-main .alert h4.alert-heading {
+  font-size: 24px;
+  margin-bottom: 10px;
+  color: #000;
+  text-shadow: none;
+  border-bottom: 2px solid;
+  padding-bottom: 10px;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+body.com_jevents #jev_adminui #system-message-container.j-toggle-main .alert .alert-message {
+  font-size: 14px;
+  text-shadow: none;
+  font-weight: 400;
+  line-height: 20px;
+}
 body.com_jevents #jev_adminui .box-body .summary a.ashow_repeats {
   clear: both;
   display: block;
@@ -215,6 +240,13 @@ body.com_jevents #jev_adminui .row {
 }
 body.com_jevents li {
   line-height: 20px;
+}
+body.com_jevents section.content.ov_info .span3 {
+  width: 25%;
+  box-sizing: border-box;
+  display: inline-block;
+  margin: 0px;
+  padding: 10px;
 }
 @media (min-width: 768px) {
   .content-header {
@@ -2417,35 +2449,35 @@ a:focus {
  * Component: Button
  * -----------------
  */
-body.com_jevents .btn {
+#jev_adminui .btn {
   border-radius: 3px;
   -webkit-box-shadow: none;
   box-shadow: none;
   border: 1px solid transparent;
 }
-body.com_jevents .btn.uppercase {
+#jev_adminui .btn.uppercase {
   text-transform: uppercase;
 }
-body.com_jevents .btn.btn-flat {
+#jev_adminui .btn.btn-flat {
   border-radius: 0;
   -webkit-box-shadow: none;
   -moz-box-shadow: none;
   box-shadow: none;
   border-width: 1px;
 }
-body.com_jevents .btn:active {
+#jev_adminui .btn:active {
   -webkit-box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
   -moz-box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
   box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
 }
-body.com_jevents .btn:focus {
+#jev_adminui .btn:focus {
   outline: none;
 }
-body.com_jevents .btn.btn-file {
+#jev_adminui .btn.btn-file {
   position: relative;
   overflow: hidden;
 }
-body.com_jevents .btn.btn-file > input[type='file'] {
+#jev_adminui .btn.btn-file > input[type='file'] {
   position: absolute;
   top: 0;
   right: 0;
@@ -2460,81 +2492,81 @@ body.com_jevents .btn.btn-file > input[type='file'] {
   cursor: inherit;
   display: block;
 }
-body.com_jevents .btn-default {
+#jev_adminui .btn-default {
   background-color: #f4f4f4;
   color: #444;
   border-color: #ddd;
 }
-body.com_jevents .btn-default:hover,
-body.com_jevents .btn-default:active,
-body.com_jevents .btn-default.hover {
+#jev_adminui .btn-default:hover,
+#jev_adminui .btn-default:active,
+#jev_adminui .btn-default.hover {
   background-color: #e7e7e7;
 }
-body.com_jevents .btn-primary {
+#jev_adminui .btn-primary {
   background-color: #3c8dbc;
   border-color: #367fa9;
 }
-body.com_jevents .btn-primary:hover,
-body.com_jevents .btn-primary:active,
-body.com_jevents .btn-primary.hover {
+#jev_adminui .btn-primary:hover,
+#jev_adminui .btn-primary:active,
+#jev_adminui .btn-primary.hover {
   background-color: #367fa9;
 }
-body.com_jevents .btn-success {
+#jev_adminui .btn-success {
   background-color: #00a65a;
   border-color: #008d4c;
 }
-body.com_jevents .btn-success:hover,
-body.com_jevents .btn-success:active,
-body.com_jevents .btn-success.hover {
+#jev_adminui .btn-success:hover,
+#jev_adminui .btn-success:active,
+#jev_adminui .btn-success.hover {
   background-color: #008d4c;
 }
-body.com_jevents .btn-info {
+#jev_adminui .btn-info {
   background-color: #00c0ef;
   border-color: #00acd6;
 }
-body.com_jevents .btn-info:hover,
-body.com_jevents .btn-info:active,
-body.com_jevents .btn-info.hover {
+#jev_adminui .btn-info:hover,
+#jev_adminui .btn-info:active,
+#jev_adminui .btn-info.hover {
   background-color: #00acd6;
 }
-body.com_jevents .btn-danger {
+#jev_adminui .btn-danger {
   background-color: #dd4b39;
   border-color: #d73925;
 }
-body.com_jevents .btn-danger:hover,
-body.com_jevents .btn-danger:active,
-body.com_jevents .btn-danger.hover {
+#jev_adminui .btn-danger:hover,
+#jev_adminui .btn-danger:active,
+#jev_adminui .btn-danger.hover {
   background-color: #d73925;
 }
-body.com_jevents .btn-warning {
+#jev_adminui .btn-warning {
   background-color: #f39c12;
   border-color: #e08e0b;
 }
-body.com_jevents .btn-warning:hover,
-body.com_jevents .btn-warning:active,
-body.com_jevents .btn-warning.hover {
+#jev_adminui .btn-warning:hover,
+#jev_adminui .btn-warning:active,
+#jev_adminui .btn-warning.hover {
   background-color: #e08e0b;
 }
-body.com_jevents .btn-outline {
+#jev_adminui .btn-outline {
   border: 1px solid #fff;
   background: transparent;
   color: #fff;
 }
-body.com_jevents .btn-outline:hover,
-body.com_jevents .btn-outline:focus,
-body.com_jevents .btn-outline:active {
+#jev_adminui .btn-outline:hover,
+#jev_adminui .btn-outline:focus,
+#jev_adminui .btn-outline:active {
   color: rgba(255, 255, 255, 0.7);
   border-color: rgba(255, 255, 255, 0.7);
 }
-body.com_jevents .btn-link {
+#jev_adminui .btn-link {
   -webkit-box-shadow: none;
   box-shadow: none;
 }
-body.com_jevents .btn[class*='bg-']:hover {
+#jev_adminui .btn[class*='bg-']:hover {
   -webkit-box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.2);
   box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.2);
 }
-body.com_jevents .btn-app {
+#jev_adminui .btn-app {
   border-radius: 3px;
   position: relative;
   padding: 15px 5px;
@@ -2547,24 +2579,24 @@ body.com_jevents .btn-app {
   background-color: #f4f4f4;
   font-size: 12px;
 }
-body.com_jevents .btn-app > .fa,
-body.com_jevents .btn-app > .glyphicon,
-body.com_jevents .btn-app > .ion {
+#jev_adminui .btn-app > .fa,
+#jev_adminui .btn-app > .glyphicon,
+#jev_adminui .btn-app > .ion {
   font-size: 20px;
   display: block;
 }
-body.com_jevents .btn-app:hover {
+#jev_adminui .btn-app:hover {
   background: #f4f4f4;
   color: #444;
   border-color: #aaa;
 }
-body.com_jevents .btn-app:active,
-body.com_jevents .btn-app:focus {
+#jev_adminui .btn-app:active,
+#jev_adminui .btn-app:focus {
   -webkit-box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
   -moz-box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
   box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
 }
-body.com_jevents .btn-app > .badge {
+#jev_adminui .btn-app > .badge {
   position: absolute;
   top: -3px;
   right: -10px;

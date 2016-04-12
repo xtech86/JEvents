@@ -749,5 +749,11 @@ function _init() {
 jQuery( document ).ready(function (jQuery) {
   if( jQuery('#system-message-container').html().length > 5) {
     jQuery("#system-message-container").detach().insertBefore('#jev_adminui section.content');
-    jQuery("#system-message-container .alert").addClass("callout callout-success lead") }
+    jQuery("#system-message-container .alert").addClass("callout callout-success lead");
+  }
+  jQuery('#system-message-container h4').each(function(i, val) {
+    if (jQuery(this).text() == "Warning") {
+      jQuery(this).closest('div').removeClass("callout-success").addClass('callout-warning');
+    }
+  });
 });

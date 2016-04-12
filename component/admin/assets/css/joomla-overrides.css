@@ -1,8 +1,17 @@
-body.admin.view-.layout-.task-.itemid- .btn.btn-subhead,
-body.admin.view-.layout-.task-.itemid- .subhead-collapse {
+body.admin.view-.layout-.task- .btn.btn-subhead,
+body.admin.com_jevents.view-.layout-.task-cpanel\.cpanel .btn.btn-subhead,
+body.view-.layout-.task- .btn.btn-subhead .btn.btn-subhead,
+body.admin.com_jevents.view-.layout-.task-cpanel\.cpanel .btn.btn-subhead .btn.btn-subhead,
+body.admin.view-.layout-.task- .subhead-collapse,
+body.admin.com_jevents.view-.layout-.task-cpanel\.cpanel .subhead-collapse,
+body.view-.layout-.task- .btn.btn-subhead .subhead-collapse,
+body.admin.com_jevents.view-.layout-.task-cpanel\.cpanel .btn.btn-subhead .subhead-collapse {
   display: none;
 }
-body.admin.view-.layout-.task-.itemid- #jev_adminui {
+body.admin.view-.layout-.task- #jev_adminui,
+body.admin.com_jevents.view-.layout-.task-cpanel\.cpanel #jev_adminui,
+body.view-.layout-.task- .btn.btn-subhead #jev_adminui,
+body.admin.com_jevents.view-.layout-.task-cpanel\.cpanel .btn.btn-subhead #jev_adminui {
   top: 0px;
 }
 body.com_jevents > .container-fluid.container-main {
@@ -40,6 +49,22 @@ body.com_jevents #jev_adminui #system-message-container.j-toggle-main .alert.ale
 body.com_jevents #jev_adminui #system-message-container.j-toggle-main .alert.alert-success .alert-message {
   font-size: 14px;
 }
+body.com_jevents #jev_adminui #system-message-container.j-toggle-main .alert h4.alert-heading {
+  font-size: 24px;
+  margin-bottom: 10px;
+  color: #000;
+  text-shadow: none;
+  border-bottom: 2px solid;
+  padding-bottom: 10px;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+body.com_jevents #jev_adminui #system-message-container.j-toggle-main .alert .alert-message {
+  font-size: 14px;
+  text-shadow: none;
+  font-weight: 400;
+  line-height: 20px;
+}
 body.com_jevents #jev_adminui .box-body .summary a.ashow_repeats {
   clear: both;
   display: block;
@@ -60,6 +85,13 @@ body.com_jevents #jev_adminui .row {
 }
 body.com_jevents li {
   line-height: 20px;
+}
+body.com_jevents section.content.ov_info .span3 {
+  width: 25%;
+  box-sizing: border-box;
+  display: inline-block;
+  margin: 0px;
+  padding: 10px;
 }
 @media (min-width: 768px) {
   .content-header {

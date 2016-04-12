@@ -13,7 +13,7 @@ if (!isset($this->jevviewdone)){
 	echo $barhtml;
 	 */
 	$this->jevviewdone = true;
-	
+
 	$this->loadModules("jevposteditevent");
-	
+
 }

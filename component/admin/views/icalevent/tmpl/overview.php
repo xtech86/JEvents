@@ -50,8 +50,8 @@ $fullspan = 12;
             <!-- Content Header (Page header) -->
             <section class="content-header">
                 <h1>
-                    Manage Events
-                    <small>Select an event below to edit</small>
+                    <?php echo JText::_("JEV_ADMIN_ICAL_EVENTS"); ?>
+                    <small><?php echo JText::_("JEV_SELECT_EVENT_TO_EDIT");?></small>
                 </h1>
             </section>
 
@@ -91,7 +91,7 @@ $fullspan = 12;
                                         ?>
                                         <a href="javascript: void(0);"
                                            onclick="return listItemTask('cb<?php echo $i; ?>','icalrepeat.list')" class="ashow_repeats">
-                                            <i class="fa fa-plus"> </i> <small>View repeats</small>
+                                            <i class="fa fa-plus"> </i> <small><?php echo JText::_("JEV_VIEW_REPEATS"); ?></small>
                                         </a>
                                         <?php
                                         }

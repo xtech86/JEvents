@@ -10,3 +10,5 @@
 
 #jevents.span12 {margin-left: 0px;}
 div#sidebar.sidebar {clear:both;}
+
+#jev_adminui #myParamsTabsContent {border-radius: 0px !important; border: 0px !important; width: 100%;}

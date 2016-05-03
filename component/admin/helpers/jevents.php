@@ -315,7 +315,7 @@ STYLE;
                     </li>
                   </ul>
                 </li>
-				<li class="' . ($task == 'defaults.list&' ? 'active' : '') . ' treeview">
+				<li class="' . ($task == 'defaults.list' || $task == 'defaults.edit'  ? 'active' : '') . ' treeview">
 					<a href="#">
 						<i class="fa fa-files-o"></i>
 						<span>Custom Layouts</span> <i class="fa fa-angle-left pull-right"></i>

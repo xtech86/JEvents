@@ -1,8 +1,10 @@
 <?php
 /**
-* @copyright	Copyright (C) 2015-2015 GWE Systems Ltd. All rights reserved.
+* @copyright	Copyright (C) 2015-2016 GWE Systems Ltd. All rights reserved.
  * @license		By negoriation with author via http://www.gwesystems.com
 */
+
+use Joomla\String\StringHelper;
 
 function ProcessJsonRequest(&$requestObject, $returnData){
 
@@ -55,7 +57,7 @@ function ProcessJsonRequest(&$requestObject, $returnData){
 	/*
 	$regex     = '/[^a-zA-Z0-9_\'\"\'\\40\\-\\_]/';
 	$title    = preg_replace($regex, "", $title);
-	$title = JString::substr($title."    ",0,4);
+	$title = StringHelper::substr($title."    ",0,4);
 	*/
 
 	if (trim($title)=="" && trim($title)==""){

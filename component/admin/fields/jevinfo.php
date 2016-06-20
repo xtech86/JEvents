@@ -5,7 +5,7 @@
  *
  * @version     $Id: jevinfo.php 1331 2010-10-19 12:35:49Z geraintedwards $
  * @package     JEvents
- * @copyright   Copyright (C) 2008-2015 GWE Systems Ltd
+ * @copyright   Copyright (C) 2008-2016 GWE Systems Ltd
  * @license     GNU/GPLv2, see http://www.gnu.org/licenses/gpl-2.0.html
  * @link        http://www.jevents.net
  */
@@ -21,6 +21,8 @@ JFormHelper::loadFieldClass('spacer');
 // Must load admin language files
 $lang = JFactory::getLanguage();
 $lang->load("com_jevents", JPATH_ADMINISTRATOR);
+
+use Joomla\String\StringHelper;
 
 /**
  * JEVMenu Field class for the JEvents Component
@@ -70,7 +72,7 @@ class JFormFieldJEVInfo extends JFormFieldSpacer
 		{
 			if (is_object($help))
 				$help = (string) $help;
-			$help = ((isset($help)) && (JString::strlen($help) <= 0)) ? null : $help;
+			$help = ((isset($help)) && (StringHelper::strlen($help) <= 0)) ? null : $help;
 		}
 		if (!is_null($help))
 		{
@@ -132,7 +134,7 @@ class JFormFieldJEVInfo extends JFormFieldSpacer
 		static $counthelps = 0;
 		$counthelps++;
 
-		if (JString::substr($help, 0, 7) == 'http://' || JString::substr($help, 0, 8) == 'https://')
+		if (StringHelper::substr($help, 0, 7) == 'http://' || StringHelper::substr($help, 0, 8) == 'https://')
 		{
 			//help text is url, open new window
 			$onclick_cmd = "window.open(\"$help\", \"help\", \"height=700,width=800,resizable=yes,scrollbars\");return false";

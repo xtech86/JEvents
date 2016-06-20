@@ -1,11 +1,11 @@
 <?php
 
 /**
- * JEvents Component for Joomla 1.5.x
+ * JEvents Component for Joomla! 3.x
  *
  * @version     $Id: jevtimezone.php 1975 2011-04-27 15:52:33Z geraintedwards $
  * @package     JEvents
- * @copyright   Copyright (C) 2008-2015 GWE Systems Ltd
+ * @copyright   Copyright (C) 2008-2016 GWE Systems Ltd
  * @license     GNU/GPLv2, see http://www.gnu.org/licenses/gpl-2.0.html
  * @link        http://www.jevents.net
  */
@@ -79,9 +79,10 @@ class JFormFieldJevtimezone extends JFormField
 			 * html_entity_decode was used in place of htmlspecialchars_decode because
 			 * htmlspecialchars_decode is not compatible with PHP 4
 			 */
-			$value = htmlspecialchars(html_entity_decode($value, ENT_QUOTES), ENT_QUOTES);
+			
+			$value = htmlspecialchars(html_entity_decode($this->value, ENT_QUOTES), ENT_QUOTES);
 
-			return '<input type="text" name="' . $this->name . '" id="' . $this->id. '" value="' . $this->value . '" />';
+			return '<input type="text" name="' . $this->name . '" id="' . $this->id. '" value="' . $value . '" />';
 		}
 
 	}

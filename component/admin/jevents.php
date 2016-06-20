@@ -1,10 +1,10 @@
 <?php
 /**
- * JEvents Component for Joomla 1.5.x
+ * JEvents Component for Joomla! 3.x
  *
  * @version     $Id: jevents.php 3552 2012-04-20 09:41:53Z geraintedwards $
  * @package     JEvents
- * @copyright   Copyright (C)  2008-2015 GWE Systems Ltd
+ * @copyright   Copyright (C)  2008-2016 GWE Systems Ltd
  * @license     GNU/GPLv2, see http://www.gnu.org/licenses/gpl-2.0.html
  * @link        http://www.jevents.net
  */

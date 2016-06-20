@@ -1,10 +1,10 @@
 <?php 
 /**
- * JEvents Component for Joomla 1.5.x
+ * JEvents Component for Joomla! 3.x
  *
  * @version     $Id: edit_icalevent.edit_page.php 2091 2011-05-16 09:12:40Z geraintedwards $
  * @package     JEvents
- * @copyright   Copyright (C)  2008-2015 GWE Systems Ltd
+ * @copyright   Copyright (C)  2008-2016 GWE Systems Ltd
  * @license     GNU/GPLv2, see http://www.gnu.org/licenses/gpl-2.0.html
  * @link        http://www.jevents.net
  */
@@ -72,7 +72,11 @@ Joomla.submitbutton = function (pressbutton){
 
     if(pressbutton == "defaults.apply" || pressbutton == "defaults.save")
     {
-        <?php $editor =  JFactory::getEditor("none");?>
+        <?php
+
+	    $editor =  JEditor::getInstance('none');
+
+	    ?>
                     
        <?php 
        $requiredfields = "'CALTAB','TITLE','CATEGORY','ICAL','MESSAGE'";
@@ -82,6 +86,7 @@ Joomla.submitbutton = function (pressbutton){
        }
        ?>
         var requiredFields = [<?php echo $requiredfields; ?>];
+
         var defaultsLayout = <?php echo $editor->getContent('value'); ?>;
         if(defaultsLayout == '')
         {

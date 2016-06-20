@@ -1,10 +1,10 @@
 <?php
 /**
- * JEvents Component for Joomla 1.5.x
+ * JEvents Component for Joomla! 3.x
  *
  * @version     $Id: edit16.php 2983 2011-11-10 14:02:23Z geraintedwards $
  * @package     JEvents
- * @copyright   Copyright (C)  2008-2015 GWE Systems Ltd
+ * @copyright   Copyright (C)  2008-2016 GWE Systems Ltd
  * @license     GNU/GPLv2, see http://www.gnu.org/licenses/gpl-2.0.html
  * @link        http://www.jevents.net
  */
@@ -15,6 +15,8 @@ jimport('joomla.html.html.bootstrap');
 
 //JHtml::_('formbehavior.chosen', '#adminForm select:not(.notchosen)');
 JHtml::_('formbehavior.chosen', '#adminForm select.chosen');
+
+use Joomla\String\StringHelper;
 
 $version = JEventsVersion::getInstance();
 
@@ -138,6 +140,14 @@ if (count($plugins)){
                                     } else {
                                         $class = " class=' $difficultyClass'";
                                     }
+				if (StringHelper::strlen($class) > 0)
+				{
+					$class = " class='$class $difficultyClass'";
+				}
+				else
+				{
+					$class = " class=' $difficultyClass'";
+				}
 
                                     $html[] = "<tr $class>";
                                     if (!isset($field->label) || $field->label == "") {
@@ -155,11 +165,17 @@ if (count($plugins)){
                                     foreach ($this->form->getFieldset($name) as $field) {
                                         $class = isset($field->class) ? $field->class : "";
 
-                                        if (JString::strlen($class) > 0) {
+                                        if (StringHelper::strlen($class) > 0) {
                                             $class = " class='$class'";
                                         }
                                         $html[] = "<tr $class>";
                                         $html[] = '<td class="paramlist_value" colspan="2">' . $field->input . '</td>';
+					if (StringHelper::strlen($class) > 0)
+					{
+						$class = " class='$class'";
+					}
+					$html[] = "<tr $class>";
+					$html[] = '<td class="paramlist_value" colspan="2">' . $field->input . '</td>';
 
                                         $html[] = '</tr>';
                                     }
@@ -221,8 +237,8 @@ if (count($plugins)){
 
                                                 $hasconfig = true;
                                                 $class = isset($field->class) ? $field->class : "";
-
-                                                if (JString::strlen($class) > 0) {
+	                                            
+                                                if (StringHelper::strlen($class) > 0) {
                                                     $class = " class='$class'";
                                                 }
                                                 $html[] = "<tr $class>";

@@ -1,16 +1,18 @@
 <?php
 /**
- * JEvents Component for Joomla 1.5.x
+ * JEvents Component for Joomla! 3.x
  *
  * @version     $Id: view.html.php 3012 2011-11-16 10:29:35Z geraintedwards $
  * @package     JEvents
- * @copyright   Copyright (C) 2008-2015 GWE Systems Ltd
+ * @copyright   Copyright (C) 2008-2016 GWE Systems Ltd
  * @license     GNU/GPLv2, see http://www.gnu.org/licenses/gpl-2.0.html
  * @link        http://www.jevents.net
  */
 
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die();
+
+use Joomla\String\StringHelper;
 
 /**
  * HTML View class for the component frontend
@@ -205,7 +207,7 @@ class IcalrepeatViewIcalrepeat extends AdminIcalrepeatViewIcalrepeat
 	// This handles all methods where the view is passed as the first argument
 	function __call($name, $arguments){
 		if (strpos($name,"_")===0){
-			$name="ViewHelper".ucfirst(JString::substr($name,1));
+			$name="ViewHelper".ucfirst(StringHelper::substr($name,1));
 		}
 		$helper = ucfirst($this->jevlayout).ucfirst($name);
 		if (!$this->loadHelper($helper)){

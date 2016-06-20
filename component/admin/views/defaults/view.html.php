@@ -1,10 +1,10 @@
 <?php
 /**
- * JEvents Component for Joomla 1.5.x
+ * JEvents Component for Joomla! 3.x
  *
  * @version     $Id: view.html.php 2942 2011-11-01 16:12:51Z carcam $
  * @package     JEvents
- * @copyright   Copyright (C)  2008-2015 GWE Systems Ltd
+ * @copyright   Copyright (C)  2008-2016 GWE Systems Ltd
  * @license     GNU/GPLv2, see http://www.gnu.org/licenses/gpl-2.0.html
  * @link        http://www.jevents.net
  */
@@ -16,6 +16,9 @@ defined('_JEXEC') or die();
  *
  * @static
  */
+
+use Joomla\String\StringHelper;
+
 class AdminDefaultsViewDefaults extends JEventsAbstractView
 {
 
@@ -247,7 +250,7 @@ function replaceLabelsCallback($matches)
 {
 	if (count($matches) == 1)
 	{
-		return "{{" . JText::_(JString::substr($matches[0], 2, JString::strlen($matches[0]) - 3)) . ":";
+		return "{{" . JText::_(StringHelper::substr($matches[0], 2, StringHelper::strlen($matches[0]) - 3)) . ":";
 	}
 	return "";
 

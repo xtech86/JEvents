@@ -1,11 +1,11 @@
 <?php
 
 /**
- * JEvents Component for Joomla 1.5.x
+ * JEvents Component for Joomla! 3.x
  *
  * @version     $Id: csvToiCal.php 3285 2012-02-21 14:56:25Z geraintedwards $
  * @package     JEvents
- * @copyright   Copyright (C) 2008-2015 GWE Systems Ltd, 2006-2008 JEvents Project Group
+ * @copyright   Copyright (C) 2008-2016 GWE Systems Ltd, 2006-2008 JEvents Project Group
  * @license     GNU/GPLv2, see http://www.gnu.org/licenses/gpl-2.0.html
  * @link        http://www.jevents.net
  */
@@ -13,6 +13,8 @@
 defined('_JEXEC') or die('Restricted access');
 
 include_once("csvLine.php");
+
+use Joomla\String\StringHelper;
 
 if (!function_exists('str_getcsv'))
 {
@@ -86,7 +88,7 @@ class CsvToiCal
 	 */
 	public function getConvertedTempFile()
 	{
-		$file = array("name" => JString::substr($this->tmpFileName, strrpos($this->tmpFileName, DIRECTORY_SEPARATOR) + 1),
+		$file = array("name" => StringHelper::substr($this->tmpFileName, strrpos($this->tmpFileName, DIRECTORY_SEPARATOR) + 1),
 			"tmp_name" => $this->tmpFileName);
 		return $file;
 
@@ -109,7 +111,7 @@ class CsvToiCal
 	private function parseFileHeader()
 	{
 		if ($this->data){
-			$line = JString::substr($this->data,0,JString::strpos($this->data,"\n")+1);
+			$line = StringHelper::substr($this->data,0,StringHelper::strpos($this->data,"\n")+1);
 		}
 		else {
 			$fp = fopen($this->file, 'r');
@@ -258,9 +260,27 @@ class CsvToiCal
 			// unfold content lines according the unfolding procedure of rfc2445
 			$this->data = str_replace("\n ","",$this->data);
 			$this->data = str_replace("\n\t","",$this->data);
-
+                        
 			// Convert string into array for easier processing
 			$this->data = explode("\n", $this->data);
+                        for ($i=0;$i<count($this->data); $i++){
+                            $buffer = $this->data[$i];
+                            while ((!$line = $this->parseCsvLine($buffer)) && $i+1<count($this->data))
+                            {
+                                $i++;
+                                $buffer .= $this->data[$i];
+                            }
+                            if (!$line)
+                            {
+					// something gone wrong, CSV is corrupted, cancel
+					return false;
+                            }
+                            if ($i == 0)
+				continue; // fist line is header, so continue
+                            fwrite($this->tmpfile, $line->getInICalFormat()); // write to the converted file				
+                        }
+                        /*
+                         * this approach doesn't deal with carraige returns within fields!
 			$i = 1;
 			foreach ($this->data as $buffer){
 				if ($buffer == "")
@@ -274,6 +294,7 @@ class CsvToiCal
 					continue; // fist line is header, so continue
 				fwrite($this->tmpfile, $line->getInICalFormat()); // write to the converted file				
 			}
+                         */
 		}
 		else {
 			$fp = fopen($this->file, 'r');

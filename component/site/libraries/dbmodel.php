@@ -1,11 +1,11 @@
 <?php
 
 /**
- * JEvents Component for Joomla 1.5.x
+ * JEvents Component for Joomla! 3.x
  *
  * @version     $Id: dbmodel.php 3575 2012-05-01 14:06:28Z geraintedwards $
  * @package     JEvents
- * @copyright   Copyright (C) 2008-2015 GWE Systems Ltd, 2006-2008 JEvents Project Group
+ * @copyright   Copyright (C) 2008-2016 GWE Systems Ltd, 2006-2008 JEvents Project Group
  * @license     GNU/GPLv2, see http://www.gnu.org/licenses/gpl-2.0.html
  * @link        http://www.jevents.net
  */
@@ -13,6 +13,7 @@ defined('_JEXEC') or die('Restricted access');
 
 // load language constants
 JEVHelper::loadLanguage('front');
+use Joomla\String\StringHelper;
 
 class JEventsDBModel
 {
@@ -20,8 +21,8 @@ class JEventsDBModel
 	var $cfg = null;
 	var $datamodel = null;
 
-	function JEventsDBModel(&$datamodel)
-	{
+	public function __construct(&$datamodel){
+
 		$this->cfg = JEVConfig::getInstance();
 
 		$this->datamodel = & $datamodel;
@@ -184,7 +185,7 @@ class JEventsDBModel
 
 		if (!array_key_exists($index, $instances))
 		{
-			if (count($catids) > 0 && $catidList != "0" && JString::strlen($catidList) != "")
+			if (count($catids) > 0 && $catidList != "0" && StringHelper::strlen($catidList) != "")
 			{
 				$where = ' AND c.id IN (' . $catidList . ') ';
 			}
@@ -238,7 +239,7 @@ class JEventsDBModel
 
 		if (!array_key_exists($index, $instances))
 		{
-			if (count($catids) > 0 && $catidList != "0" && JString::strlen($catidList) != "")
+			if (count($catids) > 0 && $catidList != "0" && StringHelper::strlen($catidList) != "")
 			{
 				$where = ' AND (p.id IN (' . $catidList . ') ' . ($levels > 1 ? ' OR gp.id IN (' . $catidList . ')' : '') . ($levels > 2 ? ' OR ggp.id IN (' . $catidList . ')' : '') . ')';
 			}
@@ -278,7 +279,7 @@ class JEventsDBModel
 		$lang = JFactory::getLanguage();
 		$langtag = $lang->getTag();
 
-		if (strpos($startdate, "-") === false)
+		if (strpos($startdate, "-") === false  || is_numeric($startdate))
 		{
 			$startdate = JevDate::strftime('%Y-%m-%d 00:00:00', $startdate);
 			$enddate = JevDate::strftime('%Y-%m-%d 23:59:59', $enddate);
@@ -427,14 +428,15 @@ class JEventsDBModel
 	 * Fetch recently created events
 	 */
 	// Allow the passing of filters directly into this function for use in 3rd party extensions etc.
-	function popularIcalEvents($startdate, $enddate, $limit = 10, $noRepeats = 0)
+        // TODO fix multi-day event handling!
+	function popularIcalEvents($startdate, $enddate, $limit = 10, $noRepeats = 0, $multidayTreatment = 0)
 	{
 		$user = JFactory::getUser();
 		$db = JFactory::getDBO();
 		$lang = JFactory::getLanguage();
 		$langtag = $lang->getTag();
 
-		if (strpos($startdate, "-") === false)
+		if (strpos($startdate, "-") === false  || is_numeric($startdate))
 		{
 			$startdate = strftime('%Y-%m-%d 00:00:00', $startdate);
 			$enddate = strftime('%Y-%m-%d 23:59:59', $enddate);
@@ -494,6 +496,47 @@ class JEventsDBModel
 		$t_datenow = JEVHelper::getNow();
 		$t_datenowSQL = $t_datenow->toSql();
 
+		// multiday condition
+		if ($multidayTreatment == 3)
+		{
+			// We only show events once regardless of multiday setting of event so we allow them all through here!
+			$multiday = "";
+			$multiday2 = "";
+			$multiday3 = "";
+		}
+		else if ($multidayTreatment == 2)
+		{
+			// We only show events on their first day only regardless of multiday setting of event so we allow them all through here!
+			$multiday = "";
+			$multiday2 = "";
+			$multiday3 = "";
+		}
+		else if ($multidayTreatment == 1)
+		{
+			// We only show events on all days regardless of multiday setting of event so we allow them all through here!
+			$multiday = "";
+			$multiday2 = "";
+			$multiday3 = "";
+		}
+		else
+		{
+			// We only show events on their first day if they are not to be shown on multiple days so also add this condition
+			// i.e. the event settings are used
+			// This is the true version of these conditions
+			//$multiday = "\n AND ((rpt.startrepeat >= '$startdate' AND det.multiday=0) OR  det.multiday=1)";
+			//$multiday2 = "\n AND ((rpt.startrepeat <= '$startdate' AND det.multiday=0) OR  det.multiday=1)";
+			// BUT this is logically equivalent and appears much faster  on some databases
+			$multiday = "\n AND (rpt.startrepeat >= '$startdate' OR  det.multiday=1)";
+			$multiday2 = "\n AND (rpt.startrepeat <= '$startdate'OR  det.multiday=1)";
+			$multiday3 = "AND det.multiday=1";
+		}
+
+                // TODO fix this 
+                // Disable multiday checking
+               	$multiday = "";
+		$multiday2 = "";
+		$multiday3 = "";
+
 		// get the event ids first
 		$query = "SELECT  ev.ev_id FROM #__jevents_repetition as rpt"
 				. "\n LEFT JOIN #__jevents_vevent as ev ON rpt.eventid = ev.ev_id"
@@ -507,11 +550,12 @@ class JEventsDBModel
 				// We only show events on their first day if they are not to be shown on multiple days so also add this condition
 				. "\n AND ((rpt.startrepeat >= '$t_datenowSQL' AND det.multiday=0) OR  det.multiday=1)"
 				. $extrawhere
+                                . $multiday 
 				. "\n AND ev.access  IN (" . JEVHelper::getAid($user) . ")"
 				. " \n AND icsf.state=1"
 				. "\n AND icsf.access  IN (" . JEVHelper::getAid($user) . ")"
 				// published state is now handled by filter
-				. "\n AND rpt.startrepeat=(SELECT MIN(startrepeat) FROM #__jevents_repetition as rpt2 WHERE rpt2.eventid=rpt.eventid AND rpt2.startrepeat >= '$t_datenowSQL' AND rpt2.startrepeat <= '$enddate')"
+				. "\n AND rpt.startrepeat=(SELECT MIN(startrepeat) FROM #__jevents_repetition as rpt2 WHERE rpt2.eventid=rpt.eventid AND rpt2.startrepeat >= '$t_datenowSQL' AND rpt2.startrepeat <= '$enddate' $multiday3)"
 				. "\n GROUP BY ev.ev_id";
 
 		// always in reverse hits  order!
@@ -586,7 +630,7 @@ class JEventsDBModel
 		$lang = JFactory::getLanguage();
 		$langtag = $lang->getTag();
 
-		if (strpos($startdate, "-") === false)
+		if (strpos($startdate, "-") === false  || is_numeric($startdate))
 		{
 			$startdate = JevDate::strftime('%Y-%m-%d 00:00:00', $startdate);
 			$enddate = JevDate::strftime('%Y-%m-%d 23:59:59', $enddate);
@@ -1197,7 +1241,7 @@ class JEventsDBModel
 		$lang = JFactory::getLanguage();
 		$langtag = $lang->getTag();
 
-		if (strpos($startdate, "-") === false)
+		if (strpos($startdate, "-") === false  || is_numeric($startdate))
 		{
 			$startdate = JevDate::strftime('%Y-%m-%d 00:00:00', $startdate);
 			$enddate = JevDate::strftime('%Y-%m-%d 23:59:59', $enddate);
@@ -1798,131 +1842,6 @@ class JEventsDBModel
 		return $rows;
 
 	} 
-	// BAD VERSION - not used
-	function listPopularIcalEvents($startdate, $enddate, $limit = 10, $noRepeats = 0)
-	{
-		$user = JFactory::getUser();
-		$db = JFactory::getDBO();
-		$lang = JFactory::getLanguage();
-		$langtag = $lang->getTag();
-
-		if (strpos($startdate, "-") === false)
-		{
-			$startdate = JevDate::strftime('%Y-%m-%d 00:00:00', $startdate);
-			$enddate = JevDate::strftime('%Y-%m-%d 23:59:59', $enddate);
-		}
-
-		// process the new plugins
-		// get extra data and conditionality from plugins
-		$extrawhere = array();
-		$extrajoin = array();
-		$extrafields = "";  // must have comma prefix
-		$extratables = "";  // must have comma prefix
-		$needsgroup = false;
-
-		$filterarray = array("published", "justmine", "category", "search", "repeating");
-
-		// If there are extra filters from the module then apply them now
-		$reg =  JFactory::getConfig();
-		$modparams = $reg->get("jev.modparams", false);
-		if ($modparams && $modparams->get("extrafilters", false))
-		{
-			$filterarray = array_merge($filterarray, explode(",", $modparams->get("extrafilters", false)));
-		}
-
-		$filters = jevFilterProcessing::getInstance($filterarray);
-		$filters->setWhereJoin($extrawhere, $extrajoin);
-		$needsgroup = $filters->needsGroupBy();
-
-		$dispatcher = JEventDispatcher::getInstance();
-		$dispatcher->trigger('onListIcalEvents', array(& $extrafields, & $extratables, & $extrawhere, & $extrajoin, & $needsgroup));
-
-		$catwhere = "\n WHERE ev.catid IN(" . $this->accessibleCategoryList() . ")";
-		$params = JComponentHelper::getParams("com_jevents");
-		if ($params->get("multicategory", 0))
-		{
-			$extrajoin[] = "\n #__jevents_catmap as catmap ON catmap.evid = rpt.eventid";
-			$extrajoin[] = "\n #__categories AS catmapcat ON catmap.catid = catmapcat.id";
-			$extrafields .= ", GROUP_CONCAT(DISTINCT catmap.catid SEPARATOR ',') as catids";
-			$extrawhere[] = " catmapcat.access IN (" . JEVHelper::getAid($user) . ")";
-			$extrawhere[] = " catmap.catid IN(" . $this->accessibleCategoryList() . ")";
-			$needsgroup = true;
-			$catwhere = "\n WHERE 1 ";
-		}
-
-		$extrajoin = ( count($extrajoin) ? " \n LEFT JOIN " . implode(" \n LEFT JOIN ", $extrajoin) : '' );
-		$extrawhere = ( count($extrawhere) ? ' AND ' . implode(' AND ', $extrawhere) : '' );
-
-		// get the event ids first
-		$query = "SELECT  ev.ev_id FROM #__jevents_repetition as rpt"
-				. "\n LEFT JOIN #__jevents_vevent as ev ON rpt.eventid = ev.ev_id"
-				. "\n LEFT JOIN #__jevents_icsfile as icsf ON icsf.ics_id=ev.icsid "
-				. "\n LEFT JOIN #__jevents_vevdetail as det ON det.evdet_id = rpt.eventdetail_id"
-				. "\n LEFT JOIN #__jevents_rrule as rr ON rr.eventid = rpt.eventid"
-				. $extrajoin
-				. $catwhere
-				. "\n AND ev.created >= '$startdate' AND ev.created <= '$enddate'"
-				. $extrawhere
-				. "\n AND ev.access  IN (" . JEVHelper::getAid($user) . ")"
-				. " \n AND icsf.state=1"
-				. "\n AND icsf.access  IN (" . JEVHelper::getAid($user) . ")"
-				// published state is now handled by filter
-				. "\n GROUP BY ev.ev_id";
-
-		// always in reverse hits order!
-		$query .= " ORDER BY det.hits DESC ";
-
-		// This limit will always be enough
-		$query .= " LIMIT " . $limit;
-
-
-		$db = JFactory::getDBO();
-		$db->setQuery($query);
-		$ids = $db->loadColumn();
-		array_push($ids, 0);
-		$ids = implode(",", $ids);
-
-		$groupby = "\n GROUP BY rpt.rp_id";
-		if ($noRepeats)
-		{
-			$groupby = "\n GROUP BY ev.ev_id";
-			$needsgroup = true;
-		}
-
-		// This version picks the details from the details table
-		// ideally we should check if the event is a repeat but this involves extra queries unfortunately
-		$query = "SELECT rpt.*, ev.*, rr.*, det.*, ev.state as published, ev.created as created $extrafields"
-				. "\n , YEAR(rpt.startrepeat) as yup, MONTH(rpt.startrepeat ) as mup, DAYOFMONTH(rpt.startrepeat ) as dup"
-				. "\n , YEAR(rpt.endrepeat  ) as ydn, MONTH(rpt.endrepeat   ) as mdn, DAYOFMONTH(rpt.endrepeat   ) as ddn"
-				. "\n , HOUR(rpt.startrepeat) as hup, MINUTE(rpt.startrepeat ) as minup, SECOND(rpt.startrepeat ) as sup"
-				. "\n , HOUR(rpt.endrepeat  ) as hdn, MINUTE(rpt.endrepeat   ) as mindn, SECOND(rpt.endrepeat   ) as sdn"
-				. "\n FROM #__jevents_repetition as rpt"
-				. "\n LEFT JOIN #__jevents_vevent as ev ON rpt.eventid = ev.ev_id"
-				. "\n LEFT JOIN #__jevents_icsfile as icsf ON icsf.ics_id=ev.icsid "
-				. "\n LEFT JOIN #__jevents_vevdetail as det ON det.evdet_id = rpt.eventdetail_id"
-				. "\n LEFT JOIN #__jevents_rrule as rr ON rr.eventid = rpt.eventid"
-				. $extrajoin
-				. $catwhere
-				. "\n AND ev.created >= '$startdate' AND ev.created <= '$enddate'"
-				. $extrawhere
-				. "\n AND ev.access  IN (" . JEVHelper::getAid($user) . ")"
-				. "  AND icsf.state=1 "
-				. "\n AND icsf.access  IN (" . JEVHelper::getAid($user) . ")"
-				. "  AND ev.ev_id IN (" . $ids . ")"
-				// published state is now handled by filter
-				//. "\n AND ev.state=1"
-				. ($needsgroup ? $groupby : "");
-		$query .= " ORDER BY det.hits DESC ";
-
-		$cache = JEVHelper::getCache(JEV_COM_COMPONENT);
-		$rows = $cache->call(array($this,'_cachedlistIcalEvents'), $query, $langtag);
-
-		$dispatcher = JEventDispatcher::getInstance();
-		$dispatcher->trigger('onDisplayCustomFieldsMultiRowUncached', array(&$rows));
-
-		return $rows;
-
-	}
 
 	// Allow the passing of filters directly into this function for use in 3rd party extensions etc.
 	function listIcalEvents($startdate, $enddate, $order = "", $filters = false, $extrafields = "", $extratables = "", $limit = "")
@@ -1936,7 +1855,7 @@ class JEventsDBModel
 		$lang = JFactory::getLanguage();
 		$langtag = $lang->getTag();
 
-		if (strpos($startdate, "-") === false)
+		if (strpos($startdate, "-") === false  || is_numeric($startdate))
 		{
 			$startdate = JevDate::strftime('%Y-%m-%d 00:00:00', $startdate);
 			$enddate = JevDate::strftime('%Y-%m-%d 23:59:59', $enddate);
@@ -2350,7 +2269,7 @@ class JEventsDBModel
 		$lang = JFactory::getLanguage();
 		$langtag = $lang->getTag();
 
-		if (strpos($startdate, "-") === false)
+		if (strpos($startdate, "-") === false  || is_numeric($startdate))
 		{
 			$startdate = JevDate::strftime('%Y-%m-%d 00:00:00', $startdate);
 			$enddate = JevDate::strftime('%Y-%m-%d 23:59:59', $enddate);
@@ -2407,9 +2326,15 @@ class JEventsDBModel
 					. "\n , HOUR(rpt.startrepeat) as hup, MINUTE(rpt.startrepeat ) as minup, SECOND(rpt.startrepeat ) as sup"
 					. "\n , HOUR(rpt.endrepeat  ) as hdn, MINUTE(rpt.endrepeat   ) as mindn, SECOND(rpt.endrepeat   ) as sdn";
 		}
-                // suggest an index to ensure the group by gets the correct row
-		$query .= "\n FROM #__jevents_repetition as rpt  use INDEX (eventstart)"
-				. "\n LEFT JOIN #__jevents_vevent as ev ON rpt.eventid = ev.ev_id"
+		if (!$showrepeats && !$count)
+		{
+                    // suggest an index to ensure the group by gets the correct row
+                    $query .= "\n FROM #__jevents_repetition as rpt  use INDEX (eventstart)";
+                }
+                else {
+                    $query .= "\n FROM #__jevents_repetition as rpt ";                                    
+                }
+		$query .=  "\n LEFT JOIN #__jevents_vevent as ev ON rpt.eventid = ev.ev_id"
 				. "\n LEFT JOIN #__jevents_icsfile as icsf ON icsf.ics_id=ev.icsid "
 				. "\n LEFT JOIN #__jevents_vevdetail as det ON det.evdet_id = rpt.eventdetail_id"
 				. "\n LEFT JOIN #__jevents_rrule as rr ON rr.eventid = rpt.eventid"
@@ -2472,9 +2397,9 @@ class JEventsDBModel
 
 		$startdate = JevDate::strftime('%Y-%m-%d', $startdate);
 
-		if (JString::strlen($startdate) == 10)
+		if (StringHelper::strlen($startdate) == 10)
 			$startdate.= " 00:00:00";
-		if (JString::strlen($enddate) == 10)
+		if (StringHelper::strlen($enddate) == 10)
 			$enddate.= " 23:59:59";
 
 		// This code is used by the iCals code with a spoofed user so check if this is what is happening
@@ -2568,8 +2493,15 @@ class JEventsDBModel
 					. "\n , HOUR(rpt.startrepeat) as hup, MINUTE(rpt.startrepeat ) as minup, SECOND(rpt.startrepeat ) as sup"
 					. "\n , HOUR(rpt.endrepeat  ) as hdn, MINUTE(rpt.endrepeat   ) as mindn, SECOND(rpt.endrepeat   ) as sdn";
 		}
-		$query .= "\n FROM #__jevents_repetition as rpt"
-				. "\n LEFT JOIN #__jevents_vevent as ev ON rpt.eventid = ev.ev_id"
+		if (!$showrepeats && !$count)
+		{
+                    // suggest an index to ensure the group by gets the correct row
+                    $query .= "\n FROM #__jevents_repetition as rpt  use INDEX (eventstart)";
+                }
+                else {
+                    $query .= "\n FROM #__jevents_repetition as rpt ";                                    
+                }
+                $query .=    "\n LEFT JOIN #__jevents_vevent as ev ON rpt.eventid = ev.ev_id"
 				. "\n LEFT JOIN #__jevents_icsfile as icsf ON icsf.ics_id=ev.icsid "
 				. "\n LEFT JOIN #__jevents_vevdetail as det ON det.evdet_id = rpt.eventdetail_id"
 				. "\n LEFT JOIN #__jevents_rrule as rr ON rr.eventid = rpt.eventid"

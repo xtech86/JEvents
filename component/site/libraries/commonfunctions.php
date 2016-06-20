@@ -1,10 +1,10 @@
 <?php
 /**
- * JEvents Component for Joomla 1.5.x
+ * JEvents Component for Joomla! 3.x
  *
  * @version     $Id: commonfunctions.php 3549 2012-04-20 09:26:21Z geraintedwards $
  * @package     JEvents
- * @copyright   Copyright (C) 2008-2015 GWE Systems Ltd, 2006-2008 JEvents Project Group
+ * @copyright   Copyright (C) 2008-2016 GWE Systems Ltd, 2006-2008 JEvents Project Group
  * @license     GNU/GPLv2, see http://www.gnu.org/licenses/gpl-2.0.html
  * @link        http://www.jevents.net
  */
@@ -16,6 +16,8 @@ defined( '_JEXEC' ) or die( 'Restricted access' );
 // Joomla 1.5
 // tasker/controller
 jimport('joomla.application.component.controller');
+
+use Joomla\String\StringHelper;
 
 class JEV_CommonFunctions {
 
@@ -194,7 +196,7 @@ class JEV_CommonFunctions {
 	}
 
 	public static function jEventsDoLink($url="",$alt="alt",$attr=array()){
-		if (JString::strlen($url)==0) $url="javascript:void(0)";
+		if (StringHelper::strlen($url)==0) $url="javascript:void(0)";
 		$link = "<a href='".$url."' ";
 		if (count($attr)>0) {
 			foreach ($attr as $key=>$val){
@@ -269,6 +271,9 @@ class JEV_CommonFunctions {
 	public static function notifyAuthorPublished($event){
 
 		JLoader::register('JEventsCategory',JEV_ADMINPATH."/libraries/categoryClass.php");
+
+		$params = JComponentHelper::getParams(JEV_COM_COMPONENT);
+		
 		$db = JFactory::getDBO();
 		$cat = new JEventsCategory($db);
 		$cat->load($event->catid());
@@ -328,9 +333,24 @@ class JEV_CommonFunctions {
 
 		// mail function
 		$mail = JFactory::getMailer();
-		$mail->setSender(array( 0 => $adminEmail, 1 => $adminName ));
-		$mail->addRecipient($authoremail);
+		$sender_config = $params->get('sender_config', 9);
+		if ($sender_config == 0) {
+			
+			$mail->setSender(array(0 => $adminEmail, 1 => $adminName));
+			
+		} elseif ($sender_config == 1) {
 
+			$mail->setSender(array(0 => $config->mailfrom, 1 => $config->fromname));
+
+		} else {
+			$mail->setSender(array(0 => $params->get('sender_email', ''), 1 => $params->get('sender_name', '')));
+		}
+
+		if ($params->get('email_replyto', 0) == 1) {
+			$mail->addReplyTo($adminEmail);
+		}
+
+		$mail->addRecipient($authoremail);
 		$mail->setSubject($subject);
 		$mail->setBody($content);
 		$mail->IsHTML(true);
@@ -338,6 +358,7 @@ class JEV_CommonFunctions {
 	}
 
 	public static function sendAdminMail( $adminName, $adminEmail, $subject='', $title='', $content='', $day='', $month='', $year='', $start_time='', $end_time='', $author='', $live_site, $modifylink, $viewlink , $event=false, $cc = "") {
+		$config = new JConfig();
 
 		if (!$adminEmail) return;
 		if ((strpos($adminEmail,'@example.com') !== false)) return;
@@ -363,6 +384,7 @@ class JEV_CommonFunctions {
 		if ($event){
 			$messagetemplate = str_replace("{CATEGORY}", $event->catname(),$messagetemplate);
 			//$messagetemplate = str_replace("{EXTRA}", $event->extra_info(),$messagetemplate);
+
 		}
 		$messagetemplate = str_replace("{LIVESITE}", $live_site,$messagetemplate);
 		$messagetemplate = str_replace("{AUTHOR}", $author,$messagetemplate);
@@ -377,7 +399,23 @@ class JEV_CommonFunctions {
 		
 		// mail function
 		$mail = JFactory::getMailer();
-		$mail->setSender(array( 0 => $adminEmail, 1 => $adminName ));
+		$sender_config = $params->get('sender_config', 0);
+		if ($sender_config == 0) {
+
+			$mail->setSender(array(0 => $adminEmail, 1 => $adminName));
+
+		} elseif ($sender_config == 1) {
+
+			$mail->setSender(array(0 => $config->mailfrom!="" ? $config->mailfrom : adminEmail, 1 => $config->fromname!="" ? $config->fromname : adminName));
+
+		} else {
+			$mail->setSender(array(0 => $params->get('sender_email', $adminEmail), 1 => $params->get('sender_name', $adminName)));
+		}
+
+		if ($params->get('email_replyto', 0) == 1) {
+			$mail->addReplyTo($adminEmail);
+		}
+
 		$mail->addRecipient($adminEmail);
 
 		if ($params->get("com_notifyboth")){

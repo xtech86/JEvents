@@ -1,14 +1,16 @@
 <?php
 /**
- * JEvents Component for Joomla 1.5.x
+ * JEvents Component for Joomla! 3.x
  *
  * @version     $Id: overview.php 3576 2012-05-01 14:11:04Z geraintedwards $
  * @package     JEvents
- * @copyright   Copyright (C)  2008-2015 GWE Systems Ltd
+ * @copyright   Copyright (C)  2008-2016 GWE Systems Ltd
  * @license     GNU/GPLv2, see http://www.gnu.org/licenses/gpl-2.0.html
  * @link        http://www.jevents.net
  */
 defined('_JEXEC') or die('Restricted access');
+
+use Joomla\String\StringHelper;
 
 // we would use this to add custom data to the output here
 //JEVHelper::onDisplayCustomFieldsMultiRow($this->rows);
@@ -160,4 +162,4 @@ $fullspan = 12;
         <div class="control-sidebar-bg" style="position: fixed; height: auto;"></div>
     </div>
 </form>
-<br/>
+<br />

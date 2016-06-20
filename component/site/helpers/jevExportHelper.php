@@ -4,7 +4,7 @@
  *
  * @version     $Id: jevExportHelper.php
  * @package     JEvents
- * @copyright   Copyright (C) 2008-2015 GWE Systems Ltd
+ * @copyright   Copyright (C) 2008-2016 GWE Systems Ltd
  * @license     GNU/GPLv2, see http://www.gnu.org/licenses/gpl-2.0.html
  * @link        http://www.jevents.net
  */
@@ -18,6 +18,9 @@ defined('_JEXEC') or die;
  * @package		Jevents
  * @since		1.6
  */
+
+use Joomla\String\StringHelper;
+
 class JevExportHelper {
 
 	static function getAddToGCal($row)
@@ -64,13 +67,14 @@ class JevExportHelper {
 		$urlString['st'] = JevDate::strftime("%Y%m%dT%H%M%SZ",$row->getUnixStartTime());
 		$urlString['et'] = JevDate::strftime("%Y%m%dT%H%M%SZ",$row->getUnixEndTime());
 		$urlString['duration'] = (int)$row->getUnixEndTime() - (int)$row->getUnixStartTime();
+		$urlString['duration'] = (int)$row->getUnixEndTime() - (int)$row->getUnixStartTime();
 		$urlString['location'] = urlencode(isset($row->_locationaddress) ? $row->_locationaddress : $row->location());
 		$urlString['sitename'] = urlencode(JFactory::getApplication()->get('sitename'));
 		$urlString['siteurl'] = urlencode(JUri::root());
 		$urlString['rawdetails'] = urlencode($row->get('description'));
 		$urlString['details'] = strip_tags($row->get('description'));
-		if (JString::strlen($urlString['details'])>100) {
-			$urlString['details'] = JString::substr( $urlString['details'], 0, 100 ) . ' ...';
+		if (StringHelper::strlen($urlString['details'])>100) {
+			$urlString['details'] = StringHelper::substr( $urlString['details'], 0, 100 ) . ' ...';
 		}
 		$urlString['details'] = urlencode($urlString['details']);
 

@@ -1,10 +1,10 @@
 <?php
 /**
- * JEvents Component for Joomla 1.5.x
+ * JEvents Component for Joomla! 3.x
  *
  * @version     $Id: iCalEvent.php 3549 2012-04-20 09:26:21Z geraintedwards $
  * @package     JEvents
- * @copyright   Copyright (C) 2008-2015 GWE Systems Ltd, 2006-2008 JEvents Project Group
+ * @copyright   Copyright (C) 2008-2016 GWE Systems Ltd, 2006-2008 JEvents Project Group
  * @license     GNU/GPLv2, see http://www.gnu.org/licenses/gpl-2.0.html
  * @link        http://www.jevents.net
  */
@@ -12,7 +12,7 @@
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-
+use Joomla\String\StringHelper;
 
 class iCalEvent extends JTable  {
 
@@ -50,7 +50,7 @@ class iCalEvent extends JTable  {
 	/**
 	 * Null Constructor
 	 */
-	function iCalEvent( &$db ) {
+	function __construct( &$db ) {
 		parent::__construct( '#__jevents_vevent', 'ev_id', $db );
 		$this->access = JEVHelper::getBaseAccess();
 	}
@@ -375,15 +375,17 @@ else $this->_detail = false;
 			$this->_repetitions = $this->rrule->getRepetitions($this->_detail->dtstart,$this->_detail->dtend,$this->_detail->duration, $recreate,$this->_exdate);
                         
                         // is it in a non-default timezone
-                        foreach ($this->_repetitions as &$repeat){
-                            $testdate = DateTime::createFromFormat('Y-m-d H:i:s', $repeat->startrepeat, new DateTimeZone($this->tzid));
-                            $testdate->setTimezone(new DateTimeZone(@date_default_timezone_get()));
-                            $repeat->startrepeat = $testdate->format('Y-m-d H:i:s');
+                        if ($this->tzid) {
+                            foreach ($this->_repetitions as &$repeat){
+                                $testdate = DateTime::createFromFormat('Y-m-d H:i:s', $repeat->startrepeat, new DateTimeZone($this->tzid));
+                                $testdate->setTimezone(new DateTimeZone(@date_default_timezone_get()));
+                                $repeat->startrepeat = $testdate->format('Y-m-d H:i:s');
 
-                            $testdate = DateTime::createFromFormat('Y-m-d H:i:s', $repeat->endrepeat, new DateTimeZone($this->tzid));
-                            $testdate->setTimezone(new DateTimeZone(@date_default_timezone_get()));
-                            $repeat->endrepeat = $testdate->format('Y-m-d H:i:s');
-                            unset($repeat);
+                                $testdate = DateTime::createFromFormat('Y-m-d H:i:s', $repeat->endrepeat, new DateTimeZone($this->tzid));
+                                $testdate->setTimezone(new DateTimeZone(@date_default_timezone_get()));
+                                $repeat->endrepeat = $testdate->format('Y-m-d H:i:s');
+                                unset($repeat);
+                            }
                         }
                         
 			return $this->_repetitions;
@@ -418,7 +420,7 @@ else $this->_detail = false;
 		$eventid = $this->ev_id;
 		
 		$tz = false;
-		if (JString::stristr($this->recurrence_id,"TZID")){
+		if (StringHelper::stristr($this->recurrence_id,"TZID")){
 			list($tz, $this->recurrence_id) = explode(";", $this->recurrence_id);
 			$tz= str_replace("TZID=", "", $tz);
 			$tz = iCalImport::convertWindowsTzid($tz);
@@ -509,7 +511,7 @@ else $this->_detail = false;
 		$oldrepeatcount = count($oldrepeats);
 		foreach ($oldrepeats as &$oldrepeat) {
 			// find matching day
-			$oldrepeat->startday = JString::substr($oldrepeat->startrepeat,0,10);
+			$oldrepeat->startday = StringHelper::substr($oldrepeat->startrepeat,0,10);
 			// free the reference
 			unset($oldrepeat);
 		}
@@ -526,7 +528,7 @@ else $this->_detail = false;
 		for ($r = 0;$r<count($this->_repetitions);$r++){
 			$repeat =& $this->_repetitions[$r];
 			// find matching day and only one!!
-			$repeat->startday = JString::substr($repeat->startrepeat,0,10);
+			$repeat->startday = StringHelper::substr($repeat->startrepeat,0,10);
 			$matched = false;
 			foreach ($oldrepeats as $oldrepeat) {
 				if ($oldrepeat->startday == $repeat->startday){

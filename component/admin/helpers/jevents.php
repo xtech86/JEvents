@@ -83,9 +83,12 @@ STYLE;
                 );
                 if (JEVHelper::isAdminUser())
                 {
-                        JHtmlSidebar::addEntry(
+                        $params = JComponentHelper::getParams(JEV_COM_COMPONENT);
+                        if ($params->get("authorisedonly", 0)) {
+                            JHtmlSidebar::addEntry(
                                         JText::_('JEV_MANAGE_USERS'), 'index.php?option=com_jevents&task=user.list', $vName == 'user.list'
-                        );
+                            );
+                        }
                         JHtmlSidebar::addEntry(
                                         JText::_('JEV_INSTAL_CONFIG'), 'index.php?option=com_jevents&task=params.edit', $vName == 'params.edit'
                         );
@@ -145,7 +148,7 @@ STYLE;
                         // Stop if user is not authorised to manage JEvents
                         if ($extension && $extension->enabled && JEVHelper::isAdminUser()) {
                                 $manifestCache = json_decode($extension->manifest_cache);
-                                if (version_compare($manifestCache->version, "3.5.0", "ge") )
+                                if (version_compare($manifestCache->version, "3.5.0RC", "ge") )
                                 {
                                         $link = "index.php?option=com_jevents&task=plugin.jev_customfields.overview";
                                         JFactory::getLanguage()->load("plg_jevents_jevcustomfields", JPATH_ADMINISTRATOR);

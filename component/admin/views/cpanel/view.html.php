@@ -1,11 +1,11 @@
 <?php
 
 /**
- * JEvents Component for Joomla 1.5.x
+ * JEvents Component for Joomla! 3.x
  *
  * @version     $Id: view.html.php 3543 2012-04-20 08:17:42Z geraintedwards $
  * @package     JEvents
- * @copyright   Copyright (C)  2008-2015 GWE Systems Ltd
+ * @copyright   Copyright (C)  2008-2016 GWE Systems Ltd
  * @license     GNU/GPLv2, see http://www.gnu.org/licenses/gpl-2.0.html
  * @link        http://www.jevents.net
  */
@@ -17,6 +17,9 @@ defined('_JEXEC') or die();
  *
  * @static
  */
+
+use Joomla\String\StringHelper;
+
 class AdminCpanelViewCpanel extends JEventsAbstractView
 {
 
@@ -51,7 +54,7 @@ class AdminCpanelViewCpanel extends JEventsAbstractView
 	protected function checkForAddons () {
 
 		$params = JComponentHelper::getParams(JEV_COM_COMPONENT);
-		if ($params->get("clubcode", "") && JString::strlen($params->get("clubcode", "")>20)){
+		if ($params->get("clubcode", "") && StringHelper::strlen($params->get("clubcode", "")>20)){
 			return;
 		}
 
@@ -603,7 +606,7 @@ class AdminCpanelViewCpanel extends JEventsAbstractView
 		  {
 		  $output .='"' . $appname . '"=> 0,' . "\n";
 		  }
-		  $output = JString::substr($output, 0, JString::strlen($output) - 2) . ");\n\n";
+		  $output = StringHelper::substr($output, 0, StringHelper::strlen($output) - 2) . ");\n\n";
 		 */
 		$criticaldata = JFile::read('http://ubu.jev20j16.com/importantversions.txt');
 		$criticaldata = explode("\n", $criticaldata);

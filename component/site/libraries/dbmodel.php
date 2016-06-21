@@ -703,6 +703,13 @@ class JEventsDBModel
 			$catwhere = "\n WHERE 1 ";
 		}
 
+
+                // Are we responding to pagination request  - if so ignore the repeats already shown
+                $ignoreRepeatIds = $this->getIgnoreRepeatIds();
+                if ($ignoreRepeatIds){
+                    $extrawhere[] = $ignoreRepeatIds ;                            
+                }
+                                
 		$extrajoin = ( count($extrajoin) ? " \n LEFT JOIN " . implode(" \n LEFT JOIN ", $extrajoin) : '' );
 		$extrawhere = ( count($extrawhere) ? ' AND ' . implode(' AND ', $extrawhere) : '' );
 
@@ -1231,6 +1238,55 @@ class JEventsDBModel
 		return $rows;
 
 	}
+        
+        private function getIgnoreRepeatIds() 
+        {
+                $registry	= JRegistry::getInstance("jevents");
+                $modid = $registry->get("jevents.moduleid", 0);
+            
+                $shownEventIds = JFactory::getApplication()->getUserState("jevents.moduleid".$modid.".shownEventIds",array());                            
+                $page = (int)JFactory::getApplication()->getUserState("jevents.moduleid".$modid.".page",0);
+            
+                $direction = JFactory::getApplication()->getUserState("jevents.moduleid".$modid.".direction",1);
+                $firstEventDate = JFactory::getApplication()->getUserState("jevents.moduleid".$modid.".firstEventDate",false);
+                $lastEventDate = JFactory::getApplication()->getUserState("jevents.moduleid".$modid.".lastEventDate",false);
+                                
+                $ignoreRepeatIds = "";
+                if (count($shownEventIds)>0){
+                    $ignoreRepeatIds = array();
+                    foreach ($shownEventIds as $shownpage => $shownids){
+                        if ($shownpage == $page){
+                            continue;
+                        }
+                        $ignoreRepeatIds = array_merge($ignoreRepeatIds, $shownids);                        
+                    }
+                    if (!count($ignoreRepeatIds)){
+                        $ignoreRepeatIds = "";
+                    }
+                    else {
+                        $ignoreRepeatIds = " rpt.rp_id NOT IN (".implode(",",  $ignoreRepeatIds).")";
+                    }
+                }
+                
+                // Do we supplement the repeat ids to ignore with date constrains for mode 3 
+                $registry = JRegistry::getInstance("jevents");
+                $params = $registry->get("jevents.moduleparams", new JRegistry);                
+                if ($params->get("modlatest_Mode",0)!=2){
+                    $db = JFactory::getDbo();
+                    if ($direction==1 && $lastEventDate){                        
+                        $extra = " rpt.startrepeat >= ".$db->quote($lastEventDate);
+                    }
+                    else if($firstEventDate) {
+                        $extra = " rpt.startrepeat <= ".$db->quote($firstEventDate);
+                    }
+                    else {
+                        return $ignoreRepeatIds;
+                    }
+                    $ignoreRepeatIds .= ($ignoreRepeatIds!="" ? " AND " : "") . $extra;
+                }
+                return $ignoreRepeatIds;
+            
+        }
 
         function randomIcalEvents($startdate, $enddate, $limit = 10, $noRepeats = 0, $multidayTreatment = 0)
 	{

@@ -1,6 +1,23 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
+
+## 17-06-2016 - Geraint Edwards
+* Fix duplicated output in flat theme date range view.
+* Let category link in latest events module respect target menu item is using ${CATEGORYLNK}
+
+## 14-06-2016 - Geraint Edwards
+* Enable configuration of all JEvents plugins via the main JEvents config/params page
+* Allow filtering of all published JEvents layouts i.e. without need to check all the categories in turn
+* Fix for jevFilter constructor names
+* DTSTAMP for export of repeat exceptions should not have timezone in it
+* Allow list of events view to be ordered with more choices
+* Installer message when updating using Joomla updater was not being shown
+* SMore flexibility on countdown output in latest events module
+
+## 13-06-2016 - Tony Partridge
+* Updated the google export to support http and https replacing to webcal://, fixes invalid email address issue when adding to google calendar.
+
 ## 08-06-2016 - Tony Partridge
 * Updated constructor classes for PHP7 to avoid deprecated notices.
 * Replaced some old intval() usage with (int) since we are using whole numbers in the values, this is also more efficient.

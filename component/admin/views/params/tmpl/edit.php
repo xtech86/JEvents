@@ -28,8 +28,21 @@ foreach (JEV_CommonFunctions::getJEventsViewList() as $viewfile) {
     }
 }
 $hasPlugins = false;
-$plugins = JPluginHelper::getPlugin("jevents");
-if (count($plugins)){
+$db = JFactory::getDbo();
+$query = $db->getQuery(true)
+        ->select('folder AS type, element AS name, params, enabled, manifest_cache ')
+        ->from('#__extensions')
+        // include unpublished plugins
+        //->where('enabled = 1')        
+        ->where('type =' . $db->quote('plugin'))
+        ->where('state IN (0,1)')
+        ->where('(folder="jevents" OR element="gwejson")')
+        ->order('enabled desc, ordering asc');
+
+$jevplugins = $db->setQuery($query)->loadObjectList();
+//echo $db->getQuery();
+//$jevplugins = JPluginHelper::getPlugin("jevents");
+if (count($jevplugins)){
     $hasPlugins = true;
 }
 ?>
@@ -135,19 +148,11 @@ if (count($plugins)){
                                         $difficultyClass .= " hiddenDifficulty";
                                     }
 
-                                    if (JString::strlen($class) > 0) {
+                                    if (StringHelper::strlen($class) > 0) {
                                         $class = " class='$class $difficultyClass'";
                                     } else {
                                         $class = " class=' $difficultyClass'";
                                     }
-				if (StringHelper::strlen($class) > 0)
-				{
-					$class = " class='$class $difficultyClass'";
-				}
-				else
-				{
-					$class = " class=' $difficultyClass'";
-				}
 
                                     $html[] = "<tr $class>";
                                     if (!isset($field->label) || $field->label == "") {

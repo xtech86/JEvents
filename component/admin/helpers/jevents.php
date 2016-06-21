@@ -232,6 +232,8 @@ STYLE;
             if (file_exists($config) && !$first) {
                     $first = $viewfile;
                     $class = ' class="active "';
+                    $haslayouts = true;
+                    $themes .= '<li ' . $class . '><a ' . $config_tabs . '#' . $viewfile . '" class="themes_link"><i class="fa fa-circle-o"></i>'. $viewfile .'</a></li>';
 
             } elseif (file_exists($config)) {
                 $class = '';
@@ -241,18 +243,15 @@ STYLE;
         }
 
         $sidebar_html = '<section class="sidebar" style="height: auto;">
-
 			<!-- sidebar menu: : style can be found in sidebar.less -->
 			<ul class="sidebar-menu">
 				<li class="header">' . JText::_("JEV_ADMIN_EVENTS_MANAGEMENT") . '</li>
-				<li class="' . ($task == '' || $task == 'cpanel.cpanel' || $task == 'icalevent.list' || $task == 'icalevent.edit' ? 'active' : '') . ' ">
-				
+				<li class="' . ($task == '' || $task == 'cpanel.cpanel' || $task == 'icalevent.list' || $task == 'icalevent.edit' ? 'active' : '') . ' ">				
 					<a href="index.php?option=com_jevents&task=cpanel.cpanel">
 						<i class="fa fa-dashboard"></i> <span>' . JText::_("JEV_ADMIN_DASHBOARD") . '</span>
 					</a>
 				</li>
 				<li class="' . ($task == '' || $task == 'cpanel.cpanel' || $task == 'icalevent.list' || $task == 'icalevent.edit' ? 'active' : '') . ' treeview">
-				
 					<a href="#">
 						<i class="fa fa-calendar-plus-o"></i> <span>' . JText::_("JEV_ADMIN_EVENTS") . '</span> <i class="fa fa-angle-left pull-right"></i>
 					</a>
@@ -260,7 +259,6 @@ STYLE;
 						<li><a href="index.php?option=com_jevents&task=icalevent.edit"><i class="fa fa-calendar-plus-o"></i> ' . JText::_("JEV_ADDEVENT") . '</a></li>
 						<li><a href="index.php?option=com_jevents&task=icalevent.list&state=3"><i class="fa fa-calendar"></i> ' . JText::_("JEV_INSTAL_MANAGE") . '</a></li>
 						<li><a href="index.php?option=com_jevents&task=icalevent.list&state=-1"><i class="fa fa-trash"></i> ' . JText::_("JEV_TRASHED_EVENTS") . '</a></li>
-
 					</ul>
 				</li>
 				<li>
@@ -280,7 +278,6 @@ STYLE;
                     <i class="fa fa-angle-left pull-right"></i>
                   </a>
                   <ul class="treeview-menu ' . ($task == 'params.edit' ? 'menu-open' : '') . '" >
-
                     <li class="' . ($task == 'params.edit' ? 'active' : '') . '">
                       <a href="#"><i class="fa fa-cog"></i> ' . JText::_("JEV_ADMIN_JEVENTS_CORE") . '<i class="fa fa-angle-left pull-right"></i></a>
                       <ul class="treeview-menu">

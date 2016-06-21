@@ -24,6 +24,18 @@
       }
     }
   }
+  .jevconfig {
+    @media (min-width: @screen-sm-min) {
+      table.settings_level {
+        float: right;
+        margin-top: -25px;
+
+        tr .paramlist_value > span {
+          display: inline-block;
+        }
+      }
+    }
+  }
 }
 .main-header {
   position: absolute;
@@ -135,6 +147,7 @@
     height: @navbar-height;
     font-size: 20px;
     line-height: 50px;
+    min-height: @navbar-height;
     text-align: center;
     width: @sidebar-width;
     max-width: @sidebar-width;

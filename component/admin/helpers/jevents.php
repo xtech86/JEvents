@@ -20,6 +20,7 @@ class JEventsHelper
      * Configure the Linkbar.
      *
      * @param    string    The name of the active view.
+     * @deprecated  3.5 & gone completely in 4.0  - Use addAdminSidebar
      */
     public static function addSubmenu($vName = "")
     {
@@ -103,65 +104,52 @@ STYLE;
                         JHtmlSidebar::addEntry(
                                         JText::_('JEV_CUSTOM_CSS'), 'index.php?option=com_jevents&task=cpanel.custom_css', $vName == 'cpanel.custom_css'
                         );
-                        
+
+                        // Lets do a single query and get an array of the addons! Wheyyy
+                        // Also make sure they are enabled!
+                        $jevaddons = array('com_jevlocations', 'com_rsvppro', 'jevcustomfields','com_jevpeople');
                         // Links to addons
-                        // Managed Locations
                         $db = JFactory::getDbo ();
-                        $db->setQuery ( "SELECT enabled FROM #__extensions WHERE element = 'com_jevlocations' AND type='component' " );
-                        $is_enabled = $db->loadResult ();
-                        if ($is_enabled) {
+                        $db->setQuery ("SELECT element FROM #__extensions WHERE element LIKE '%".implode('%\' OR element LIKE \'%', $jevaddons)."%' AND enabled = 1");
+                        $jevaddons_results = $db->loadColumn();
+
+
+                        // Managed Locations
+                        if (in_array('com_jevlocations', $jevaddons_results)) {
                                 $link = "index.php?option=com_jevlocations";
                                 JFactory::getLanguage()->load("com_jevlocations", JPATH_ADMINISTRATOR);
                                 JHtmlSidebar::addEntry(
                                         JText::_('COM_JEVLOCATIONS'), $link, $vName == 'cpanel.managed_locations'
                                 );
                         }
-                        
+
                         // Managed People
-                        $db = JFactory::getDbo ();
-                        $db->setQuery ( "SELECT enabled FROM #__extensions WHERE element = 'com_jevpeople' AND type='component' " );
-                        $is_enabled = $db->loadResult ();
-                        if ($is_enabled) {
+                        if (in_array('com_jevpeople', $jevaddons_results)) {
                                 $link = "index.php?option=com_jevpeople";
                                 JFactory::getLanguage()->load("com_jevpeople", JPATH_ADMINISTRATOR);
                                 JHtmlSidebar::addEntry(
                                         JText::_('COM_JEVPEOPLE'), $link, $vName == 'cpanel.managed_people'
                                 );
-                                
+
                         }
                         // RSVP Pro
-                        $db = JFactory::getDbo ();
-                        $db->setQuery ( "SELECT enabled FROM #__extensions WHERE element = 'com_rsvppro' AND type='component' " );
-                        $is_enabled = $db->loadResult ();
-                        if ($is_enabled) {
+                        if (in_array('com_rsvppro', $jevaddons_results)) {
                                 $link = "index.php?option=com_rsvppro";
                                 JFactory::getLanguage()->load("com_rsvppro", JPATH_ADMINISTRATOR);
                                 JHtmlSidebar::addEntry(
                                         JText::_('COM_RSVPPRO'), $link, $vName == 'cpanel.rsvppro'
                                 );
-                                
-                        }
-                        // Custom Fields				
-                        $db = JFactory::getDbo ();
-                        $db->setQuery ( "SELECT * FROM #__extensions WHERE element = 'jevcustomfields' AND type='plugin' AND folder='jevents' " );
-                        $extension = $db->loadObject();
-                        // Stop if user is not authorised to manage JEvents
-                        if ($extension && $extension->enabled && JEVHelper::isAdminUser()) {
-                                $manifestCache = json_decode($extension->manifest_cache);
-                                if (version_compare($manifestCache->version, "3.5.0RC", "ge") )
-                                {
-                                        $link = "index.php?option=com_jevents&task=plugin.jev_customfields.overview";
-                                        JFactory::getLanguage()->load("plg_jevents_jevcustomfields", JPATH_ADMINISTRATOR);
-                                        JHtmlSidebar::addEntry(
-                                            JText::_('JEV_CUSTOM_FIELDS'), $link, $vName == 'plugin.jev_customfields.overview'
-                                        );                                        
-                                }
-                        }
-                        
-                }
-                
-                
 
+                        }
+                        // Custom Fields
+                        if (in_array('com_rsvppro', $jevaddons_results)) {
+                                $link = "index.php?option=com_jevents&task=plugin.jev_customfields.overview";
+                                JFactory::getLanguage()->load("plg_jevents_jevcustomfields", JPATH_ADMINISTRATOR);
+                                JHtmlSidebar::addEntry(
+                                    JText::_('JEV_CUSTOM_FIELDS'), $link, $vName == 'plugin.jev_customfields.overview'
+                                );
+                        }
+                }
     }
 
     /**
@@ -200,59 +188,34 @@ STYLE;
     public static function addAdminSidebar($components = array(), $params = array())
     {
 
+        $jinput = JFactory::getApplication()->input;
+
+        $task = $jinput->getCmd("task", "cpanel.cpanel");
+
+        $com_params = JComponentHelper::getParams(JEV_COM_COMPONENT);
+        $difficulty = $com_params->get('com_difficulty', 0);
+
         // Links to addons
-
-        // Managed Locations
-
+        // Lets do a single query and get an array of the addons! Wheyyy
+        // Also make sure they are enabled!
+        $jevaddons = array('com_jevlocations', 'com_rsvppro', 'jevcustomfields','com_jevpeople');
+        // Links to addons
         $db = JFactory::getDbo ();
-        $db->setQuery ( "SELECT enabled FROM #__extensions WHERE element = 'com_jevlocations' AND type='component' " );
-        $is_enabled = $db->loadResult();
-
-        if ($is_enabled) {
-            $link = "index.php?option=com_jevlocations";
-            JFactory::getLanguage()->load("com_jevlocations", JPATH_ADMINISTRATOR);
-                //$this->_quickiconButtonWHover($link, "cpanel/LocationsCool.png", "cpanel/LocationsHot.png", JText::_('COM_JEVLOCATIONS'), "/administrator/components/" . JEV_COM_COMPONENT . "/assets/images/");
-        }
-
-        // Managed People
-
-        $db = JFactory::getDbo ();
-        $db->setQuery ( "SELECT enabled FROM #__extensions WHERE element = 'com_jevpeople' AND type='component' " );
-        $is_enabled = $db->loadResult ();
-        if ($is_enabled) {
-            $link = "index.php?option=com_jevpeople";
-            JFactory::getLanguage()->load("com_jevpeople", JPATH_ADMINISTRATOR);
-            //$this->_quickiconButtonWHover($link, "cpanel/PeopleCool.png", "cpanel/PeopleHot.png", JText::_('COM_JEVPEOPLE'), "/administrator/components/" . JEV_COM_COMPONENT . "/assets/images/");
-        }
-
-        // RSVP Pro
-
-        $db = JFactory::getDbo ();
-        $db->setQuery ( "SELECT enabled FROM #__extensions WHERE element = 'com_rsvppro' AND type='component' " );
-        $is_enabled = $db->loadResult ();
-        if ($is_enabled) {
-            $link = "index.php?option=com_rsvppro";
-            JFactory::getLanguage()->load("com_rsvppro", JPATH_ADMINISTRATOR);
-            //$this->_quickiconButtonWHover($link, "cpanel/RSVPCool.png", "cpanel/RSVPHot.png", JText::_('COM_RSVPPRO'), "/administrator/components/" . JEV_COM_COMPONENT . "/assets/images/");
-        }
+        $db->setQuery ("SELECT element FROM #__extensions WHERE element LIKE '%".implode('%\' OR element LIKE \'%', $jevaddons)."%' AND enabled = 1");
+        $jevaddons_results = $db->loadColumn();
 
         // Custom Fields
-
         $db = JFactory::getDbo ();
         $db->setQuery ( "SELECT * FROM #__extensions WHERE element = 'jevcustomfields' AND type='plugin' AND folder='jevents' " );
         $extension = $db->loadObject();
-        // Stop if user is not authorised to manage JEvents
+        $manifestCache = json_decode($extension->manifest_cache);
+        // Stop if user is not authorised to manage JEvents.
         $customfields = '';
-        if ($extension && $extension->enabled && JEVHelper::isAdminUser()) {
-            $manifestCache = json_decode($extension->manifest_cache);
+        if ($manifestCache->version >= '3.5' && $extension && $extension->enabled && JEVHelper::isAdminUser()) {
             $link = "index.php?option=com_jevents&task=plugin.jev_customfields.overview";
             JFactory::getLanguage()->load("plg_jevents_jevcustomfields", JPATH_ADMINISTRATOR);
             $customfields = '<li><a href="' . $link . '"><i class="fa fa-file-text-o"></i> <span>' . JText::_('JEV_CUSTOM_FIELDS') . '</span></a></li>';
         }
-
-        $jinput = JFactory::getApplication()->input;
-
-        $task = $jinput->getCmd("task", "cpanel.cpanel");
 
         $config_tabs = ($task == 'params.edit' ? "data-toggle=\"tab\" href=\"" : "href=\"index.php?option=com_jevents&task=params.edit");
 
@@ -263,16 +226,15 @@ STYLE;
         $haslayouts = false;
 
         $first = false;
+
         foreach (JEV_CommonFunctions::getJEventsViewList() as $viewfile) {
             $config = JPATH_SITE . "/components/" . JEV_COM_COMPONENT . "/views/" . $viewfile . "/config.xml";
-            if (file_exists($config)) {
-
-                if (!$first) {
+            if (file_exists($config) && !$first) {
                     $first = $viewfile;
                     $class = ' class="active"';
-                } else {
-                    $class = '';
-                }
+
+            } elseif (file_exists($config)) {
+                $class = '';
                 $haslayouts = true;
                 $themes .= '<li ' . $class . '><a ' . $config_tabs . '#' . $viewfile . '"><i class="fa fa-circle-o"></i>'. $viewfile .'</a></li>';
             }
@@ -282,38 +244,58 @@ STYLE;
 
 			<!-- sidebar menu: : style can be found in sidebar.less -->
 			<ul class="sidebar-menu">
-				<li class="header">Events Management</li>
+				<li class="header">' . JText::_("JEV_ADMIN_EVENTS_MANAGEMENT") . '</li>
 				<li class="' . ($task == '' || $task == 'cpanel.cpanel' || $task == 'icalevent.list' || $task == 'icalevent.edit' ? 'active' : '') . ' treeview">
 					<a href="#">
-						<i class="fa fa-dashboard"></i> <span>Events</span> <i class="fa fa-angle-left pull-right"></i>
+						<i class="fa fa-dashboard"></i> <span>' . JText::_("JEV_ADMIN_EVENTS") . '</span> <i class="fa fa-angle-left pull-right"></i>
 					</a>
 					<ul class="treeview-menu">
-						<li><a href="index.php?option=com_jevents&task=icalevent.edit"><i class="fa fa-calendar-plus-o"></i> Add an Event</a></li>
-						<li><a href="index.php?option=com_jevents&task=icalevent.list&state=3"><i class="fa fa-calendar"></i> Manage Events</a></li>
-						<li><a href="index.php?option=com_jevents&task=icalevent.list&state=-1"><i class="fa fa-trash"></i> Trashed Events</a></li>
+						<li><a href="index.php?option=com_jevents&task=icalevent.edit"><i class="fa fa-calendar-plus-o"></i> ' . JText::_("JEV_ADDEVENT") . '</a></li>
+						<li><a href="index.php?option=com_jevents&task=icalevent.list&state=3"><i class="fa fa-calendar"></i> ' . JText::_("JEV_INSTAL_MANAGE") . '</a></li>
+						<li><a href="index.php?option=com_jevents&task=icalevent.list&state=-1"><i class="fa fa-trash"></i> ' . JText::_("JEV_TRASHED_EVENTS") . '</a></li>
 
 					</ul>
 				</li>
 				<li class="' . ($task == 'params.edit' ? 'active' : '') . ' treeview">
                   <a href="#">
-                    <i class="fa fa-cogs"></i> <span>Configuration</span>
+                    <i class="fa fa-cogs"></i> <span>' . JText::_("JEV_INSTAL_CONFIG") . '</span>
                     <i class="fa fa-angle-left pull-right"></i>
                   </a>
                   <ul class="treeview-menu ' . ($task == 'params.edit' ? 'menu-open' : '') . '" >
 
                     <li class="' . ($task == 'params.edit' ? 'active' : '') . '">
-                      <a href="#"><i class="fa fa-cog"></i> JEvents Core <i class="fa fa-angle-left pull-right"></i></a>
+                      <a href="#"><i class="fa fa-cog"></i> ' . JText::_("JEV_ADMIN_JEVENTS_CORE") . '<i class="fa fa-angle-left pull-right"></i></a>
                       <ul class="treeview-menu">
-                        <li class="difficulty1"><a '.$config_tabs.'#JEV_TAB_COMPONENT"><i class="fa fa-circle-o"></i> Component</a></li>
-                        <li class="difficulty1"><a '.$config_tabs.'#JEV_PERMISSIONS"><i class="fa fa-circle-o"></i> Permissions</a></li>
-                        <li class="difficulty1"><a '.$config_tabs.'#JEV_EVENT_EDITING"><i class="fa fa-circle-o"></i> Event Editing</a></li>
-                        <li class="difficulty1"><a '.$config_tabs.'#JEV_EVENT_DETAIL_VIEW"><i class="fa fa-circle-o"></i> Event Detail View</a></li>
-                        <li class="difficulty1"><a '.$config_tabs.'#JEV_MAIN_MONTHLY_CALENDAR"><i class="fa fa-circle-o"></i> Monthly Calendar View</a></li>
-                        <li class="difficulty1"><a '.$config_tabs.'#JEV_YEAR_CATEGORY_VIEW"><i class="fa fa-circle-o"></i> Year/Category View</a></li>
-                        <li class="difficulty2"><a '.$config_tabs.'#JEV_ICAL_CALENDAR"><i class="fa fa-circle-o"></i> iCal Import/Export</a></li>
-                        <li class="difficulty2"><a '.$config_tabs.'#JEV_TAB_RSS"><i class="fa fa-circle-o"></i> RSS</a></li>
-                        <li class="difficulty3"><a '.$config_tabs.'#ROBOT_SEF_OPTIONS"><i class="fa fa-circle-o"></i> SEF/Performance</a></li>
-                        <li class="difficulty3"><a '.$config_tabs.'#JEV_MODULE_CONFIG"><i class="fa fa-circle-o"></i> Module Config</a></li>
+                        <li class="difficulty1"><a '.$config_tabs.'#JEV_TAB_COMPONENT"><i class="fa fa-circle-o"></i> ' . JText::_("JEV_TAB_COMPONENT") . '</a></li>
+                        <li class="difficulty1"><a '.$config_tabs.'#JEV_PERMISSIONS"><i class="fa fa-circle-o"></i> ' . JText::_("JEV_PERMISSIONS") . '</a></li>
+                        <li class="difficulty1"><a '.$config_tabs.'#JEV_EVENT_EDITING"><i class="fa fa-circle-o"></i> ' . JText::_("JEV_EVENT_EDITING") . '</a></li>
+                        <li class="difficulty1"><a '.$config_tabs.'#JEV_EVENT_DETAIL_VIEW"><i class="fa fa-circle-o"></i> ' . JText::_("JEV_EVENT_DETAIL_VIEW") . '</a></li>
+                        <li class="difficulty1"><a '.$config_tabs.'#JEV_MAIN_MONTHLY_CALENDAR"><i class="fa fa-circle-o"></i> ' . JText::_("JEV_ADMIN_MONTHLY_CALENDAR_VIEW") . '</a></li>
+                        <li class="difficulty1"><a '.$config_tabs.'#JEV_YEAR_CATEGORY_VIEW"><i class="fa fa-circle-o"></i> ' . JText::_("YEARCATEGORY_VIEW") . '</a></li>';
+                        if ($difficulty == 1) {
+                            $sidebar_html .= '<li class="difficulty2 hiddenDifficulty"><a '.$config_tabs.'#JEV_ICAL_CALENDAR"><i class="fa fa-circle-o"></i> ' . JText::_("JEV_ICAL_CALENDAR") . '</a></li>
+                            <li class="difficulty2 hiddenDifficulty"><a '.$config_tabs.'#JEV_TAB_RSS"><i class="fa fa-circle-o"></i> ' . JText::_("JEV_TAB_RSS") . '</a></li>';
+                        } else {
+                            $sidebar_html .= '
+                            <li class="difficulty2"><a '.$config_tabs.'#JEV_ICAL_CALENDAR"><i class="fa fa-circle-o"></i> ' . JText::_("JEV_ICAL_CALENDAR") . '</a></li>
+                            <li class="difficulty2"><a '.$config_tabs.'#JEV_TAB_RSS"><i class="fa fa-circle-o"></i> ' . JText::_("JEV_TAB_RSS") . '</a></li>';
+                        }
+                        if ($difficulty <= 2)
+                        {
+                            $sidebar_html .= '
+                            <li class="difficulty3 hiddenDifficulty"><a ' . $config_tabs . '#ROBOT_SEF_OPTIONS"><i class="fa fa-circle-o"></i> ' . JText::_("ROBOT_SEF_OPTIONS") . '</a></li>
+                            <li class="difficulty3 hiddenDifficulty"><a ' . $config_tabs . '#JEV_MODULE_CONFIG"><i class="fa fa-circle-o"></i> ' . JText::_("JEV_MODULE_CONFIG") . '</a></li>
+                            <li class="difficulty3 hiddenDifficulty"><a ' . $config_tabs . '#plugin_options"><i class="fa fa-circle-o"></i> ' . JText::_("JEV_PLUGIN_OPTIONS") . '</a></li>
+                        ';
+                        } else {
+                            $sidebar_html .= '
+                            <li class="difficulty3"><a ' . $config_tabs . '#ROBOT_SEF_OPTIONS"><i class="fa fa-circle-o"></i> ' . JText::_("ROBOT_SEF_OPTIONS") . '</a></li>
+                            <li class="difficulty3"><a ' . $config_tabs . '#JEV_MODULE_CONFIG"><i class="fa fa-circle-o"></i> ' . JText::_("JEV_MODULE_CONFIG") . '</a></li>
+                            <li class="difficulty3"><a ' . $config_tabs . '#plugin_options"><i class="fa fa-circle-o"></i> ' . JText::_("JEV_PLUGIN_OPTIONS") . '</a></li>
+                        ';
+                        }
+
+        $sidebar_html .= '
                       </ul>
                     </li>
                   </ul>
@@ -323,11 +305,18 @@ STYLE;
 						<i class="fa fa-files-o"></i>
 						<span>Custom Layouts</span> <i class="fa fa-angle-left pull-right"></i>
 						<span class="label label-primary pull-right"></span>
-					</a>
+					</a>       
 					<ul class="treeview-menu">
-						<li><a href="index.php?option=com_jevents&task=defaults.list&filter_layout_type=jevents"><i class="fa fa-circle-o"></i> JEvents Core</a></li>
-						<li><a href="index.php?option=com_jevents&task=defaults.list&filter_layout_type=jevpeople"><i class="fa fa-circle-o"></i> Managed People</a></li>
-						<li><a href="index.php?option=com_jevents&task=defaults.list&filter_layout_type=jevlocations"><i class="fa fa-circle-o"></i> Managed Locations</a></li>
+						<li><a href="index.php?option=com_jevents&task=defaults.list&filter_layout_type=jevents"><i class="fa fa-circle-o"></i> ' . JText::_("JEV_ADMIN_JEVENTS_CORE") . '</a></li>';
+                    if (in_array('com_jevpeople', $jevaddons_results))
+                    {
+                        $sidebar_html .= '<li><a href="index.php?option=com_jevents&task=defaults.list&filter_layout_type=jevpeople"><i class="fa fa-circle-o"></i> ' . JText::_("JEV_ADMIN_JEVENTS_MANAGED_PEOPLE") . '</a></li>';
+                    }
+                    if (in_array('com_jevlocations', $jevaddons_results))
+                    {
+                        $sidebar_html .= '<li><a href="index.php?option=com_jevents&task=defaults.list&filter_layout_type=jevlocations"><i class="fa fa-circle-o"></i> ' . JText::_("JEV_ADMIN_JEVENTS_MANAGED_LOCATIONS") . '</a></li>';
+                    }
+                    $sidebar_html .='
 					</ul>
 				</li>';
 
@@ -335,12 +324,13 @@ STYLE;
             $sidebar_html .= '
             <li class="' . ($task == 'params.edit#club-layouts' ? 'active' : '') . ' treeview">
 					<a href="#">
-						<i class="fa fa-laptop"></i> <span>Club Themes</span> <i class="fa fa-angle-left pull-right"></i>
+						<i class="fa fa-laptop"></i> <span>' . JText::_("JEV_ADMIN_CLUB_THEMES") . '</span> <i class="fa fa-angle-left pull-right"></i>
 					</a>
 					<ul class="treeview-menu">' . $themes . '</ul>
 				</li>
 				';
         }
+
 
         $sidebar_html .= '<!-- Custom Fields -->
 				    ' . $customfields . '

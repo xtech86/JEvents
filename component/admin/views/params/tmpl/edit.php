@@ -79,8 +79,7 @@ if (count($jevplugins)){
                             <table class="settings_level">
                                 <tr class=" difficulty1">
                                     <?php
-                                    echo '<td class="paramlist_key"><span class="editlinktip">' . $field->label . '</span></td>';
-                                    echo '<td class="paramlist_value">' . $field->input . '</td>';
+                                    echo '<td class="paramlist_value"><span class="editlinktip">' . $field->label . '</span>' . $field->input . '</td>';
                                     ?>
                                 </tr>
                             </table>
@@ -119,6 +118,14 @@ if (count($jevplugins)){
                                 }
 
                                 foreach ($this->form->getFieldset($name) as $field) {
+
+                                    if ($field->fieldname == "clubcode_spacer") {
+
+                                        echo "<tr><td colspan='2'>" . $field->input . "<br/><br/></td></tr>";
+
+                                        $field->hidden = true;
+                                    }
+
                                     if ($field->hidden || $field->fieldname == "com_difficulty") {
                                         continue;
                                     }
@@ -274,10 +281,152 @@ if (count($jevplugins)){
                                     }
                                 }
                             }
+                            if ($hasPlugins)
+                            {
+                                echo JHtml::_('bootstrap.addPanel', "myParamsTabs", "plugin_options");
+                                echo JHtml::_('bootstrap.startAccordion', 'myPluginAccordion', array('active' => 'collapsexx', 'parent' => 'plugin_options'));
+                                $i = 0;
+                                foreach ($jevplugins as $plugin)
+                                {
+                                    $config = JPATH_SITE . "/plugins/" . $plugin->type . "/" . $plugin->name . "/" . $plugin->name . ".xml";
+                                    if (file_exists($config))
+                                    {
+                                        // Load language file
+                                        $lang     = JFactory::getLanguage();
+                                        $langfile = "plg_" . $plugin->type . "_" . $plugin->name . ".sys";
+                                        $lang->load($langfile, JPATH_ADMINISTRATOR, null, false, true);
+                                        $langfile = "plg_" . $plugin->type . "_" . $plugin->name;
+                                        $lang->load($langfile, JPATH_ADMINISTRATOR, null, false, true);
+
+                                        // Now get plugin specific parameters
+                                        //JFactory::getApplication()->setUserState('com_plugins.edit.plugin.data', array());
+                                        $pluginform = JForm::getInstance("com_jevents.config.plugins." . $plugin->name, $config, array('control' => 'jform_plugin[' . $plugin->type . '][' . $plugin->name . ']', 'load_data' => true), true, "/extension/config/fields");
+                                        //$pluginform = JForm::getInstance('com_plugins.plugin', $config, array('control' => 'jform_plugin['.$plugin->name.']', 'load_data' => true), true, "/extension/config/fields");
+                                        $pluginparams = new JRegistry($plugin->params);
+
+                                        // Load the whole XML config file to get the plugin name in plain english
+                                        $xml = new SimpleXMLElement($config, 0, true);
+                                        // TODO Consider adding enabled/disabled method here for plugins inclusing unpublished ones!
+                                        // TODO handle unpublished plugins too
+                                        $label = JText::_($xml->name);
+
+                                        $checked1 = $plugin->enabled ? 'checked="checked" ' : '';
+                                        $checked0 = !$plugin->enabled ? 'checked="checked" ' : '';
+                                        $label .= '<fieldset class="btn-group radio"  style="float:right;">'
+                                            . '<input type="radio"  ' . $checked1 . '  value="1" name="jform_plugin[' . $plugin->type . '][' . $plugin->name . '][enabled]"  id="jform_plugin_' . $plugin->type . '_' . $plugin->name . '_params_enabled1" class="btn">'
+                                            . '<label for="jform_plugin_' . $plugin->type . '_' . $plugin->name . '_params_enabled1" class="btn">'
+                                            . JText::_('JENABLED')
+                                            . '</label>'
+                                            . '<input type="radio" ' . $checked0 . ' value="0" name="jform_plugin[' . $plugin->type . '][' . $plugin->name . '][enabled]"  id="jform_plugin_' . $plugin->type . '_' . $plugin->name . '_params_enabled0" class="btn">'
+                                            . '<label for="jform_plugin_' . $plugin->type . '_' . $plugin->name . '_params_enabled0" class="btn">'
+                                            . JText::_('JDISABLED')
+                                            . '</label>'
+                                            . '</fieldset>';
+
+                                        $hasfields = false;
+                                        $fieldSets = $pluginform->getFieldsets();
+                                        foreach ($fieldSets as $name => $fieldSet)
+                                        {
+                                            if ($pluginform->getFieldset($name))
+                                            {
+                                                $hasfields = true;
+                                            }
+                                        }
+
+                                        if ($hasfields)
+                                        {
+                                            echo JHtml::_('bootstrap.addSlide', 'myPluginAccordion', JText::_($label), 'collapse' . ($i++));
+
+                                            $fieldSets = $pluginform->getFieldsets();
+                                            $html      = array();
+                                            $hasconfig = false;
+                                            foreach ($fieldSets as $name => $fieldSet)
+                                            {
+                                                if (!$pluginform->getFieldset($name))
+                                                {
+                                                    continue;
+                                                }
+
+                                                $html[] = '<table class="paramlist admintable" >';
+
+                                                if (isset($fieldSet->description) && !empty($fieldSet->description))
+                                                {
+                                                    $desc   = JText::_($fieldSet->description);
+                                                    $html[] = '<tr><td class="paramlist_description" colspan="2">' . $desc . '</td></tr>';
+                                                }
+
+                                                foreach ($pluginform->getFieldset($name) as $field)
+                                                {
+                                                    if ($field->hidden)
+                                                    {
+                                                        continue;
+                                                    }
+
+                                                    // Set the value for the form
+                                                    $field->value = $pluginparams->get($field->fieldname, $field->default);
+
+                                                    $maxjoomlaversion = $this->form->getFieldAttribute($field->fieldname, "maxjoomlaversion", false);
+                                                    if ($maxjoomlaversion && version_compare(JVERSION, $maxjoomlaversion, ">"))
+                                                    {
+                                                        continue;
+                                                    }
+                                                    $minjoomlaversion = $this->form->getFieldAttribute($field->fieldname, "minjoomlaversion", false);
+                                                    if ($minjoomlaversion && version_compare(JVERSION, $minjoomlaversion, "<"))
+                                                    {
+                                                        continue;
+                                                    }
+
+                                                    $hasconfig = true;
+                                                    $class     = isset($field->class) ? $field->class : "";
+
+                                                    if (StringHelper::strlen($class) > 0)
+                                                    {
+                                                        $class = " class='$class'";
+                                                    }
+                                                    $html[] = "<tr $class>";
+                                                    if (!isset($field->label) || $field->label == "")
+                                                    {
+                                                        $html[] = '<td class="paramlist_key"><span class="editlinktip">' . $field->label . '</span></td>';
+                                                        $html[] = '<td class="paramlist_value">' . $field->input . '</td>';
+                                                    }
+                                                    else
+                                                    {
+                                                        $html[] = '<td class="paramlist_value" colspan="2">' . $field->input . '</td>';
+                                                    }
+
+                                                    $html[] = '</tr>';
+                                                }
+                                                $html[] = '</table>';
+                                                echo implode("\n", $html);
+                                            }
+                                            echo JHtml::_('bootstrap.endSlide');
+                                        }
+                                        else
+                                        {
+                                            ?>
+                                            <div class="accordion-group">
+                                                <div class="accordion-heading">
+                                                    <strong>
+                                                    <span class="accordion-toggle">
+                                                    <?php echo $label; ?>
+                                                    </span>
+                                                    </strong>
+                                                </div>
+                                            </div>
+                                            <?php
+                                        }
+                                    }
+                                    else
+                                    {
+                                        //echo $plugin->name;
+                                    }
+                                }
+                                echo JHtml::_('bootstrap.endAccordion');
+                                echo JHtml::_('bootstrap.endPanel');
+                            }
+
                             echo JHtml::_('bootstrap.endPane', 'myParamsTabs');
                             ?>
-
-
                 </div>
             </div>
         </section>

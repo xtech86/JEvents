@@ -340,7 +340,7 @@ class AdminIcaleventViewIcalevent extends JEventsAbstractView
 
 	}
 
-	function toolbarConfirmButton($task = '', $msg = '', $icon = '', $iconOver = '', $alt = '', $listSelect = true)
+	public function toolbarConfirmButton($task = '', $msg = '', $icon = '', $iconOver = '', $alt = '', $listSelect = true)
 	{
 		$bar =  JToolBar::getInstance('toolbar');
 

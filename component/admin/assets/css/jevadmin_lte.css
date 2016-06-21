@@ -869,6 +869,9 @@ a:focus {
 .sidebar-menu .treeview-menu > li > a > .fa-angle-down {
   width: auto;
 }
+.sidebar-menu a.themes_link {
+  text-transform: capitalize;
+}
 /*
  * Component: Sidebar Mini
  */

@@ -375,11 +375,13 @@ $accesslevels = "jeval".implode(" jeval", array_unique($accesslevels));
 										echo JHtml::_('bootstrap.addPanel', 'myEditTabs', "common");
 									}
 									?>
-									<div class="row jevtitle">
-										<div class="span2">
+									<div class="row">
+										<div class="span4">
+										<div class="row jevtitle">
+										<div class="span12">
 											<?php echo $this->form->getLabel("title"); ?>
 										</div>
-										<div class="span10">
+										<div class="span12">
 											<?php echo str_replace("/>", " data-placeholder='xx' />", $this->form->getInput("title")); ?>
 										</div>
 									</div>
@@ -388,10 +390,10 @@ $accesslevels = "jeval".implode(" jeval", array_unique($accesslevels));
 									{
 										?>
 										<div class="row jevpriority">
-											<div class="span2">
+											<div class="span12">
 												<?php echo $this->form->getLabel("priority"); ?>
 											</div>
-											<div class="span10">
+											<div class="span12">
 												<?php echo $this->form->getInput("priority"); ?>
 											</div>
 										</div>
@@ -403,10 +405,10 @@ $accesslevels = "jeval".implode(" jeval", array_unique($accesslevels));
 									{
 										?>
 										<div class="row jevcreator">
-											<div class="span2">
+											<div class="span12">
 												<?php echo $this->form->getLabel("creator"); ?>
 											</div>
-											<div class="span10">
+											<div class="span12">
 												<?php echo $this->form->getInput("creator"); ?>
 											</div>
 										</div>
@@ -418,10 +420,10 @@ $accesslevels = "jeval".implode(" jeval", array_unique($accesslevels));
 									{
 										?>
 										<div class="row jevcalendar">
-											<div class="span2">
+											<div class="span12">
 												<?php echo $this->form->getLabel("ics_id"); ?>
 											</div>
-											<div class="span10">
+											<div class="span12">
 												<?php echo $this->form->getInput("ics_id"); ?>
 											</div>
 										</div>
@@ -435,10 +437,10 @@ $accesslevels = "jeval".implode(" jeval", array_unique($accesslevels));
 									{
 										?>
 										<div class="row jevlockevent">
-											<div class="span2">
+											<div class="span12">
 												<?php echo $this->form->getLabel("lockevent"); ?>
 											</div>
-											<div class="span10 radio btn-group">
+											<div class="span12 radio btn-group">
 												<?php echo $this->form->getInput("lockevent"); ?>
 											</div>
 										</div>
@@ -453,12 +455,12 @@ $accesslevels = "jeval".implode(" jeval", array_unique($accesslevels));
 											if ($this->form->getLabel("catid"))
 											{
 												?>
-												<div class="span2">
+												<div class="span12">
 													<?php
 													echo $this->form->getLabel("catid");
 													?>
 												</div>
-												<div class="span10 jevcategory">
+												<div class="span12 jevcategory">
 													<?php echo $this->form->getInput("catid"); ?>
 												</div>
 												<?php
@@ -498,12 +500,12 @@ $accesslevels = "jeval".implode(" jeval", array_unique($accesslevels));
 											if ($this->form->getLabel("access"))
 											{
 												?>
-												<div class="span2">
+												<div class="span12">
 													<?php
 													echo $this->form->getLabel("access");
 													?>
 												</div>
-												<div class="span10 accesslevel ">
+												<div class="span12 accesslevel ">
 													<?php echo $this->form->getInput("access"); ?>
 												</div>
 												<?php
@@ -517,10 +519,10 @@ $accesslevels = "jeval".implode(" jeval", array_unique($accesslevels));
 									{
 										?>
 										<div class="row jevpublished">
-											<div class="span2">
+											<div class="span12">
 												<?php echo $this->form->getLabel("state"); ?>
 											</div>
-											<div class="span10">
+											<div class="span12">
 												<?php echo $this->form->getInput("state"); ?>
 											</div>
 										</div>
@@ -536,16 +538,25 @@ $accesslevels = "jeval".implode(" jeval", array_unique($accesslevels));
 									{
 										?>
 										<div class="row jevcolour">
-											<div class="span2">
+											<div class="span12">
 												<?php echo $this->form->getLabel("color"); ?>
 											</div>
-											<div class="span10">
+											<div class="span12">
 												<?php echo $this->form->getInput("color"); ?>
 											</div>
 										</div>
 										<?php
 									}
-
+								?> 									<div class="row jev_contact">
+												<div class="span12">
+													<?php echo $this->form->getLabel("contact_info"); ?>
+												</div>
+												<div class="span12" >
+													<?php echo $this->form->getInput("contact_info"); ?>
+												</div>
+											</div>
+											</div>
+											<?php
 									if ($cfg->get('timebeforedescription', 0))
 									{
 										ob_start();
@@ -558,36 +569,31 @@ $accesslevels = "jeval".implode(" jeval", array_unique($accesslevels));
 									}
 									?>
 
+								<div class="span8">
 									<div class="row jev_description">
-										<div class="span2">
+										<div class="span12">
 											<?php echo $this->form->getLabel("jevcontent"); ?>
 										</div>
-										<div class="span10" id='jeveditor' >
+										<div class="span12" id='jeveditor' >
 											<?php echo $this->form->getInput("jevcontent"); ?>
 										</div>
 									</div>
-									<div class="row jeveditlocation" id="jeveditlocation">
-										<div class="span2">
-											<?php echo $this->form->getLabel("location"); ?>
-										</div>
-										<div class="span10" >
-											<?php echo $this->form->getInput("location"); ?>
-										</div>
-									</div>
-									<div class="row jev_contact">
-										<div class="span2">
-											<?php echo $this->form->getLabel("contact_info"); ?>
-										</div>
-										<div class="span10" >
-											<?php echo $this->form->getInput("contact_info"); ?>
-										</div>
-									</div>
 									<div class="row jev_extrainfo">
-										<div class="span2">
+										<div class="span12">
 											<?php echo $this->form->getLabel("extra_info"); ?>
 										</div>
-										<div class="span10" >
+										<div class="span12" >
 											<?php echo $this->form->getInput("extra_info"); ?>
+										</div>
+									</div>
+								</div>
+								</div>
+										<div class="row jeveditlocation" id="jeveditlocation">
+										<div class="span12">
+											<?php echo $this->form->getLabel("location"); ?>
+										</div>
+										<div class="span12" >
+											<?php echo $this->form->getInput("location"); ?>
 										</div>
 									</div>
 

@@ -128,13 +128,9 @@ class AdminIcalsViewIcals extends JEventsAbstractView
 
 
 		JHTML::_('behavior.tooltip');
-                
-                if (JevJoomlaVersion::isCompatible("3.0")){
-                    $this->setLayout("edit");
-                }
-                else {
-                    $this->setLayout("edit16");
-                }
+
+		$this->setLayout("edit");
+
 	}
 
 }

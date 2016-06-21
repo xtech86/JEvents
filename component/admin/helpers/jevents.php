@@ -231,12 +231,12 @@ STYLE;
             $config = JPATH_SITE . "/components/" . JEV_COM_COMPONENT . "/views/" . $viewfile . "/config.xml";
             if (file_exists($config) && !$first) {
                     $first = $viewfile;
-                    $class = ' class="active"';
+                    $class = ' class="active "';
 
             } elseif (file_exists($config)) {
                 $class = '';
                 $haslayouts = true;
-                $themes .= '<li ' . $class . '><a ' . $config_tabs . '#' . $viewfile . '"><i class="fa fa-circle-o"></i>'. $viewfile .'</a></li>';
+                $themes .= '<li ' . $class . '><a ' . $config_tabs . '#' . $viewfile . '" class="themes_link"><i class="fa fa-circle-o"></i>'. $viewfile .'</a></li>';
             }
         }
 
@@ -245,9 +245,16 @@ STYLE;
 			<!-- sidebar menu: : style can be found in sidebar.less -->
 			<ul class="sidebar-menu">
 				<li class="header">' . JText::_("JEV_ADMIN_EVENTS_MANAGEMENT") . '</li>
+				<li class="' . ($task == '' || $task == 'cpanel.cpanel' || $task == 'icalevent.list' || $task == 'icalevent.edit' ? 'active' : '') . ' ">
+				
+					<a href="index.php?option=com_jevents&task=cpanel.cpanel">
+						<i class="fa fa-dashboard"></i> <span>' . JText::_("JEV_ADMIN_DASHBOARD") . '</span>
+					</a>
+				</li>
 				<li class="' . ($task == '' || $task == 'cpanel.cpanel' || $task == 'icalevent.list' || $task == 'icalevent.edit' ? 'active' : '') . ' treeview">
+				
 					<a href="#">
-						<i class="fa fa-dashboard"></i> <span>' . JText::_("JEV_ADMIN_EVENTS") . '</span> <i class="fa fa-angle-left pull-right"></i>
+						<i class="fa fa-calendar-plus-o"></i> <span>' . JText::_("JEV_ADMIN_EVENTS") . '</span> <i class="fa fa-angle-left pull-right"></i>
 					</a>
 					<ul class="treeview-menu">
 						<li><a href="index.php?option=com_jevents&task=icalevent.edit"><i class="fa fa-calendar-plus-o"></i> ' . JText::_("JEV_ADDEVENT") . '</a></li>
@@ -255,6 +262,17 @@ STYLE;
 						<li><a href="index.php?option=com_jevents&task=icalevent.list&state=-1"><i class="fa fa-trash"></i> ' . JText::_("JEV_TRASHED_EVENTS") . '</a></li>
 
 					</ul>
+				</li>
+				<li>
+					<a href="index.php?option=com_categories&extension=com_jevents">
+						<i class="fa fa-folder"></i> <span>' . JText::_("JEV_CATEGORIES") . '</span>
+					</a>
+				</li>
+				<li class="' . ($task == 'icals.overview' || $task == 'icals.edit'  ?  'active' : '') . ' ">
+				
+					<a href="index.php?option=com_jevents&task=icals.overview">
+						<i class="fa fa-calendar"></i> <span>' . JText::_("JEV_ADMIN_CALENDAR_FEEDS") . '</span>
+					</a>
 				</li>
 				<li class="' . ($task == 'params.edit' ? 'active' : '') . ' treeview">
                   <a href="#">
@@ -303,7 +321,7 @@ STYLE;
 				<li class="' . ($task == 'defaults.list' || $task == 'defaults.edit'  ? 'active' : '') . ' treeview">
 					<a href="#">
 						<i class="fa fa-files-o"></i>
-						<span>Custom Layouts</span> <i class="fa fa-angle-left pull-right"></i>
+						<span>' . JText::_("JEV_LAYOUT_DEFAULTS") . '</span> <i class="fa fa-angle-left pull-right"></i>
 						<span class="label label-primary pull-right"></span>
 					</a>       
 					<ul class="treeview-menu">

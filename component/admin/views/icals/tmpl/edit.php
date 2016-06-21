@@ -79,6 +79,7 @@ $action = JFactory::getApplication()->isAdmin() ? "index.php" : "index.php?optio
         echo JEventsHTML::buildScriptTag('end');
         
         ?>
+        ji
         <div class="control-group">
             <div class="control-label">
                 <?php echo JText::_("Unique_Identifier"); ?> 

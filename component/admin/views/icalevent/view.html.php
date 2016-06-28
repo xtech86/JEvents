@@ -145,7 +145,7 @@ class AdminIcaleventViewIcalevent extends JEventsAbstractView
 			JToolBarHelper::title(JText::_('EDIT_ICAL_EVENT'), 'jevents');
 		}
 
-		$bar =  JToolBar::getInstance('toolbar');
+		$bar =  JToolBar::getInstance('newtoolbar');
 		if ($this->id > 0)
 		{
 			if ($this->editCopy)
@@ -164,12 +164,12 @@ class AdminIcaleventViewIcalevent extends JEventsAbstractView
 		else
 		{
 			if (JEVHelper::isEventEditor())
-				JToolBarHelper::apply('icalevent.apply', "JEV_SAVE");
-			JToolBarHelper::save('icalevent.save');
-			JToolBarHelper::save2new('icalevent.savenew', "JEV_SAVE_NEW");
+				$this->toolbarApply('icalevent.apply', "JEV_SAVE");
+			$this->toolbarSave('icalevent.save');
+			$this->toolbarSave2new('icalevent.savenew', "JEV_SAVE_NEW");
 		}
 
-		JToolBarHelper::cancel('icalevent.list');
+		$this->toolbarCancel('icalevent.list');
 		//JToolBarHelper::help( 'screen.icalevent.edit', true);
 
 		// TODO move this into JForm field type!
@@ -240,7 +240,7 @@ class AdminIcaleventViewIcalevent extends JEventsAbstractView
 		JToolbarHelper::save('icalevent.savetranslation');
 		JToolbarHelper::cancel('icalevent.close');
 
-		$bar =  JToolBar::getInstance('toolbar');
+		$bar =  JToolBar::getInstance('newtoolbar');
 
 		// Add a standard button
 		$bar->appendButton('confirm', JText::_("JEV_DELETE_TRANSLATION_WARNING"),  'trash',  'JEV_DELETE', "icalevent.deletetranslation", false);
@@ -342,7 +342,7 @@ class AdminIcaleventViewIcalevent extends JEventsAbstractView
 
 	public function toolbarConfirmButton($task = '', $msg = '', $icon = '', $iconOver = '', $alt = '', $listSelect = true)
 	{
-		$bar =  JToolBar::getInstance('toolbar');
+		$bar =  JToolBar::getInstance('newtoolbar');
 
 		// Add a standard button
 		$bar->appendButton('Jevconfirm', $msg, $icon, $alt, $task, $listSelect, false, "document.adminForm.updaterepeats.value");

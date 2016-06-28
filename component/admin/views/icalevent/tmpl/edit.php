@@ -69,6 +69,9 @@ $accesslevels = "jeval".implode(" jeval", array_unique($accesslevels));
 
 	JEVHelper::stylesheet('jev_cp.css', 'administrator/components/' . JEV_COM_COMPONENT . '/assets/css/');
 
+        $bar = JToolBar::getInstance('newtoolbar');
+        $barhtml = $bar->getItems() ? $bar->render() : "";
+        
 	?>
 	<div id="jev_adminui" class="jev_adminui skin-blue sidebar-mini">
 		<header class="main-header">
@@ -89,6 +92,8 @@ $accesslevels = "jeval".implode(" jeval", array_unique($accesslevels));
 				<h1>
 					<?php echo JText::_("JEV_CREATE_AN_EVENT"); ?>
 					<small><?php echo JText::_("JEV_CREATE_AN_EVENT_STRAPLINE"); ?></small>
+                                        <?php echo $barhtml;?>
+                                        
 				</h1>
 			</section>
 
@@ -701,7 +706,7 @@ $app = JFactory::getApplication();
 if ($app->isSite()) {
     if ($params->get('com_edit_toolbar', 0) == 1 || $params->get('com_edit_toolbar', 0) == 2 ) {
         //Load the toolbar at the bottom!
-        $bar = JToolBar::getInstance('toolbar');
+        $bar = JToolBar::getInstance('newtoolbar');
         $barhtml = $bar->render();
         echo $barhtml;
     }

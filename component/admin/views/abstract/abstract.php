@@ -863,4 +863,81 @@ class JEventsAbstractView extends JViewLegacy
 
 	}
 
+	/**
+	 * Writes a save button for a given option.
+	 * Save operation leads to a save and then close action.
+	 *
+	 * @param   string  $task  An override for the task.
+	 * @param   string  $alt   An override for the alt text.
+	 *
+	 * @return  void
+	 *
+	 * @since   1.5
+	 */
+	public function toolbarSave($task = 'save', $alt = 'JTOOLBAR_SAVE')
+	{
+		$bar = JToolbar::getInstance('newtoolbar');
+
+		// Add a save button.
+		$bar->appendButton('Standard', 'save', $alt, $task, false);
+	}
+
+	/**
+	 * Writes a save and create new button for a given option.
+	 * Save and create operation leads to a save and then add action.
+	 *
+	 * @param   string  $task  An override for the task.
+	 * @param   string  $alt   An override for the alt text.
+	 *
+	 * @return  void
+	 *
+	 * @since   1.6
+	 */
+	public function toolbarSave2new($task = 'save2new', $alt = 'JTOOLBAR_SAVE_AND_NEW')
+	{
+		$bar = JToolbar::getInstance('newtoolbar');
+
+		// Add a save and create new button.
+		$bar->appendButton('Standard', 'save-new', $alt, $task, false);
+	}        
+        
+	/**
+	 * Writes a cancel button and invokes a cancel operation (eg a checkin).
+	 *
+	 * @param   string  $task  An override for the task.
+	 * @param   string  $alt   An override for the alt text.
+	 *
+	 * @return  void
+	 *
+	 * @since   1.5
+	 */
+	public  function toolbarCancel($task = 'cancel', $alt = 'JTOOLBAR_CANCEL')
+	{
+		$bar = JToolbar::getInstance('newtoolbar');
+
+		// Add a cancel button.
+		$bar->appendButton('Standard', 'cancel', $alt, $task, false);
+	}
+        
+        
+	/**
+	 * Writes a save button for a given option.
+	 * Apply operation leads to a save action only (does not leave edit mode).
+	 *
+	 * @param   string  $task  An override for the task.
+	 * @param   string  $alt   An override for the alt text.
+	 *
+	 * @return  void
+	 *
+	 * @since   1.5
+	 */
+	public  function toolbarApply($task = 'apply', $alt = 'JTOOLBAR_APPLY')
+	{
+		$bar = JToolbar::getInstance('newtoolbar');
+
+		// Add an apply button
+		$bar->appendButton('Standard', 'apply', $alt, $task, false);
+	}
+
+        
 }

@@ -14,6 +14,9 @@ body.view-.layout-.task- .btn.btn-subhead #jev_adminui,
 body.admin.com_jevents.view-.layout-.task-cpanel\.cpanel .btn.btn-subhead #jev_adminui {
   top: 0px;
 }
+body.com_jevents #isisJsData {
+  display: none;
+}
 body.com_jevents > .container-fluid.container-main {
   margin: 0px !important;
   padding: 0px !important;
@@ -29,10 +32,10 @@ body.com_jevents .subhead-fixed {
   z-index: 1021;
 }
 body.com_jevents #jev_adminui {
-  top: 45px;
+  top: 33px;
   position: absolute;
   width: 100%;
-  margin-top: 30px;
+  margin-top: 0px;
 }
 body.com_jevents #jev_adminui #system-message-container.j-toggle-main {
   float: none;

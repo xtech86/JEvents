@@ -9,16 +9,20 @@ $pathIMG = JURI::root() . '/administrator/images/';
 JEVHelper::stylesheet('jev_cp.css', 'administrator/components/' . JEV_COM_COMPONENT . '/assets/css/');
 JEVHelper::script('select2.full.min.js', 'administrator/components/' . JEV_COM_COMPONENT . '/assets/js/plugins/select2/');
 
+//Custom Toolbar Load
+$bar     = JToolBar::getInstance('newtoolbar');
+$toolbar = $bar->getItems() ? $bar->render() : "";
+
 ?>
 <div id="jev_adminui" class="jev_adminui skin-blue sidebar-mini">
 	<header class="main-header">
-		<?php echo JEventsHelper::addAdminHeader(); ?>
+		<?php echo JEventsHelper::addAdminHeader($items = array(), $toolbar); ?>
 	</header>
 	<!-- =============================================== -->
 	<!-- Left side column. contains the sidebar -->
 	<aside class="main-sidebar">
 		<!-- sidebar: style can be found in sidebar.less -->
-		<?php echo JEventsHelper:: addAdminSidebar(); ?>
+		<?php echo JEventsHelper:: addAdminSidebar($toolbar); ?>
 		<!-- /.sidebar -->
 	</aside>
 	<!-- =============================================== -->

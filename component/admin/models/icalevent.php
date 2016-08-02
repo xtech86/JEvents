@@ -13,7 +13,7 @@ class IcaleventsModelicalevent extends JModelAdmin
 	 *
 	 * @since 1.5
 	 */
-	function __construct()
+	public function __construct()
 	{
 		parent::__construct();
 	}

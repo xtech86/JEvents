@@ -70,18 +70,18 @@ $accesslevels = "jeval".implode(" jeval", array_unique($accesslevels));
 	JEVHelper::stylesheet('jev_cp.css', 'administrator/components/' . JEV_COM_COMPONENT . '/assets/css/');
 
         $bar = JToolBar::getInstance('newtoolbar');
-        $barhtml = $bar->getItems() ? $bar->render() : "";
+        $toolbar = $bar->getItems() ? $bar->render() : "";
         
 	?>
 	<div id="jev_adminui" class="jev_adminui skin-blue sidebar-mini">
 		<header class="main-header">
-			<?php echo JEventsHelper::addAdminHeader(); ?>
+			<?php echo JEventsHelper::addAdminHeader($items = array(), $toolbar); ?>
 		</header>
 		<!-- =============================================== -->
 		<!-- Left side column. contains the sidebar -->
 		<aside class="main-sidebar">
 			<!-- sidebar: style can be found in sidebar.less -->
-			<?php echo JEventsHelper:: addAdminSidebar(); ?>
+			<?php echo JEventsHelper:: addAdminSidebar($toolbar); ?>
 			<!-- /.sidebar -->
 		</aside>
 		<!-- =============================================== -->
@@ -91,9 +91,7 @@ $accesslevels = "jeval".implode(" jeval", array_unique($accesslevels));
 			<section class="content-header">
 				<h1>
 					<?php echo JText::_("JEV_CREATE_AN_EVENT"); ?>
-					<small><?php echo JText::_("JEV_CREATE_AN_EVENT_STRAPLINE"); ?></small>
-                                        <?php echo $barhtml;?>
-                                        
+					<small><?php echo JText::_("JEV_CREATE_AN_EVENT_STRAPLINE"); ?></small> 					
 				</h1>
 			</section>
 
@@ -108,8 +106,6 @@ $accesslevels = "jeval".implode(" jeval", array_unique($accesslevels));
 						?> >
 							<form action="<?php echo $action; ?>" method="post" name="adminForm" enctype='multipart/form-data' id="adminForm"   class="form-horizontal jevbootstrap" >
 								<?php
-								ob_start();
-
 								// these are needed for front end admin
 								ob_start();
 								?>
@@ -591,6 +587,18 @@ $accesslevels = "jeval".implode(" jeval", array_unique($accesslevels));
 											<?php echo $this->form->getInput("extra_info"); ?>
 										</div>
 									</div>
+									<!-- Started tags iimpelementation
+									TODO - Complete implementation
+									<div class="row jev_tags">
+										<div class="span12">
+											<?php echo $this->form->getLabel("tags"); ?>
+										</div>
+										<div class="span12" >
+											<?php echo $this->form->getInput("tags"); ?>
+										</div>
+									</div>
+									-->
+
 								</div>
 								</div>
 										<div class="row jeveditlocation" id="jeveditlocation">

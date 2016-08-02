@@ -36,7 +36,7 @@ class AdminCpanelViewCpanel extends JEventsAbstractView
 		$document->setTitle(JText::_('JEVENTS') . ' :: ' . JText::_('JEVENTS'));
 
         // Set toolbar items for the page
-		JToolBarHelper::title(JText::_('JEVENTS') . ' :: ' . JText::_('JEVENTS'), 'jevents');
+		$this->toolbartitle(JText::_('JEVENTS') . ': ' . JText::_('JEV_DASHBOARD'), 'jevents');
 
 		JEventsHelper::addSubmenu();
 
@@ -950,17 +950,18 @@ class AdminCpanelViewCpanel extends JEventsAbstractView
 
 	}
 
-	function custom_css()
+	public function custom_css()
 	{
 		jimport('joomla.html.pane');
 
 		$document = JFactory::getDocument();
 		$document->setTitle(JText::_('JEVENTS') . ' :: ' . JText::_('JEVENTS'));
+		$bar =  JToolBar::getInstance('newtoolbar');
 
-		JToolBarHelper::title(JText::_('JEVENTS') . ' :: ' . JText::_('JEVENTS'), 'jevents');
+		$this->toolbartitle(JText::_('JEVENTS') . ': ' . JText::_('JEV_CUSTOM_CSS'), 'jevents');
 
-        JToolBarHelper::apply('cpanel.custom_css');
-        JToolBarHelper::cancel('cpanel.cpanel');
+        $this->toolbarApply('cpanel.custom_css');
+        $this->toolbarCancel('cpanel.cpanel');
 
      //   jimport('joomla.form.form');
 
@@ -976,7 +977,7 @@ class AdminCpanelViewCpanel extends JEventsAbstractView
 
 	}
 
-	function setUpdateUrls()
+	protected  function setUpdateUrls()
 	{
 		$params = JComponentHelper::getParams(JEV_COM_COMPONENT);
 

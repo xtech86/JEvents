@@ -313,15 +313,15 @@ class AdminIcaleventController extends JControllerAdmin
 		}
 		else if ($order == 'created')
 		{
-			$order = ($this->_largeDataSet ? "\n GROUP BY  ev.ev_id ORDER BY ev.created $dir" : "\n GROUP BY  ev.ev_id ORDER BY ev.created $dir");
+			$order =  "\n GROUP BY  ev.ev_id ORDER BY ev.created $dir";
 		}
 		else if ($order == 'modified')
 		{
-			$order = ($this->_largeDataSet ? "\n GROUP BY  ev.ev_id ORDER BY modified $dir" : "\n GROUP BY  ev.ev_id ORDER BY modified $dir");
+			$order = "\n GROUP BY  ev.ev_id ORDER BY modified $dir";
 		}
 		else
 		{
-			$order = ($this->_largeDataSet ? "\n GROUP BY  ev.ev_id ORDER BY detail.summary $dir" : "\n GROUP BY  ev.ev_id ORDER BY detail.summary $dir");
+			$order = "\n GROUP BY  ev.ev_id ORDER BY detail.summary $dir";
 		}
 		// only include repeat id since we need it if we call plugins on the resultant data
 		$query = "SELECT ev.* " .  ($this->_largeDataSet ? "" :", rpt.rp_id") . ", ev.state as evstate, detail.*, ev.created as created, max(detail.modified) as modified,  a.title as _groupname " . $anonfields

@@ -19,7 +19,7 @@ defined('_JEXEC') or die();
 class AdminIcaleventViewIcalevent extends JEventsAbstractView
 {
 
-	function overview($tpl = null)
+	public function overview($tpl = null)
 	{
 
 		// Get data from the model
@@ -28,25 +28,26 @@ class AdminIcaleventViewIcalevent extends JEventsAbstractView
 		$document = JFactory::getDocument();
 		$document->setTitle(JText::_('ICAL_EVENTS'));
 
-		// Set toolbar items for the page
-		JToolBarHelper::title(JText::_('ICAL_EVENTS'), 'jevents');
+		$bar =  JToolBar::getInstance('newtoolbar');
 
-		JToolBarHelper::addNew('icalevent.edit');
-		JToolBarHelper::editList('icalevent.edit');
-		JToolBarHelper::publishList('icalevent.publish');
-		JToolBarHelper::unpublishList('icalevent.unpublish');
-		JToolBarHelper::custom('icalevent.editcopy', 'copy.png', 'copy.png', 'JEV_ADMIN_COPYEDIT');
-		$state = intval(JFactory::getApplication()->getUserStateFromRequest("stateIcalEvents", 'state', 0));
+		// Set toolbar items for the page
+		$this->toolbartitle(JText::_('ICAL_EVENTS'), 'jevents');
+
+		$this->toolbaraddNew('icalevent.edit');
+		$this->toolbareditList('icalevent.edit');
+		$this->toolbarpublishList('icalevent.publish');
+		$this->toolbarunpublishList('icalevent.unpublish');
+		$this->toolbarcustom('icalevent.editcopy', 'copy.png', 'copy.png', 'JEV_ADMIN_COPYEDIT');
+		$state = (int) JFactory::getApplication()->getUserStateFromRequest("stateIcalEvents", 'state', 0);
 		if ($state==-1){
-			JToolBarHelper::deleteList("JEV_EMPTY_TRASH_DELETE_EVENT_AND_ALL_REPEATS", 'icalevent.emptytrash',"JTOOLBAR_EMPTY_TRASH");
+			$this->toolbardeleteList("JEV_EMPTY_TRASH_DELETE_EVENT_AND_ALL_REPEATS", 'icalevent.emptytrash',"JTOOLBAR_EMPTY_TRASH");
 		}
 		else {
-			JToolBarHelper::trash('icalevent.delete');
+			$this->toolbartrash('icalevent.delete');
 		}
-		JToolBarHelper::spacer();
+		$this->toolbarspacer();
 		//JToolBarHelper::help( 'screen.ical', true);
 
-		JEventsHelper::addSubmenu();
 
 		$showUnpublishedICS = false;
 
@@ -100,8 +101,7 @@ class AdminIcaleventViewIcalevent extends JEventsAbstractView
 				JText::_('JEV_EVENT_CREATOR'), 'created_by', JHtml::_('select.options', $userOptions, 'value', 'text', $created_by)
 		);
 
-		$this->sidebar = JHtmlSidebar::render();
-		
+		$this->filters = JHtmlSidebar::render();
 
 		$params = JComponentHelper::getParams(JEV_COM_COMPONENT);
 		//$section = $params->get("section",0);
@@ -237,8 +237,8 @@ class AdminIcaleventViewIcalevent extends JEventsAbstractView
 	{
 		JFactory::getApplication()->input->set('hidemainmenu', true);
 
-		JToolbarHelper::save('icalevent.savetranslation');
-		JToolbarHelper::cancel('icalevent.close');
+		$this->toolbarSave('icalevent.savetranslation');
+		$this->toolbarCancel('icalevent.close');
 
 		$bar =  JToolBar::getInstance('newtoolbar');
 
@@ -247,7 +247,7 @@ class AdminIcaleventViewIcalevent extends JEventsAbstractView
 		
 	}
 	
-	function csvimport($tpl = null)
+	protected function csvimport($tpl = null)
 	{
 
 		$document = JFactory::getDocument();
@@ -259,9 +259,6 @@ class AdminIcaleventViewIcalevent extends JEventsAbstractView
 		JToolBarHelper::cancel('icalevent.list');
 
 		JEventsHelper::addSubmenu();
-
-		$params = JComponentHelper::getParams(JEV_COM_COMPONENT);
-		//$section = $params->get("section",0);
 
 		JHTML::_('behavior.tooltip');
 

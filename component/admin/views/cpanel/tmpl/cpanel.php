@@ -17,16 +17,20 @@ $version = JEventsVersion::getInstance();
 
 JEVHelper::stylesheet('jev_cp.css', 'administrator/components/' . JEV_COM_COMPONENT . '/assets/css/');
 
+//Custom Toolbar Load
+$bar     = JToolBar::getInstance('newtoolbar');
+$toolbar = $bar->getItems() ? $bar->render() : "";
+
 ?>
 <div id="jev_adminui" class="jev_adminui skin-blue sidebar-mini">
 	<header class="main-header">
-		<?php echo JEventsHelper::addAdminHeader(); ?>
+		<?php echo JEventsHelper::addAdminHeader($items = array(), $toolbar); ?>
 	</header>
 	<!-- =============================================== -->
 	<!-- Left side column. contains the sidebar -->
 	<aside class="main-sidebar">
 		<!-- sidebar: style can be found in sidebar.less -->
-		<?php echo JEventsHelper:: addAdminSidebar(); ?>
+		<?php echo JEventsHelper:: addAdminSidebar($toolbar); ?>
 		<!-- /.sidebar -->
 	</aside>
 	<!-- =============================================== -->
@@ -204,6 +208,40 @@ JEVHelper::stylesheet('jev_cp.css', 'administrator/components/' . JEV_COM_COMPON
 							<span class="label label-danger pull-right"><i class="fa fa-database"></i></span>
 						</div><!-- /.box-header -->
 						<div class="box-body">
+							<?php
+							// lets get the first 10 unpublished events
+							// TODO remove the query from the view, should be in model.
+
+							// Get a db connection.
+							$db = JFactory::getDbo();
+
+							// Create a new query object.
+							$query = $db->getQuery(true);
+
+							// Select all records from the user profile table where key begins with "custom.".
+							// Order it by the ordering field.
+
+
+							$query
+								->select(array('dtstart', 'dtend', 'summary', 'published', 'modified'))
+								->from($db->quoteName('#__jevents_vevdetail'))
+								->where($db->quoteName('published') . ' = -1')
+								->order('modified ASC')
+								->setLimit('10');
+
+							//echo ($query);die;
+							// Reset the query using our newly populated query object.
+							$db->setQuery($query);
+
+
+							// Load the results as a list of stdClass objects (see later for more options on retrieving data).
+							$results = $db->loadObjectList();
+							//var_dump($results);
+							foreach ($results as $row) {
+								echo $row->summary . "</br>1";
+							}
+
+							?>
 							<p>Great! You have no unpublished events.</b></p>
 							<a href="http://almsaeedstudio.com/download/AdminLTE" class="btn btn-danger"><i class="fa fa-download"></i> Download</a>
 						</div><!-- /.box-body -->

@@ -28,22 +28,23 @@ $order = JFactory::getApplication()->getUserStateFromRequest("eventsorder", "fil
 $pathIMG = JURI::root() . 'administrator/images/';
 $mainspan = 10;
 $fullspan = 12;
+
+//Custom Toolbar Load
+$bar     = JToolBar::getInstance('newtoolbar');
+$toolbar = $bar->getItems() ? $bar->render() : "";
+
 ?>
 <form action="index.php" method="post" name="adminForm" id="adminForm">
     <!-- New FLAT Admin UI -->
     <div id="jev_adminui" class="jev_adminui skin-blue sidebar-mini">
         <header class="main-header">
-
-            <?php
-            $header_items = array();
-
-            echo JEventsHelper::addAdminHeader($header_items); ?>
+            <?php echo JEventsHelper::addAdminHeader($items = array(), $toolbar); ?>
         </header>
         <!-- =============================================== -->
         <!-- Left side column. contains the sidebar -->
         <aside class="main-sidebar">
             <!-- sidebar: style can be found in sidebar.less -->
-            <?php echo JEventsHelper:: addAdminSidebar(); ?>
+            <?php echo JEventsHelper:: addAdminSidebar($toolbar); ?>
             <!-- /.sidebar -->
         </aside>
         <!-- =============================================== -->
@@ -55,11 +56,14 @@ $fullspan = 12;
                     <?php echo JText::_("JEV_ADMIN_ICAL_EVENTS"); ?>
                     <small><?php echo JText::_("JEV_SELECT_EVENT_TO_EDIT");?></small>
                 </h1>
+                <section class="content-filters">
+                    <?php
+                    if ($this->filters) { echo $this->filters; }?>
+                </section>
             </section>
 
             <!-- Main content -->
             <section class="content events_list">
-
                 <!-- Default box -->
                 <div class="box">
                     <!-- /.box-header -->

@@ -19,68 +19,55 @@ defined('_JEXEC') or die();
  */
 class AdminIcalsViewIcals extends JEventsAbstractView
 {
-	
-	function overview($tpl = null)
+
+	public function overview($tpl = null)
 	{
 
 		$document = JFactory::getDocument();
-		$document->setTitle(JText::_( 'ICALS' ));
+		$document->setTitle(JText::_('ICALS'));
 
 		// Set toolbar items for the page
-		JToolBarHelper::title( JText::_( 'ICALS' ), 'jevents' );
-
-		JToolBarHelper::publishList('icals.publish');
-		JToolBarHelper::unpublishList('icals.unpublish');
-		JToolBarHelper::addNew('icals.edit');
-		JToolBarHelper::editList('icals.edit');
-		JToolBarHelper::deleteList('Delete Ical and all associated events and repeats?','icals.delete');
-		JToolBarHelper::spacer();
+		$this->toolbarpublishList('icals.publish');
+		$this->toolbarunpublishList('icals.unpublish');
+		$this->toolbaraddNew('icals.edit');
+		$this->toolbareditList('icals.edit');
+		$this->toolbardeleteList('Delete Ical and all associated events and repeats?', 'icals.delete');
 
 		JEventsHelper::addSubmenu();
 
-		$params = JComponentHelper::getParams(JEV_COM_COMPONENT);
-		//$section = $params->get("section",0);
-
 		JHTML::_('behavior.tooltip');
-		if (JevJoomlaVersion::isCompatible("3.0")){
-			$this->sidebar = JHtmlSidebar::render();					
-		}				
 	}
 
-	function edit($tpl = null)
+	public function edit($tpl = null)
 	{
 
-		JEVHelper::script('editicalJQ.js','components/'.JEV_COM_COMPONENT.'/assets/js/');
+		JEVHelper::script('editicalJQ.js', 'components/' . JEV_COM_COMPONENT . '/assets/js/');
 
 		$document = JFactory::getDocument();
-		$document->setTitle(JText::_( 'EDIT_ICS' ));
+		$document->setTitle(JText::_('EDIT_ICS'));
 
-		// Set toolbar items for the page
-		JToolBarHelper::title( JText::_( 'EDIT_ICS' ), 'jevents' );
-
-		//JToolBarHelper::save('icals.save');
-		$bar =  JToolBar::getInstance('toolbar');
-		if ($this->editItem && isset($this->editItem->ics_id) && $this->editItem->ics_id >0){
-			JToolBarHelper::save('icals.savedetails');
+		if ($this->editItem && isset($this->editItem->ics_id) && $this->editItem->ics_id > 0)
+		{
+			$this->toolbarSave('icals.savedetails');
 		}
-		JToolBarHelper::cancel('icals.list');
-		//JToolBarHelper::help( 'screen.icals.edit', true);
+		$this->toolbarCancel('icals.list');
 
 		$params = JComponentHelper::getParams(JEV_COM_COMPONENT);
-		//$section = $params->get("section",0);
 
 		$db = JFactory::getDbo();
-		if ($params->get("authorisedonly",0)){
+		if ($params->get("authorisedonly", 0))
+		{
 			// get authorised users
 			$sql = "SELECT u.* FROM #__jev_users as jev LEFT JOIN #__users as u on u.id=jev.user_id where jev.published=1 and jev.cancreate=1";
-			$db= JFactory::getDBO();
-			$db->setQuery( $sql );
+			$db  = JFactory::getDBO();
+			$db->setQuery($sql);
 			$users = $db->loadObjectList();
 		}
-		else {
-			$rules = JAccess::getAssetRules("com_jevents", true);
+		else
+		{
+			$rules         = JAccess::getAssetRules("com_jevents", true);
 			$creatorgroups = $rules->getData();
-			// need to merge the arrays because of stupid way Joomla checks super user permissions
+			// need to merge the arrays because of stupid way Joomla! checks super user permissions
 			//$creatorgroups = array_merge($creatorgroups["core.admin"]->getData(), $creatorgroups["core.create"]->getData());
 			// use union orf arrays sincee getData no longer has string keys in the resultant array
 			//$creatorgroups = $creatorgroups["core.admin"]->getData()+ $creatorgroups["core.create"]->getData();
@@ -89,43 +76,47 @@ class AdminIcalsViewIcals extends JEventsAbstractView
 			// take the higher permission setting
 			foreach ($creatorgroups["core.create"]->getData() as $creatorgroup => $permission)
 			{
-				if ($permission){
-					$creatorgroupsdata[$creatorgroup]=$permission;
+				if ($permission)
+				{
+					$creatorgroupsdata[$creatorgroup] = $permission;
 				}
 			}
 
 			$users = array(0);
 			foreach ($creatorgroupsdata as $creatorgroup => $permission)
 			{
-								if ($permission == 1)
-									{
+				if ($permission == 1)
+				{
 					$users = array_merge(JAccess::getUsersByGroup($creatorgroup, true), $users);
 				}
 			}
-			$sql = "SELECT * FROM #__users where id IN (".implode(",",array_values($users)).") ORDER BY name asc";
-			$db->setQuery( $sql );
+			$sql = "SELECT * FROM #__users where id IN (" . implode(",", array_values($users)) . ") ORDER BY name asc";
+			$db->setQuery($sql);
 			$users = $db->loadObjectList();
 		}
 		$userOptions = array();
-		foreach( $users as $user )
+		foreach ($users as $user)
 		{
-			$userOptions[] = JHTML::_('select.option', $user->id, $user->name. " ($user->username)" );
+			$userOptions[] = JHTML::_('select.option', $user->id, $user->name . " ($user->username)");
 		}
-		$jevuser	= JFactory::getUser();
-		if ($this->editItem && isset($this->editItem->ics_id) && $this->editItem->ics_id >0 && $this->editItem->created_by>0){
+		$jevuser = JFactory::getUser();
+		if ($this->editItem && isset($this->editItem->ics_id) && $this->editItem->ics_id > 0 && $this->editItem->created_by > 0)
+		{
 			$created_by = $this->editItem->created_by;
 		}
-		else {
+		else
+		{
 			$created_by = $jevuser->id;
 		}
-		if (count($userOptions)>0){
+		if (count($userOptions) > 0)
+		{
 			$userlist = JHTML::_('select.genericlist', $userOptions, 'created_by', 'class="inputbox" size="1" ', 'value', 'text', $created_by);
 		}
-		else {
+		else
+		{
 			$userList = "";
 		}
-		$this->assignRef("users",$userlist);
-
+		$this->users = $userList;
 
 		JHTML::_('behavior.tooltip');
 

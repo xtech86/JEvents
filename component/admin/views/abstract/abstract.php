@@ -938,6 +938,222 @@ class JEventsAbstractView extends JViewLegacy
 		// Add an apply button
 		$bar->appendButton('Standard', 'apply', $alt, $task, false);
 	}
+	/**
+	 * Writes the common 'new' icon for the button bar.
+	 *
+	 * @param   string   $task   An override for the task.
+	 * @param   string   $alt    An override for the alt text.
+	 * @param   boolean  $check  True if required to check that a standard list item is checked.
+	 *
+	 * @return  void
+	 *
+	 * @since   1.5
+	 */
+	public  function toolbaraddNew($task = 'add', $alt = 'JTOOLBAR_NEW', $check = false)
+	{
+		$bar = JToolbar::getInstance('newtoolbar');
 
-        
+		// Add a new button.
+		$bar->appendButton('Standard', 'new', $alt, $task, $check);
+	}
+
+	/**
+	 * Writes a common 'publish' button.
+	 *
+	 * @param   string   $task   An override for the task.
+	 * @param   string   $alt    An override for the alt text.
+	 * @param   boolean  $check  True if required to check that a standard list item is checked.
+	 *
+	 * @return  void
+	 *
+	 * @since   1.5
+	 */
+	public  function toolbarpublish($task = 'publish', $alt = 'JTOOLBAR_PUBLISH', $check = false)
+	{
+		$bar = JToolbar::getInstance('newtoolbar');
+
+		// Add a publish button.
+		$bar->appendButton('Standard', 'publish', $alt, $task, $check);
+	}
+
+	/**
+	 * Writes a common 'publish' button for a list of records.
+	 *
+	 * @param   string  $task  An override for the task.
+	 * @param   string  $alt   An override for the alt text.
+	 *
+	 * @return  void
+	 *
+	 * @since   1.5
+	 */
+	public  function toolbarpublishList($task = 'publish', $alt = 'JTOOLBAR_PUBLISH')
+	{
+		$bar = JToolbar::getInstance('newtoolbar');
+
+		// Add a publish button (list).
+		$bar->appendButton('Standard', 'publish', $alt, $task, true);
+	}
+
+	/**
+	 * Writes a common 'unpublish' button.
+	 *
+	 * @param   string   $task   An override for the task.
+	 * @param   string   $alt    An override for the alt text.
+	 * @param   boolean  $check  True if required to check that a standard list item is checked.
+	 *
+	 * @return  void
+	 *
+	 * @since   1.5
+	 */
+	public  function toolbarunpublish($task = 'unpublish', $alt = 'JTOOLBAR_UNPUBLISH', $check = false)
+	{
+		$bar = JToolbar::getInstance('newtoolbar');
+
+		// Add an unpublish button
+		$bar->appendButton('Standard', 'unpublish', $alt, $task, $check);
+	}
+
+
+	/**
+	 * Writes a common 'delete' button for a list of records.
+	 *
+	 * @param   string  $msg   Postscript for the 'are you sure' message.
+	 * @param   string  $task  An override for the task.
+	 * @param   string  $alt   An override for the alt text.
+	 *
+	 * @return  void
+	 *
+	 * @since   1.5
+	 */
+	public static function toolbardeleteList($msg = '', $task = 'remove', $alt = 'JTOOLBAR_DELETE')
+	{
+		$bar = JToolbar::getInstance('newtoolbar');
+
+		// Add a delete button.
+		if ($msg)
+		{
+			$bar->appendButton('Confirm', $msg, 'delete', $alt, $task, true);
+		}
+		else
+		{
+			$bar->appendButton('Standard', 'delete', $alt, $task, true);
+		}
+	}
+
+	/**
+	 * Writes a common 'unpublish' button for a list of records.
+	 *
+	 * @param   string  $task  An override for the task.
+	 * @param   string  $alt   An override for the alt text.
+	 *
+	 * @return  void
+	 *
+	 * @since   1.5
+	 */
+	public static function toolbarunpublishList($task = 'unpublish', $alt = 'JTOOLBAR_UNPUBLISH')
+	{
+		$bar = JToolbar::getInstance('newtoolbar');
+
+		// Add an unpublish button (list).
+		$bar->appendButton('Standard', 'unpublish', $alt, $task, true);
+	}
+
+	/**
+	 * Writes a common 'edit' button for a list of records.
+	 *
+	 * @param   string  $task  An override for the task.
+	 * @param   string  $alt   An override for the alt text.
+	 *
+	 * @return  void
+	 *
+	 * @since   1.5
+	 */
+	public static function toolbareditList($task = 'edit', $alt = 'JTOOLBAR_EDIT')
+	{
+		$bar = JToolbar::getInstance('newtoolbar');
+
+		// Add an edit button.
+		$bar->appendButton('Standard', 'edit', $alt, $task, true);
+	}
+	/**
+	 * Writes a custom option and task button for the button bar.
+	 *
+	 * @param   string  $task        The task to perform (picked up by the switch($task) blocks).
+	 * @param   string  $icon        The image to display.
+	 * @param   string  $iconOver    The image to display when moused over.
+	 * @param   string  $alt         The alt text for the icon image.
+	 * @param   bool    $listSelect  True if required to check that a standard list item is checked.
+	 *
+	 * @return  void
+	 *
+	 * @since   1.5
+	 */
+	public static function toolbarcustom($task = '', $icon = '', $iconOver = '', $alt = '', $listSelect = true)
+	{
+		$bar = JToolbar::getInstance('newtoolbar');
+
+		// Strip extension.
+		$icon = preg_replace('#\.[^.]*$#', '', $icon);
+
+		// Add a standard button.
+		$bar->appendButton('Standard', $icon, $alt, $task, $listSelect);
+	}
+	/**
+	 * Writes a common 'trash' button for a list of records.
+	 *
+	 * @param   string  $task   An override for the task.
+	 * @param   string  $alt    An override for the alt text.
+	 * @param   bool    $check  True to allow lists.
+	 *
+	 * @return  void
+	 *
+	 * @since   1.5
+	 */
+	public static function toolbartrash($task = 'remove', $alt = 'JTOOLBAR_TRASH', $check = true)
+	{
+		$bar = JToolbar::getInstance('newtoolbar');
+
+		// Add a trash button.
+		$bar->appendButton('Standard', 'trash', $alt, $task, $check, false);
+	}
+	/**
+	 * Writes a spacer cell.
+	 *
+	 * @param   string  $width  The width for the cell
+	 *
+	 * @return  void
+	 *
+	 * @since   1.5
+	 */
+	public static function toolbarspacer($width = '')
+	{
+		$bar = JToolbar::getInstance('newtoolbar');
+
+		// Add a spacer.
+		$bar->appendButton('Separator', 'spacer', $width);
+	}
+
+	/**
+	 * Title cell.
+	 * For the title and toolbar to be rendered correctly,
+	 * this title function must be called before the starttable function and the toolbars icons
+	 * this is due to the nature of how the css has been used to position the title in respect to the toolbar.
+	 *
+	 * @param   string  $title  The title.
+	 * @param   string  $icon   The space-separated names of the image.
+	 *
+	 * @return  void
+	 *
+	 * @since   1.5
+	 */
+	public static function toolbartitle($title, $icon = 'generic.png')
+	{
+		$layout = new JLayoutFile('joomla.toolbar.title');
+		$html   = $layout->render(array('title' => $title, 'icon' => $icon));
+
+		$app = JFactory::getApplication();
+		$app->JComponentTitle = $html;
+		JFactory::getDocument()->setTitle(strip_tags($title) . ' - ' . $app->get('sitename') . ' - ' . JText::_('JADMINISTRATION'));
+	}
+
 }

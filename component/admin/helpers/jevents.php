@@ -185,7 +185,7 @@ STYLE;
 
     }
 
-    public static function addAdminSidebar($components = array(), $params = array())
+    public static function addAdminSidebar($toolbar = '')
     {
 
         $jinput = JFactory::getApplication()->input;
@@ -244,6 +244,9 @@ STYLE;
 
         $sidebar_html = '<section class="sidebar" style="height: auto;">
 			<!-- sidebar menu: : style can be found in sidebar.less -->
+            <div class="je-sb-toolbar">
+			    ' . $toolbar . '
+			</div>
 			<ul class="sidebar-menu">
 				<li class="header">' . JText::_("JEV_ADMIN_EVENTS_MANAGEMENT") . '</li>
 				<li class="' . ($task == '' || $task == 'cpanel.cpanel' || $task == 'icalevent.list' || $task == 'icalevent.edit' ? 'active' : '') . ' ">				
@@ -266,8 +269,7 @@ STYLE;
 						<i class="fa fa-folder"></i> <span>' . JText::_("JEV_CATEGORIES") . '</span>
 					</a>
 				</li>
-				<li class="' . ($task == 'icals.overview' || $task == 'icals.edit'  ?  'active' : '') . ' ">
-				
+				<li class="' . ($task == 'icals.overview' || $task == 'icals.edit'  ?  'active' : '') . ' ">			
 					<a href="index.php?option=com_jevents&task=icals.overview">
 						<i class="fa fa-calendar"></i> <span>' . JText::_("JEV_ADMIN_CALENDAR_FEEDS") . '</span>
 					</a>
@@ -346,6 +348,13 @@ STYLE;
 				';
         }
 
+        // Custom CSS
+	    $sidebar_html .= '<li class="' . ($task == 'cpanel.custom_css' ?  'active' : '') . ' ">
+					<a href="index.php?option=com_jevents&task=cpanel.custom_css">
+						<i class="fa fa-css3"></i> <span>' . JText::_("JEV_CUSTOM_CSS") . '</span>
+					</a>
+				</li>';
+
 
         $sidebar_html .= '<!-- Custom Fields -->
 				    ' . $customfields . '
@@ -355,7 +364,7 @@ STYLE;
         return $sidebar_html;
     }
 
-    public static function addAdminHeader($items = array(), $buttons = array(), $notifications = array(), $params = array())
+    public static function addAdminHeader($items = array(), $toolbar = '', $notifications = array(), $params = array())
     {
         // Load in the Libraries
         JEVHelper::stylesheet('jevadmin_lte.css', 'administrator/components/' . JEV_COM_COMPONENT . '/assets/css/');
@@ -376,7 +385,7 @@ STYLE;
 			<!-- mini logo for sidebar mini 50x50 pixels -->
 			<span class="logo-mini"><img src="components/'.JEV_COM_COMPONENT.'/assets/images/JeventsTransparent_icon.png" alt="JEvents Icon" /></span>
 			<!-- logo for regular state and mobile devices -->
-			<span class="logo-lg"><img style="width:50px;max-width:100%;"src="components/'.JEV_COM_COMPONENT.'/assets/images/JeventsTransparent_icon.png" alt="JEvents Icon" /><b>JE</b>vents</span>
+			<span class="logo-lg"><img style="width:50px;max-width:100%;margin-top:-18px;margin-left:-10px;margin-right:5px;"src="components/'.JEV_COM_COMPONENT.'/assets/images/JeventsTransparent_icon.png" alt="JEvents Icon" /><b>JE</b>vents</span>
 		</a>
 		<!-- Header Navbar: style can be found in header.less -->
 		<nav class="navbar navbar-static-top" role="navigation">
@@ -384,6 +393,9 @@ STYLE;
 			<a href="#" class="sidebar-toggle" data-toggle="offcanvas" role="button">
 				<span class="sr-only">Toggle navigation</span>
 			</a>
+			<div class="je-toolbar">
+			    ' . $toolbar . '
+			</div>
 			<!-- Navbar Right Menu -->
 			<div class="navbar-custom-menu">
 				<ul class="nav navbar-nav">';
@@ -391,46 +403,46 @@ STYLE;
         foreach ($items as $key => $value) {
             $header_html .= $value;
         }
-		$header_html	.=	'<!-- User Account: style can be found in dropdown.less -->
-					<li class="dropdown user user-menu">
-						<a href="#" class="dropdown-toggle" data-toggle="dropdown">
-							<img src="http://www.gravatar.com/avatar/'. md5($user->email) . '?s35" class="user-image" alt="User Image">
-							<span class="hidden-xs">' . $user->name . '</span>
-						</a>
-						<ul class="dropdown-menu">
-							<!-- User image -->
-							<li class="user-header">
-								<img src="http://www.gravatar.com/avatar/'. md5($user->email).'?s80" class="img-circle" alt="User Image">
-								<p>'.$user->name.'
-									<small></small>
-								</p>
-							</li>
-							<!-- Menu Body -->
-							<li class="user-body">
-								<div class="col-xs-4 text-center">
-									<a href="#">Followers</a>
-								</div>
-								<div class="col-xs-4 text-center">
-									<a href="#">Sales</a>
-								</div>
-								<div class="col-xs-4 text-center">
-									<a href="#">Friends</a>
-								</div>
-							</li>
-							<!-- Menu Footer-->
-							<li class="user-footer">
-								<div class="pull-left">
-									<a href="#" class="btn btn-default btn-flat">Profile</a>
-								</div>
-								<div class="pull-right">
-									<a href="#" class="btn btn-default btn-flat">Sign out</a>
-								</div>
-							</li>
-						</ul>
-					</li>
-				</ul>
-			</div>
-		</nav>';
+//		$header_html	.=	'<!-- User Account: style can be found in dropdown.less -->
+//					<li class="dropdown user user-menu">
+//						<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+//							<img src="http://www.gravatar.com/avatar/'. md5($user->email) . '?s35" class="user-image" alt="User Image">
+//							<span class="hidden-xs">' . $user->name . '</span>
+//						</a>
+//						<ul class="dropdown-menu">
+//							<!-- User image -->
+//							<li class="user-header">
+//								<img src="http://www.gravatar.com/avatar/'. md5($user->email).'?s80" class="img-circle" alt="User Image">
+//								<p>'.$user->name.'
+//									<small></small>
+//								</p>
+//							</li>
+//							<!-- Menu Body -->
+//							<li class="user-body">
+//								<div class="col-xs-4 text-center">
+//									<a href="#">Followers</a>
+//								</div>
+//								<div class="col-xs-4 text-center">
+//									<a href="#">Sales</a>
+//								</div>
+//								<div class="col-xs-4 text-center">
+//									<a href="#">Friends</a>
+//								</div>
+//							</li>
+//							<!-- Menu Footer-->
+//							<li class="user-footer">
+//								<div class="pull-left">
+//									<a href="#" class="btn btn-default btn-flat">Profile</a>
+//								</div>
+//								<div class="pull-right">
+//									<a href="#" class="btn btn-default btn-flat">Sign out</a>
+//								</div>
+//							</li>
+//						</ul>
+//					</li>
+//				</ul>
+//			</div>
+//		</nav>';
 
         return $header_html;
 

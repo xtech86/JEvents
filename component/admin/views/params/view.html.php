@@ -20,7 +20,7 @@ defined('_JEXEC') or die();
 class AdminParamsViewParams extends JEventsAbstractView
 {
 
-	function edit()
+	public function edit()
 	{
 
 		$this->editor =  JFactory::getEditor();
@@ -33,12 +33,9 @@ class AdminParamsViewParams extends JEventsAbstractView
 		$document = JFactory::getDocument();
 		$document->setTitle(JText::_('COM_JEVENTS_CONFIGURATION'));
 
-		// Set toolbar items for the page
-		JToolBarHelper::title(JText::_('COM_JEVENTS_CONFIGURATION'), 'jevents');
-
-		JToolBarHelper::apply('params.apply');
-		JToolBarHelper::save('params.save');
-		JToolBarHelper::cancel('cpanel.cpanel');
+		$this->toolbarApply('params.apply');
+		$this->toolbarSave('params.save');
+		$this->toolbarCancel('cpanel.cpanel');
 
 		$model = $this->getModel();
 
@@ -72,7 +69,7 @@ class AdminParamsViewParams extends JEventsAbstractView
 
 	}
 
-	function dbsetup($tpl = null)
+	public function dbsetup($tpl = null)
 	{
 		
 		JEVHelper::stylesheet( 'eventsadmin.css',  'components/'.JEV_COM_COMPONENT.'/assets/css/' );

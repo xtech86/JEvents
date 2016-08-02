@@ -49,6 +49,12 @@
 
 		<field name="tzid" type="jevtimezone" default="0"  layoutfield="TZID"  labelclass=""
 			   label="JEV_EVENT_TIMEZONE" onchange="updateRepeatWarning();" description="JEV_EVENT_TIMEZONE_TIP" />
+
+		<field name="tags" type="tag" mode="ajax"
+			   label="JTAG" description="JTAG_DESC"
+			   class="inputbox span12 small" multiple="true"
+		>
+		</field>
                 
 	</fieldset>
 </form>

@@ -12,8 +12,6 @@ defined('_JEXEC') or die('Restricted access');
 
 jimport('joomla.html.html.bootstrap');
 // We need to get the params first
-
-//JHtml::_('formbehavior.chosen', '#adminForm select:not(.notchosen)');
 JHtml::_('formbehavior.chosen', '#adminForm select.chosen');
 
 use Joomla\String\StringHelper;
@@ -42,23 +40,26 @@ $query      = $db->getQuery(true)
 	->order('enabled desc, ordering asc');
 
 $jevplugins = $db->setQuery($query)->loadObjectList();
-//echo $db->getQuery();
-//$jevplugins = JPluginHelper::getPlugin("jevents");
+
 if (count($jevplugins))
 {
 	$hasPlugins = true;
 }
+
+$bar = JToolBar::getInstance('newtoolbar');
+$toolbar = $bar->getItems() ? $bar->render() : "";
+
 ?>
 <!-- Set Difficulty : -->
 <div id="jev_adminui" class="jev_adminui skin-blue sidebar-mini">
 	<header class="main-header">
-		<?php echo JEventsHelper::addAdminHeader(); ?>
+		<?php echo JEventsHelper::addAdminHeader($items = array(), $toolbar); ?>
 	</header>
 	<!-- =============================================== -->
 	<!-- Left side column. contains the sidebar -->
 	<aside class="main-sidebar">
 		<!-- sidebar: style can be found in sidebar.less -->
-		<?php echo JEventsHelper:: addAdminSidebar(); ?>
+		<?php echo JEventsHelper::addAdminSidebar($toolbar); ?>
 		<!-- /.sidebar -->
 	</aside>
 	<!-- =============================================== -->
@@ -128,11 +129,9 @@ if (count($jevplugins))
 
 								foreach ($this->form->getFieldset($name) as $field)
 								{
-
-									if ($field->fieldname == "clubcode_spacer")
+									if (strpos($field->fieldname, 'spacer') !== FALSE)
 									{
-
-										echo "<tr><td colspan='2'>" . $field->input . "<br/><br/></td></tr>";
+										$html[] = "<tr><td colspan='2'>" . $field->input . "<br/><br/></td></tr>";
 
 										$field->hidden = true;
 									}
@@ -152,15 +151,6 @@ if (count($jevplugins))
 									{
 										continue;
 									}
-
-									// Hide club update field if no club addons are installed
-									//if ($field->fieldname=="clubcode_spacer" || $field->fieldname=="clubcode"){
-									//	// disable if no club addons are installed
-									//	$plugins = JPluginHelper::getPlugin("jevents");
-									//	if (count($plugins)==0 && !$haslayouts){
-									//		continue;
-									//	}
-									//}
 
 									$class = isset($field->class) ? $field->class : "";
 
@@ -259,6 +249,14 @@ if (count($jevplugins))
 
 											foreach ($layoutform->getFieldset($name) as $field)
 											{
+												if (strpos($field->fieldname, 'spacer') == true)
+												{
+
+													$html[] = "<tr><td colspan='2'>" . $field->input . "<br/><br/></td></tr>";
+
+													$field->hidden = true;
+												}
+
 												if ($field->hidden)
 												{
 													continue;
@@ -277,7 +275,7 @@ if (count($jevplugins))
 
 												$hasconfig = true;
 												$class     = isset($field->class) ? $field->class : "";
-
+												echo $intro;
 												if (StringHelper::strlen($class) > 0)
 												{
 													$class = " class='$class'";

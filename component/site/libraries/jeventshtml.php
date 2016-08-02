@@ -390,7 +390,7 @@ class JEventsHTML
 
 		// should we offer multi-choice categories?
 		// do not use jev_com_component incase we call this from locations etc.
-		$params = JComponentHelper::getParams(JRequest::getCmd("option"));
+		$params = JComponentHelper::getParams(JRequest::getCmd("option", "com_jevents"));
 		if ($eventediting && $params->get("multicategory", 0))
 		{
 			$size = count($options) > 6 ? 6 : count($options) + 1;
@@ -707,9 +707,9 @@ class JEventsHTML
 						// BAR COLOR GENERATION
 						//$start_publish = JevDate::mktime (0, 0, 0, date("m"),date("d"),date("Y"));
 						//$colorgenerate = intval(($start_publish/$event_id));
-						//$bg1color = StringHelper::substr($colorgenerate, 5, 1);
-						//$bg2color = StringHelper::substr($colorgenerate, 3, 1);
-						//$bg3color = StringHelper::substr($colorgenerate, 7, 1);
+						//$bg1color = JString::substr($colorgenerate, 5, 1);
+						//$bg2color = JString::substr($colorgenerate, 3, 1);
+						//$bg3color = JString::substr($colorgenerate, 7, 1);
 						$bg1color = rand(0, 9);
 						$bg2color = rand(0, 9);
 						$bg3color = rand(0, 9);

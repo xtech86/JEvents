@@ -98,7 +98,7 @@ class jEventCal {
 
 	// workaround for php 4 - much easier in php 5!!!
 	function getOrSet($field, $val=""){
-		if (StringHelper::strlen($val)==0) return $this->get($field);
+		if (JString::strlen($val)==0) return $this->get($field);
 		else $this->set($field,$val);
 	}
 	function get($field){
@@ -129,9 +129,10 @@ class jEventCal {
             }            
         }
 	function created() { return $this->_created; }
+	function modified() { return $this->_modified; }
 	
 	function formattedCreationDate() { return $this->_created; }
-	function formattedModifyDate() { return $this->_created; }
+	function formattedModifyDate() { return $this->_modified; }
 
 	function hits() { return $this->_hits; }
 	function state() { return $this->_state; }
@@ -252,21 +253,45 @@ class jEventCal {
 	}
 
 	function contactLink($val="", $admin=false){
-		if (StringHelper::strlen($val)==0) {
+		if (JString::strlen($val)==0) {
 			if (!isset($this->_contactLink) || $this->_contactLink=="") $this->_contactLink = JEventsHTML::getUserMailtoLink( $this->id(), $this->created_by(),$admin, $this);
 		}
 		else $this->_contactLink=$val;
 
 		// New Joomla code for mail cloak only works once on a page !!!
-		// Random number
-		$rand = rand(1, 100000);
+                $rand = md5($this->_contactLink . rand(1, 100000));
+                if (version_compare(JVERSION, "3.6.1", "<")) {
+                    return preg_replace("/cloak[0-9]*/i", "cloak".$rand, $this->_contactLink);
+                }
+                else {
+                    return  preg_replace_callback('/id="cloak([a-f0-9]+)"/i', 
+                        function ($matches){
+                            $oldrand = $matches[1];
+                            // Joomla 3.6.1 changed this YET again!
+                            foreach (JFactory::getDocument()->_script as &$script){
+                                if (strpos($script, $oldrand)>0){
+                                    $script = str_replace("document.getElementById('cloak$oldrand').innerHTML = '';",
+                                            "jQuery('.cloak$oldrand').html('');",
+                                            $script);
+                                    $script = str_replace("document.getElementById('cloak$oldrand').innerHTML += ",
+                                            "jQuery('.cloak$oldrand').html(jQuery('.cloak$oldrand').html() + ",
+                                            $script);
+                                    $script = str_replace("$oldrand+'<\/a>';","$oldrand+'<\/a>');", $script);
+                                    //$script = str_replace("cloak$oldrand", "cloak$rand", $script);
+                                }
+                            }
+                            //if (strpos(JFactory, $oldrand))
+                            $return = 'id="cloak'.$rand.'" class="cloak'.$oldrand.'" ';
 
-		return preg_replace("/cloak[0-9]*/i", "cloak".$rand, $this->_contactLink);
-		//return $this->_contactLink;
+                            return $return;
+                        }, 
+                        $this->_contactLink);
+                }
+
 	}
 
 	function catname($val=""){
-		if (StringHelper::strlen($val)==0) {
+		if (JString::strlen($val)==0) {
 			if (!isset($this->_catname)) $this->_catname = $this->getCategoryName();
 			return $this->_catname;
 		}
@@ -274,7 +299,7 @@ class jEventCal {
 	}
 
 	function allcategories($val=""){
-		if (StringHelper::strlen($val)==0) {
+		if (JString::strlen($val)==0) {
 			if (!isset($this->_catname)) $this->_catname = $this->getCategoryName();
 			return $this->_catname;
 		}
@@ -282,7 +307,7 @@ class jEventCal {
 	}
 
 	function bgcolor($val=""){
-		if (StringHelper::strlen($val)==0) {
+		if (JString::strlen($val)==0) {
 			if (!isset($this->_bgcolor)) $this->_bgcolor = JEV_CommonFunctions::setColor($this);
 			return $this->_bgcolor;
 		}
@@ -290,7 +315,7 @@ class jEventCal {
 	}
 
 	function fgcolor($val=""){
-		if (StringHelper::strlen($val)==0) {
+		if (JString::strlen($val)==0) {
 			include_once(JPATH_ADMINISTRATOR."/components/".JEV_COM_COMPONENT."/libraries/colorMap.php");
 			if (!isset($this->_fgcolor)) $this->_fgcolor = JevMapColor($this->bgcolor());
 			return $this->_fgcolor;
@@ -849,7 +874,7 @@ class jEventCal {
 						$each = strtolower($each);
 					}
 					$daystring="";
-					if (StringHelper::strlen($this->reccurweeks())==0){
+					if (JString::strlen($this->reccurweeks())==0){
 						$days = explode("|",$this->reccurweekdays());
 						for ($d=0;$d<count($days);$d++){
 							$daystring .= JEventsHTML::getDayName( $days[$d] );

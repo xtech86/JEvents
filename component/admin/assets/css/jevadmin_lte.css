@@ -151,6 +151,14 @@
 .skin-blue.layout-top-nav .main-header > .logo:hover {
   background-color: #3b8ab8;
 }
+body.admin.view-.layout-.task-,
+body.admin.com_jevents.view-.layout-.task-cpanel\.cpanel,
+body.view-.layout-.task- .btn.btn-subhead,
+body.admin.com_jevents.view-.layout-.task-cpanel\.cpanel .btn.btn-subhead {
+  /*#jev_adminui {
+    top: 0px;
+  }*/
+}
 body.admin.view-.layout-.task- .btn.btn-subhead,
 body.admin.com_jevents.view-.layout-.task-cpanel\.cpanel .btn.btn-subhead,
 body.view-.layout-.task- .btn.btn-subhead .btn.btn-subhead,
@@ -160,12 +168,6 @@ body.admin.com_jevents.view-.layout-.task-cpanel\.cpanel .subhead-collapse,
 body.view-.layout-.task- .btn.btn-subhead .subhead-collapse,
 body.admin.com_jevents.view-.layout-.task-cpanel\.cpanel .btn.btn-subhead .subhead-collapse {
   display: none;
-}
-body.admin.view-.layout-.task- #jev_adminui,
-body.admin.com_jevents.view-.layout-.task-cpanel\.cpanel #jev_adminui,
-body.view-.layout-.task- .btn.btn-subhead #jev_adminui,
-body.admin.com_jevents.view-.layout-.task-cpanel\.cpanel .btn.btn-subhead #jev_adminui {
-  top: 0px;
 }
 body.com_jevents #isisJsData {
   display: none;
@@ -239,6 +241,9 @@ body.com_jevents #jev_adminui .pagination.pagination-toolbar {
 body.com_jevents #jev_adminui .row {
   margin: 0px;
 }
+body.com_jevents #jev_adminui .cpanel_cpanel .span6 .label {
+  float: right;
+}
 body.com_jevents li {
   line-height: 20px;
 }
@@ -273,6 +278,14 @@ body.com_jevents section.content.ov_info .span3 {
     max-width: 100%;
     width: 100%;
   }
+}
+#system-debug {
+  width: 100% !important;
+  position: absolute !important;
+  z-index: 9999 !important;
+  margin-left: 0px !important;
+  margin-top: 85% !important;
+  box-sizing: border-box !important;
 }
 /*
  * Core: General Layout Style

@@ -27,25 +27,6 @@ JHtml::_('behavior.calendar');
 if ($params->get("bootstrapchosen", 1))
 {
 	JHtml::_('formbehavior.chosen', '#jevents select:not(.notchosen)');
-	// Use this as a basis for setting the primary category
-	/*
-	JHtml::_('jquery.ui', array("core","sortable"));
-	$script = <<< SCRIPT
-window.setTimeout(function() {
-	jQuery("#catid").chosen().change(
-		function() {
-			if (jQuery("#catid_chzn li.search-choice")) {
-				jQuery("#catid_chzn li.search-choice").on('mousedown', function() {
-					alert(this);
-					return true;
-				});
-			}
-		}
-	);
-}, 1000);
-SCRIPT;
-	JFactory::getDocument()->addScriptDeclaration($script);
-	 */
 }
 if ($params->get("bootstrapcss", 1)==1)
 {
@@ -65,12 +46,12 @@ $accesslevels = $user->getAuthorisedViewLevels();
 $accesslevels = "jeval".implode(" jeval", array_unique($accesslevels));
 
 
-	$version = JEventsVersion::getInstance();
+$version = JEventsVersion::getInstance();
 
-	JEVHelper::stylesheet('jev_cp.css', 'administrator/components/' . JEV_COM_COMPONENT . '/assets/css/');
+JEVHelper::stylesheet('jev_cp.css', 'administrator/components/' . JEV_COM_COMPONENT . '/assets/css/');
 
-        $bar = JToolBar::getInstance('newtoolbar');
-        $toolbar = $bar->getItems() ? $bar->render() : "";
+$bar = JToolBar::getInstance('newtoolbar');
+$toolbar = $bar->getItems() ? $bar->render() : "";
         
 	?>
 	<div id="jev_adminui" class="jev_adminui skin-blue sidebar-mini">

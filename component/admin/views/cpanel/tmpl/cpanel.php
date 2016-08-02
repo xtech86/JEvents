@@ -21,6 +21,9 @@ JEVHelper::stylesheet('jev_cp.css', 'administrator/components/' . JEV_COM_COMPON
 $bar     = JToolBar::getInstance('newtoolbar');
 $toolbar = $bar->getItems() ? $bar->render() : "";
 
+//Global limit
+$limit = 4;
+
 ?>
 <div id="jev_adminui" class="jev_adminui skin-blue sidebar-mini">
 	<header class="main-header">
@@ -45,169 +48,88 @@ $toolbar = $bar->getItems() ? $bar->render() : "";
 		</section>
 
 		<!-- Main content -->
-		<section class="content ov_info">
+		<section class="content ov_info cpanel_cpanel">
+			<!-- Default box -->
 			<div class="row">
 				<div class="span12">
-				<div class="span3">
-					<div class="info-box">
-						<span class="info-box-icon bg-aqua"><i class="ion ion-ios-gear-outline"></i></span>
-						<div class="info-box-content">
-							<span class="info-box-text">CPU Traffic</span>
-							<span class="info-box-number">90<small>%</small></span>
-						</div>
-						<!-- /.info-box-content -->
+					<div class="box box-primary">
+						<div class="box-header with-border">
+							<h3 class="box-title">Welcome to JEvents</h3>
+							<span class="label label-primary pull-right"></span>
+						</div><!-- /.box-header -->
+						<div class="box-body">
+							Here you can see an overview
+						</div><!-- /.box-body -->
 					</div>
-					<!-- /.info-box -->
 				</div>
-				<!-- /.col -->
-				<div class="span3">
-					<div class="info-box">
-						<span class="info-box-icon bg-red"><i class="fa fa-google-plus"></i></span>
 
-						<div class="info-box-content">
-							<span class="info-box-text">Likes</span>
-							<span class="info-box-number">41,410</span>
-						</div>
-						<!-- /.info-box-content -->
-					</div>
-					<!-- /.info-box -->
-				</div>
-				<!-- /.col -->
+			</div><!-- /.box -->
 
-				<div class="span3">
-					<div class="info-box">
-						<span class="info-box-icon bg-green"><i class="ion ion-ios-cart-outline"></i></span>
-
-						<div class="info-box-content">
-							<span class="info-box-text">Sales</span>
-							<span class="info-box-number">760</span>
-						</div>
-						<!-- /.info-box-content -->
-					</div>
-					<!-- /.info-box -->
-				</div>
-				<!-- /.col -->
-				<div class="span3">
-					<div class="info-box">
-						<span class="info-box-icon bg-yellow"><i class="ion ion-ios-people-outline"></i></span>
-
-						<div class="info-box-content">
-							<span class="info-box-text">New Members</span>
-							<span class="info-box-number">2,000</span>
-						</div>
-						<!-- /.info-box-content -->
-					</div>
-					<!-- /.info-box -->
-				</div>
-					</div>
-				<!-- /.col -->
-			</div>
 			<div class="row">
 				<div class="span6">
 					<div class="box box-primary">
 						<div class="box-header with-border">
 							<h3 class="box-title">Latest Events Added</h3>
-							<span class="label label-primary pull-right"><i class="fa fa-html5"></i></span>
+							<span class="label label-primary pull-right"></span>
 						</div><!-- /.box-header -->
 						<div class="box-body">
 							<p>This is a list of the most recent events added to your website by all users.</p>
-							<ul class="todo-list ui-sortable">
-								<li>
-									<!-- drag handle -->
-                      <span class="handle ui-sortable-handle">
-                        <i class="fa fa-ellipsis-v"></i>
-                        <i class="fa fa-ellipsis-v"></i>
-                      </span>
-									<!-- checkbox -->
-									<input type="checkbox" value="">
-									<!-- todo text -->
-									<span class="text">Design a nice theme</span>
-									<!-- Emphasis label -->
-									<small class="label label-danger"><i class="fa fa-clock-o"></i> 2 mins</small>
-									<!-- General tools such as edit or delete-->
+							<?php
+							// lets get the most recently created events
+							// TODO remove the query from the view, should be in model.
+
+							// Get a db connection.
+							$db = JFactory::getDbo();
+
+							// Create a new query object.
+							$query = $db->getQuery(true);
+
+							// Select all records from the user profile table where key begins with "custom.".
+							// Order it by the ordering field.
+
+							$query
+							->select(array('evdet_id','dtstart', 'dtend', 'summary', 'modified', 've.ev_id', 've.created', 've.state', 've.modified_by'))
+							->from($db->quoteName('#__jevents_vevdetail'))
+							->leftJoin($db->quoteName('#__jevents_vevent') . 'AS ve ON ve.ev_id = evdet_id')
+							->where($db->quoteName('ve.state') . ' = 1')
+							->order('ve.created ASC')
+							->setLimit($limit);
+
+							// Reset the query using our newly populated query object.
+							$db->setQuery($query);
+
+							// Load the results as a list of stdClass objects (see later for more options on retrieving data).
+							$results = $db->loadObjectList();
+
+							if (count($results) > 0)
+							{
+							echo '<ul class="todo-list">';
+								foreach ($results as $row)
+								{
+									$user = JFactory::getUser($row->created_by);
+								echo '<li><span class="text">' . $row->summary . '</span>
+									 <span class="label label-success"> ' . JText::sprintf("JEV_BY_SPRINT", $user->name) . '</span>
 									<div class="tools">
-										<i class="fa fa-edit"></i>
-										<i class="fa fa-trash-o"></i>
+										<a href="index.php?option=com_jevents&task=icalevent.edit&evid='.$row->ev_id.'"><i class="fa fa-edit"></i></a>
+										<a href="index.php?option=com_jevents&task=icalevent.delete&evid='.$row->ev_id.'"><i class="fa fa-trash-o"></i></a>
 									</div>
-								</li>
-								<li>
-                      <span class="handle ui-sortable-handle">
-                        <i class="fa fa-ellipsis-v"></i>
-                        <i class="fa fa-ellipsis-v"></i>
-                      </span>
-									<input type="checkbox" value="">
-									<span class="text">Make the theme responsive</span>
-									<small class="label label-info"><i class="fa fa-clock-o"></i> 4 hours</small>
-									<div class="tools">
-										<i class="fa fa-edit"></i>
-										<i class="fa fa-trash-o"></i>
-									</div>
-								</li>
-								<li>
-                      <span class="handle ui-sortable-handle">
-                        <i class="fa fa-ellipsis-v"></i>
-                        <i class="fa fa-ellipsis-v"></i>
-                      </span>
-									<input type="checkbox" value="">
-									<span class="text">Let theme shine like a star</span>
-									<small class="label label-warning"><i class="fa fa-clock-o"></i> 1 day</small>
-									<div class="tools">
-										<i class="fa fa-edit"></i>
-										<i class="fa fa-trash-o"></i>
-									</div>
-								</li>
-								<li>
-                      <span class="handle ui-sortable-handle">
-                        <i class="fa fa-ellipsis-v"></i>
-                        <i class="fa fa-ellipsis-v"></i>
-                      </span>
-									<input type="checkbox" value="">
-									<span class="text">Let theme shine like a star</span>
-									<small class="label label-success"><i class="fa fa-clock-o"></i> 3 days</small>
-									<div class="tools">
-										<i class="fa fa-edit"></i>
-										<i class="fa fa-trash-o"></i>
-									</div>
-								</li>
-								<li>
-                      <span class="handle ui-sortable-handle">
-                        <i class="fa fa-ellipsis-v"></i>
-                        <i class="fa fa-ellipsis-v"></i>
-                      </span>
-									<input type="checkbox" value="">
-									<span class="text">Check your messages and notifications</span>
-									<small class="label label-primary"><i class="fa fa-clock-o"></i> 1 week</small>
-									<div class="tools">
-										<i class="fa fa-edit"></i>
-										<i class="fa fa-trash-o"></i>
-									</div>
-								</li>
-								<li>
-                      <span class="handle ui-sortable-handle">
-                        <i class="fa fa-ellipsis-v"></i>
-                        <i class="fa fa-ellipsis-v"></i>
-                      </span>
-									<input type="checkbox" value="">
-									<span class="text">Let theme shine like a star</span>
-									<small class="label label-default"><i class="fa fa-clock-o"></i> 1 month</small>
-									<div class="tools">
-										<i class="fa fa-edit"></i>
-										<i class="fa fa-trash-o"></i>
-									</div>
-								</li>
-							</ul>
-							<a href="http://almsaeedstudio.com/download/AdminLTE-dist" class="btn btn-primary"><i class="fa fa-download"></i> View All</a>
+								</li>';
+								}
+								echo '</ul>';
+
+							} ?>
 						</div><!-- /.box-body -->
 					</div><!-- /.box -->
 				</div><!-- /.col -->
 				<div class="span6">
-					<div class="box box-danger">
+					<div class="box box-info">
 						<div class="box-header with-border">
-							<h3 class="box-title">Unpublished Events</h3>
-
-							<span class="label label-danger pull-right"><i class="fa fa-database"></i></span>
+							<h3 class="box-title">Recently Edited Events</h3>
+							<span class="label label-danger pull-right"></span>
 						</div><!-- /.box-header -->
 						<div class="box-body">
+							<p>This is a list of the most recent events that have been edited on your website by all users.</p>
+
 							<?php
 							// lets get the first 10 unpublished events
 							// TODO remove the query from the view, should be in model.
@@ -221,45 +143,170 @@ $toolbar = $bar->getItems() ? $bar->render() : "";
 							// Select all records from the user profile table where key begins with "custom.".
 							// Order it by the ordering field.
 
-
 							$query
-								->select(array('dtstart', 'dtend', 'summary', 'published', 'modified'))
+								->select(array('evdet_id','dtstart', 'dtend', 'summary', 'modified', 'ed.ev_id', 'ed.state'))
 								->from($db->quoteName('#__jevents_vevdetail'))
-								->where($db->quoteName('published') . ' = -1')
+								->leftJoin($db->quoteName('#__jevents_vevent') . 'AS ed ON ed.ev_id = evdet_id')
+								->where($db->quoteName('ed.state') . ' = 1')
 								->order('modified ASC')
-								->setLimit('10');
+								->setLimit($limit);
 
 							//echo ($query);die;
 							// Reset the query using our newly populated query object.
 							$db->setQuery($query);
 
-
 							// Load the results as a list of stdClass objects (see later for more options on retrieving data).
 							$results = $db->loadObjectList();
-							//var_dump($results);
-							foreach ($results as $row) {
-								echo $row->summary . "</br>1";
-							}
+							$resultscnt = count($results);
 
+							if ($resultscnt > 0)
+							{
+								echo '<ul class="todo-list">';
+								foreach ($results as $row)
+								{
+									$user = JFactory::getUser($row->created_by);
+									echo '<li><span class="text">' . $row->summary . '</span>
+									 <span class="label label-info"> ' . JText::sprintf("JEV_BY_SPRINT", $user->name) . '</span>
+										<div class="tools">
+										<a href="index.php?option=com_jevents&task=icalevent.edit&evid='.$row->ev_id.'"><i class="fa fa-edit"></i></a>
+										<a href="index.php?option=com_jevents&task=icalevent.delete&evid='.$row->ev_id.'"><i class="fa fa-trash-o"></i></a>
+										</div>
+									</li>';
+								}
+								echo '</ul>';
+							} else {
+								echo '<p>You have no unpublished events at present</p>';
+							}
 							?>
-							<p>Great! You have no unpublished events.</b></p>
-							<a href="http://almsaeedstudio.com/download/AdminLTE" class="btn btn-danger"><i class="fa fa-download"></i> Download</a>
 						</div><!-- /.box-body -->
 					</div><!-- /.box -->
 				</div><!-- /.col -->
 			</div>
-			<!-- Default box -->
-			<div class="box">
-				<div class="box-header with-border">
-					<h3 class="box-title">Welcome to JEvents!</h3>
-				</div>
-				<div class="box-body">
-					We need to add stuff here
-				</div><!-- /.box-body -->
-				<div class="box-footer">
+			<div class="row">
+				<div class="span6">
+					<div class="box box-warning">
+						<div class="box-header with-border">
+							<h3 class="box-title">Recently Unpublished Events</h3>
 
-				</div><!-- /.box-footer-->
-			</div><!-- /.box -->
+							<span class="label label-danger pull-right"></span>
+						</div><!-- /.box-header -->
+						<div class="box-body">
+							<p>This is a list of the most recent events added to your website by all users.</p>
+
+							<?php
+							// lets get the first 10 unpublished events
+							// TODO remove the query from the view, should be in model.
+
+							// Get a db connection.
+							$db = JFactory::getDbo();
+
+							// Create a new query object.
+							$query = $db->getQuery(true);
+
+							// Select all records from the user profile table where key begins with "custom.".
+
+							$query
+								->select(array('evdet_id','dtstart', 'dtend', 'summary', 'modified', 'ed.ev_id', 'ed.state'))
+								->from($db->quoteName('#__jevents_vevdetail'))
+								->leftJoin($db->quoteName('#__jevents_vevent') . 'AS ed ON ed.ev_id = evdet_id')
+								->where($db->quoteName('ed.state') . ' = 0')
+								->order('modified ASC')
+								->setLimit($limit);
+
+							//echo ($query);die;
+							// Reset the query using our newly populated query object.
+							$db->setQuery($query);
+
+							// Load the results as a list of stdClass objects (see later for more options on retrieving data).
+							$results = $db->loadObjectList();
+							$resultscnt = count($results);
+
+							if ($resultscnt > 0)
+							{
+								echo '<ul class="todo-list">';
+								foreach ($results as $row)
+								{
+									$user = JFactory::getUser($row->created_by);
+									echo '<li><span class="text">' . $row->summary . '</span>
+									 <span class="label label-warning"> ' . JText::sprintf("JEV_BY_SPRINT", $user->name) . '</span>
+										<div class="tools">
+											<a href="index.php?option=com_jevents&task=icalevent.edit&evid='.$row->ev_id.'"><i class="fa fa-edit"></i></a>
+											<a href="index.php?option=com_jevents&task=icalevent.delete&evid='.$row->ev_id.'"><i class="fa fa-trash-o"></i></a>
+										</div>
+									</li>';
+								}
+								echo '</ul>';
+								if ($resultscnt >= $limit) {
+								}
+							} else {
+								echo '<p>You have no unpublished events at present</p>';
+							}
+							?>
+						</div><!-- /.box-body -->
+					</div><!-- /.box -->
+				</div><!-- /.col -->
+				<div class="span6">
+					<div class="box box-danger">
+						<div class="box-header with-border">
+							<h3 class="box-title">Recently Trashed Events</h3>
+							<span class="label label-danger pull-right"></span>
+						</div><!-- /.box-header -->
+						<div class="box-body">
+							<p>This is a list of the most recent events added to your website by all users.</p>
+
+							<?php
+							// lets get the first 10 unpublished events
+							// TODO remove the query from the view, should be in model.
+
+							// Get a db connection.
+							$db = JFactory::getDbo();
+
+							// Create a new query object.
+							$query = $db->getQuery(true);
+
+							// Select all records from the user profile table where key begins with "custom.".
+							// Order it by the ordering field.
+
+							$query
+								->select(array('evdet_id','dtstart', 'dtend', 'summary', 'modified', 'ed.ev_id', 'ed.state'))
+								->from($db->quoteName('#__jevents_vevdetail'))
+								->leftJoin($db->quoteName('#__jevents_vevent') . 'AS ed ON ed.ev_id = evdet_id')
+								->where($db->quoteName('ed.state') . ' = -1')
+								->order('modified ASC')
+								->setLimit($limit);
+
+							//echo ($query);die;
+							// Reset the query using our newly populated query object.
+							$db->setQuery($query);
+
+							// Load the results as a list of stdClass objects (see later for more options on retrieving data).
+							$results = $db->loadObjectList();
+							$resultscnt = count($results);
+
+							if ($resultscnt > 0)
+							{
+								echo '<ul class="todo-list">';
+								foreach ($results as $row)
+								{
+									$user = JFactory::getUser($row->created_by);
+									echo '<li><span class="text">' . $row->summary . '</span>
+									 <span class="label label-danger"> ' . JText::sprintf("JEV_BY_SPRINT", $user->name) . '</span>
+										<div class="tools">
+										<a href="index.php?option=com_jevents&task=icalevent.edit&evid='.$row->ev_id.'"><i class="fa fa-edit"></i></a>
+										<!--<a href="index.php?option=com_jevents&task=icalevent.publish&evid='.$row->ev_id.'"><i class="fa fa-arrow-circle-up"></i></a>-->
+										</div>
+									</li>';
+								}
+								echo '</ul>';
+
+							} else {
+								echo '<p>You have no unpublished events at present</p>';
+							}
+							?>
+						</div><!-- /.box-body -->
+					</div><!-- /.box -->
+				</div><!-- /.col -->
+			</div>
 
 		</section><!-- /.content -->
 	</div>

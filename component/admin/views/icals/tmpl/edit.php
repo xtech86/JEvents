@@ -61,33 +61,35 @@ $toolbar = $bar->getItems() ? $bar->render() : "";
 							<?php
 							global $task;
 
-							if (isset($this->editItem->ics_id))
-							{
-								$id       = $this->editItem->ics_id;
-								$catid    = $this->editItem->catid;
-								$access   = $this->editItem->access;
-								$srcURL   = $this->editItem->srcURL;
-								$filename = $this->editItem->filename;
-								$overlaps = $this->editItem->overlaps;
-								$label    = $this->editItem->label;
-								$icaltype = $this->editItem->icaltype;
-								if ($srcURL == "")
-									$filemessage = JText::_("Loaded from Local file called" . " ");
-								else
-									$filemessage = JText::_('FROM_FILE');
-							}
-							else
-							{
-								$id          = 0;
-								$catid       = 0;
-								$access      = 0;
-								$srcURL      = "";
-								$filename    = "";
-								$overlaps    = 0;
-								$label       = "";
-								$icaltype    = 2;
-								$filemessage = JText::_('FROM_FILE');
-							}
+        if (isset($this->editItem->ics_id)) {
+            $id = $this->editItem->ics_id;
+            $catid = $this->editItem->catid;
+            $access = $this->editItem->access;
+            $srcURL = $this->editItem->srcURL;
+            $filename = $this->editItem->filename;
+            $overlaps = $this->editItem->overlaps;
+            $label = $this->editItem->label;
+            $icaltype = $this->editItem->icaltype;
+            if ($srcURL == "")
+			{
+                $filemessage = JText::_("COM_JEVENTS_MANAGE_CALENDARS_OVERVIEW_LOADED_FROM_LOCAL_FILE_CALLLED") . " ";
+			}
+            else
+			{
+                $filemessage = JText::_('FROM_FILE');
+			}
+        }
+        else {
+            $id = 0;
+            $catid = 0;
+            $access = 0;
+            $srcURL = "";
+            $filename = "";
+            $overlaps = 0;
+            $label = "";
+            $icaltype = 2;
+            $filemessage = JText::_('FROM_FILE');
+        }
 
 
 							// build the html select list

@@ -95,12 +95,16 @@
 		</field>		
 		
 		<field name="catseparator" type="text" default="|" menu="hide" size="2" label="JEV_CATEGORY_SEPARATOR" description="JEV_CATEGORY_SEPARATOR_DESC" difficulty="3"/>
-		
-		
-		
+
+		<field name="jev_manage_show_id" type="jevboolean" class="btn-group" default="0" menu="hide" label="JEV_MANAGE_SHOW_ID" description="JEV_MANAGE_SHOW_ID_DESC"  difficulty="3" />
+		<field name="jev_manage_show_rpid" type="jevboolean" class="btn-group" default="0" menu="hide" label="JEV_MANAGE_SHOW_RPID" description="JEV_MANAGE_SHOW_RPID_DESC"  difficulty="3" />
+		<field name="jev_manage_show_calendar" type="jevboolean" class="btn-group" default="0" menu="hide" label="JEV_MANAGE_SHOW_CAL" description="JEV_MANAGE_SHOW_CAL_DESC"  difficulty="3" />
+
 		<!--//
 		<field name="jevkey" type="jevkey" default="" menu="hide" size="40" label='COPYRIGHT_MESSAGE_KEY'  description='PLEASE_USE_THIS_KEY_CODE_AT_THE_JEVENTS_WEBSITE_TO_OBTAIN_A_FREE_CODE_THAT_WILL_DISABLE_THE_COPYRIGHT_MESSAGE'  />
 		<field name="jevunlock" type="jevunlock" default="" menu="hide" size="40" label='COPYRIGHT_UNLOCK_CODE'  description='YOU_CAN_OBTAIN_THIS_FREE_CODE_FROM_THE_JEVENTS_WEBSITE'  />
+
+
 		//-->
 	</fieldset>
 	

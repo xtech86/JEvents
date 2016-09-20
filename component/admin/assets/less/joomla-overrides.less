@@ -7,6 +7,8 @@ body.admin.view-.layout-.task-, body.admin.com_jevents.view-.layout-.task-cpanel
   }*/
 }
 body.com_jevents {
+
+
   #isisJsData {display:none;}
   > .container-fluid.container-main {
     margin:0px !important;
@@ -29,6 +31,55 @@ body.com_jevents {
     position: absolute;
     width: 100%;
     margin-top: 0px;
+
+    .adminlist {
+
+      tr {
+        a.btn-micro.repeatslist {
+          padding: 0px;
+          margin: 0px;
+
+          .icon-list {
+
+            display: block;
+            margin: auto auto;
+          }
+        }
+
+      .time_frame {
+        > span {
+          display: inline-block;
+          font-size: 12px;
+          margin-right: 5px;
+        }
+        .from {
+
+        }
+        .to {
+
+        }
+      }
+    }
+
+      .row0, .row1 {
+        border-bottom: 2px solid #e4e4e4;
+        margin-bottom:2px !important;
+      }
+
+      th , td {
+        padding: 5px;
+
+        input[type="checkbox"] {
+          display: block !important;
+          margin: auto auto !important;
+        }
+      }
+
+      .row_info > span {
+        display:inline-block; float:left; margin-right: 10px;
+        font-size: 11px;
+      }
+    }
 
     #system-message-container {
       &.j-toggle-main {
@@ -149,6 +200,9 @@ body.com_jevents {
             width: 100%;
           }
         }
+      }
+      .title {
+        width: 90% !important;
       }
     }
   }

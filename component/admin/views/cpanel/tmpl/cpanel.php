@@ -69,11 +69,11 @@ $limit = 4;
 				<div class="span6">
 					<div class="box box-primary">
 						<div class="box-header with-border">
-							<h3 class="box-title">Latest Events Added</h3>
+							<h3 class="box-title"><?php echo JText::_('JEV_CPANEL_LATEST_EVENTS_ADDED'); ?></h3>
 							<span class="label label-primary pull-right"></span>
 						</div><!-- /.box-header -->
 						<div class="box-body">
-							<p>This is a list of the most recent events added to your website by all users.</p>
+							<p><?php echo JText::_("JEV_CPANEL_LATEST_EVENTS_ADDED_DESC"); ?> </p>
 							<?php
 							// lets get the most recently created events
 							// TODO remove the query from the view, should be in model.
@@ -107,28 +107,31 @@ $limit = 4;
 								foreach ($results as $row)
 								{
 									$user = JFactory::getUser($row->created_by);
-								echo '<li><span class="text">' . $row->summary . '</span>
-									 <span class="label label-success"> ' . JText::sprintf("JEV_BY_SPRINT", $user->name) . '</span>
-									<div class="tools">
-										<a href="index.php?option=com_jevents&task=icalevent.edit&evid='.$row->ev_id.'"><i class="fa fa-edit"></i></a>
-										<a href="index.php?option=com_jevents&task=icalevent.delete&evid='.$row->ev_id.'"><i class="fa fa-trash-o"></i></a>
-									</div>
-								</li>';
+									echo '<li><span class="text">' . $row->summary . '</span>
+									    <span class="label label-success"> ' . JText::sprintf("JEV_BY_SPRINT", $user->name) . '</span>
+									    <div class="tools">
+										    <a href="index.php?option=com_jevents&task=icalevent.edit&evid=' . $row->ev_id . '"><i class="fa fa-edit"></i></a>
+										    <a href="index.php?option=com_jevents&task=icalevent.delete&evid=' . $row->ev_id . '"><i class="fa fa-trash-o"></i></a>
+									    </div>
+								    </li>';
 								}
+
 								echo '</ul>';
 
-							} ?>
+							}  else {
+                                echo JText::_('JEV_CPANEL_LATEST_EVENTS_ADDED_NONE');
+							}?>
 						</div><!-- /.box-body -->
 					</div><!-- /.box -->
 				</div><!-- /.col -->
 				<div class="span6">
 					<div class="box box-info">
 						<div class="box-header with-border">
-							<h3 class="box-title">Recently Edited Events</h3>
+							<h3 class="box-title"><?php echo JText::_('JEV_CPANEL_RECENTLY_EDITED_EVENTS'); ?></h3>
 							<span class="label label-danger pull-right"></span>
 						</div><!-- /.box-header -->
 						<div class="box-body">
-							<p>This is a list of the most recent events that have been edited on your website by all users.</p>
+							<p><?php echo JText::_('JEV_CPANEL_RECENTLY_EDITED_EVENTS_DESC'); ?></p>
 
 							<?php
 							// lets get the first 10 unpublished events
@@ -175,7 +178,7 @@ $limit = 4;
 								}
 								echo '</ul>';
 							} else {
-								echo '<p>You have no unpublished events at present</p>';
+								echo JText::_('JEV_CPANEL_RECENTLY_EDITED_EVENTS_NONE');
 							}
 							?>
 						</div><!-- /.box-body -->
@@ -186,12 +189,12 @@ $limit = 4;
 				<div class="span6">
 					<div class="box box-warning">
 						<div class="box-header with-border">
-							<h3 class="box-title">Recently Unpublished Events</h3>
+                            <h3 class="box-title"><?php echo JText::_('JEV_CPANEL_RECENTLY_UNPUBLISHED'); ?></h3>
 
 							<span class="label label-danger pull-right"></span>
 						</div><!-- /.box-header -->
 						<div class="box-body">
-							<p>This is a list of the most recent events added to your website by all users.</p>
+							<p><?php echo JText::_('JEV_CPANEL_RECENTLY_UNPUBLISHED_DESC'); ?></p>
 
 							<?php
 							// lets get the first 10 unpublished events
@@ -239,7 +242,7 @@ $limit = 4;
 								if ($resultscnt >= $limit) {
 								}
 							} else {
-								echo '<p>You have no unpublished events at present</p>';
+								echo  JText::_('JEV_CPANEL_RECENTLY_UNPUBLISHED_NONE');
 							}
 							?>
 						</div><!-- /.box-body -->
@@ -248,11 +251,11 @@ $limit = 4;
 				<div class="span6">
 					<div class="box box-danger">
 						<div class="box-header with-border">
-							<h3 class="box-title">Recently Trashed Events</h3>
+							<h3 class="box-title"><?php echo JText::_('JEV_CPANEL_RECENTLY_TRASHED_EVENTS'); ?></h3>
 							<span class="label label-danger pull-right"></span>
 						</div><!-- /.box-header -->
 						<div class="box-body">
-							<p>This is a list of the most recent events added to your website by all users.</p>
+							<p><?php echo JText::_('JEV_CPANEL_RECENTLY_TRASHED_EVENTS_DESC');?> </p>
 
 							<?php
 							// lets get the first 10 unpublished events
@@ -300,7 +303,7 @@ $limit = 4;
 								echo '</ul>';
 
 							} else {
-								echo '<p>You have no unpublished events at present</p>';
+								echo JText::_('JEV_CPANEL_RECENTLY_TRASHED_EVENTS_NONE');
 							}
 							?>
 						</div><!-- /.box-body -->

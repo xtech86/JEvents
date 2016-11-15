@@ -3,8 +3,8 @@
 /**
  * JEvents Component for Joomla 2.5.x
  *
- * @version     3.4.18
- * @releasedate January 2015
+ * @version     3.4.24
+ * @releasedate October 2016
  * @package     JEvents
  * @copyright   Copyright (C) 2008-2016 GWE Systems Ltd, 2006-2008 JEvents Project Group
  * @license     GNU/GPLv2, see http://www.gnu.org/licenses/gpl-2.0.html
@@ -178,6 +178,11 @@ class Pkg_JeventsInstallerScript
 			$db->setQuery($query);
 			$db->execute();
 
+			// Enable Jevents Installer Plugin
+			$query = "UPDATE #__extensions SET enabled=1 WHERE folder='installer' and type='plugin' and element='jeventsinstaller'";
+			$db->setQuery($query);
+			$db->execute();
+                        
 		}
 		else {
 			jimport( 'joomla.filesystem.file' );

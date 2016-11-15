@@ -66,7 +66,7 @@ class SaveIcalEvent {
 		$jevuser	= JEVHelper::getAuthorisedUser();
 		$creatorid = $jinput->getInt("jev_creatorid", 0);
 		if ( $creatorid>0){
-			$access = $user->authorise('core.admin', 'com_jevents');
+                        $access = $user->authorise('core.admin', 'com_jevents') || $user->authorise('core.deleteall', 'com_jevents');
 		
 			if (($jevuser && $jevuser->candeleteall) || $access) {
 				$data["X-CREATEDBY"]	= $creatorid;
@@ -252,7 +252,7 @@ class SaveIcalEvent {
 			$config = new JConfig();
 			$sitename =  $config->sitename;
 
-			$subject_text	= ($newevent ? JText::_('JEV_MAIL_MODIFIED') : JText::_('JEV_MAIL_ADDED')) . ' ' . $sitename;
+			$subject_text	= (!$newevent ? JText::_('JEV_MAIL_MODIFIED') : JText::_('JEV_MAIL_ADDED')) . ' ' . $sitename;
 			$subject	= ($vevent->state == '1') ? JText::_('COM_JEV_INFO') . $subject_text : JText::_('COM_JEV_APPROVAL') . $subject_text;
 
 
@@ -301,7 +301,7 @@ class SaveIcalEvent {
 			}
 
 			$created_by = $user->name . " (".$user->email.")";
-			if ($created_by==null) {
+			if ($created_by==null || $created_by==" ()") {
 				$created_by= "Anonymous";
 				if (JRequest::getString("custom_anonusername","")!=""){
 					$created_by=JRequest::getString("custom_anonusername","")." (".JRequest::getString("custom_anonemail","").")";

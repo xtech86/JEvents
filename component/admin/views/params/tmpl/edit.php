@@ -28,16 +28,16 @@ foreach (JEV_CommonFunctions::getJEventsViewList() as $viewfile)
 	}
 }
 $hasPlugins = false;
-$db         = JFactory::getDbo();
-$query      = $db->getQuery(true)
-	->select('folder AS type, element AS name, params, enabled, manifest_cache ')
-	->from('#__extensions')
-	// include unpublished plugins
-	//->where('enabled = 1')
-	->where('type =' . $db->quote('plugin'))
-	->where('state IN (0,1)')
-	->where('(folder="jevents" OR element="gwejson")')
-	->order('enabled desc, ordering asc');
+$db    = JFactory::getDbo();
+$query = $db->getQuery(true)
+        ->select('folder AS type, element AS name, params, enabled, manifest_cache ')
+        ->from('#__extensions')
+        // include unpublished plugins
+        //->where('enabled = 1')
+        ->where('type =' . $db->quote('plugin'))
+        ->where('state IN (0,1)')
+        ->where('(folder="jevents" OR element="gwejson" OR element="jevent_embed")')
+        ->order('enabled desc, ordering asc');
 
 $jevplugins = $db->setQuery($query)->loadObjectList();
 

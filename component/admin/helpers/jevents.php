@@ -359,7 +359,52 @@ STYLE;
         $sidebar_html .= '<!-- Custom Fields -->
 				    ' . $customfields . '
 			</ul>
-		</section>';
+		';
+
+	    // RSVP Pro
+	    $sidebar_html .='<ul class="sidebar-menu">
+				<li class="header">' . JText::_("JEV_ADMIN_RSVP_PRO_HEADER_TITLE") . '</li>
+				<li class="' . ($task == '' || $task == 'cpanel.cpanel' || $task == 'icalevent.list' || $task == 'icalevent.edit' ? 'active' : '') . ' ">				
+					<a href="index.php?option=com_jevents&task=cpanel.cpanel">
+						<i class="fa fa-dashboard"></i> <span>' . JText::_("JEV_ADMIN_DASHBOARD") . '</span>
+					</a>
+				</li>
+				</ul>';
+
+        // Managed Locations
+
+	    $sidebar_html .='<ul class="sidebar-menu">
+				<li class="header">' . JText::_("JEV_ADMIN_MANAGED_LOCATIONS_HEADER_TITLE") . '</li>
+				<li class="' . ($task == '' || $task == 'cpanel.cpanel' || $task == 'icalevent.list' || $task == 'icalevent.edit' ? 'active' : '') . ' ">				
+					<a href="index.php?option=com_jevlocations&task=locations.overview">
+						<i class="fa fa-dashboard"></i> <span>' . JText::_("JEV_ADMIN_LOCATIONS_OVERVIEW") . '</span>
+					</a>
+				</li>
+				<li class="' . ($task == '' || $task == 'cpanel.cpanel' || $task == 'icalevent.list' || $task == 'icalevent.edit' ? 'active' : '') . ' ">				
+					<a href="index.php?option=com_jevlocations&task=locations.edit">
+						<i class="fa fa-dashboard"></i> <span>' . JText::_("JEV_ADMIN_LOCATIONS_ADD_LOCATION") . '</span>
+					</a>
+				</li>
+				<li>
+					<a href="index.php?option=com_categories&extension=com_jevlocations">
+						<i class="fa fa-folder"></i> <span>' . JText::_("JEV_CATEGORIES") . '</span>
+					</a>
+				</li>
+				</ul>';
+
+	    // Managed People
+
+	    $sidebar_html .='<ul class="sidebar-menu">
+				<li class="header">' . JText::_("JEV_ADMIN_MANAGED_PEOPLE_HEADER_TITLE") . '</li>
+				<li class="' . ($task == '' || $task == 'cpanel.cpanel' || $task == 'icalevent.list' || $task == 'icalevent.edit' ? 'active' : '') . ' ">				
+					<a href="index.php?option=com_jevents&task=cpanel.cpanel">
+						<i class="fa fa-dashboard"></i> <span>' . JText::_("JEV_ADMIN_DASHBOARD") . '</span>
+					</a>
+				</li>
+				</ul>';
+
+	    $sidebar_html .= '</section>'
+
 
         return $sidebar_html;
     }
@@ -460,4 +505,13 @@ STYLE;
         return $footer_html;
     }
 
+	public function sidebar_item($link, $class, $component) {
+
+
+
+	}
+
+	public function sidebar_generate ($items) {
+
+	}
 }

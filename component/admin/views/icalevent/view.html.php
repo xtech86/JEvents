@@ -82,7 +82,7 @@ class AdminIcaleventViewIcalevent extends JEventsAbstractView
 		);
 
 		// get list of creators
-		$created_by = JFactory::getApplication()->getUserStateFromRequest("createdbyIcalEvents", 'created_by', "");
+		$created_by = JFactory::getApplication()->getUserStateFromRequest("createdbyIcalEvents", 'created_by', '');
 		$sql = "SELECT distinct u.id, u.* FROM #__jevents_vevent as jev LEFT JOIN #__users as u on u.id=jev.created_by order by u.name ";
 		$db = JFactory::getDBO();
 		$db->setQuery($sql);

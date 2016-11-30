@@ -156,7 +156,7 @@ body.admin.com_jevents.view-.layout-.task-cpanel\.cpanel,
 body.view-.layout-.task- .btn.btn-subhead,
 body.admin.com_jevents.view-.layout-.task-cpanel\.cpanel .btn.btn-subhead {
   /*#jev_adminui {
-    top: 0px;
+    top: 0;
   }*/
 }
 body.admin.view-.layout-.task- .btn.btn-subhead,
@@ -174,10 +174,10 @@ body.com_jevents #isisJsData {
 }
 body.com_jevents > .container-fluid.container-main {
   margin: 0px !important;
-  padding: 0px !important;
+  padding: 0 !important;
 }
 body.com_jevents > .subhead-collapse {
-  margin-bottom: 0px !important;
+  margin-bottom: 0 !important;
 }
 body.com_jevents > header.header {
   display: none !important;
@@ -190,11 +190,11 @@ body.com_jevents #jev_adminui {
   top: 33px;
   position: absolute;
   width: 100%;
-  margin-top: 0px;
+  margin-top: 0;
 }
 body.com_jevents #jev_adminui .adminlist tr a.btn-micro.repeatslist {
-  padding: 0px;
-  margin: 0px;
+  padding: 0;
+  margin: 0;
 }
 body.com_jevents #jev_adminui .adminlist tr a.btn-micro.repeatslist .icon-list {
   display: block;
@@ -228,7 +228,7 @@ body.com_jevents #jev_adminui .adminlist .row_info > span {
 body.com_jevents #jev_adminui #system-message-container.j-toggle-main {
   float: none;
   width: 100%;
-  margin-left: 0px;
+  margin-left: 0;
   padding: 15px;
 }
 body.com_jevents #jev_adminui #system-message-container.j-toggle-main .alert.alert-success h4 {
@@ -265,14 +265,18 @@ body.com_jevents #jev_adminui .box-body .summary a.ashow_repeats i {
   margin-left: 5px;
 }
 body.com_jevents #jev_adminui tr td .admin_d_and_t {
-  margin: 0px;
+  margin: 0;
 }
 body.com_jevents #jev_adminui .pagination.pagination-toolbar {
   text-align: center;
   margin-top: 5px;
 }
 body.com_jevents #jev_adminui .row {
-  margin: 0px;
+  margin: 0;
+}
+body.com_jevents #jev_adminui .row > div {
+  padding-left: 15px;
+  padding-right: 15px;
 }
 body.com_jevents #jev_adminui .cpanel_cpanel .span6 .label {
   float: right;
@@ -284,8 +288,14 @@ body.com_jevents section.content.ov_info .span3 {
   width: 25%;
   box-sizing: border-box;
   display: inline-block;
-  margin: 0px;
+  margin: 0;
   padding: 10px;
+}
+body.com_jevents .sidebar-menu li a:focus {
+  text-decoration: none;
+}
+body.com_jevents .sidebar-menu li.active a:focus {
+  text-decoration: none;
 }
 @media (min-width: 768px) {
   .content-header {
@@ -294,7 +304,7 @@ body.com_jevents section.content.ov_info .span3 {
 }
 @media (max-width: 767px) {
   body.com_jevents {
-    padding: 0px;
+    padding: 0;
   }
   body.com_jevents > nav.navbar {
     padding: 0 20px;
@@ -315,11 +325,21 @@ body.com_jevents section.content.ov_info .span3 {
     width: 90% !important;
   }
 }
+@media (min-width: 1200px) {
+  #jev_adminui .row .span6 {
+    width: 50%;
+  }
+}
+@media (min-width: 768px) {
+  #jev_adminui .row [class*="span"] {
+    margin-left: 0;
+  }
+}
 #system-debug {
   width: 100% !important;
   position: absolute !important;
   z-index: 9999 !important;
-  margin-left: 0px !important;
+  margin-left: 0 !important;
   margin-top: 85% !important;
   box-sizing: border-box !important;
 }
@@ -2683,6 +2703,11 @@ a:focus {
   right: -10px;
   font-size: 10px;
   font-weight: 400;
+}
+#jev_adminui .btn-box-tool {
+  background-image: none;
+  background-color: transparent;
+  padding: 5px;
 }
 /*
  * Component: Callout

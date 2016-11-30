@@ -70,6 +70,12 @@ $limit = 4;
 					<div class="box box-primary">
 						<div class="box-header with-border">
 							<h3 class="box-title"><?php echo JText::_('JEV_CPANEL_LATEST_EVENTS_ADDED'); ?></h3>
+                            <div class="box-tools pull-right">
+                                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                                </button>
+                                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i>
+                                </button>
+                            </div>
 							<span class="label label-primary pull-right"></span>
 						</div><!-- /.box-header -->
 						<div class="box-body">
@@ -88,7 +94,7 @@ $limit = 4;
 							// Order it by the ordering field.
 
 							$query
-							->select(array('evdet_id','dtstart', 'dtend', 'summary', 'modified', 've.ev_id', 've.created', 've.state', 've.modified_by'))
+							->select(array('evdet_id','dtstart', 'dtend', 'summary', 'modified', 've.ev_id', 've.created', 've.created_by', 've.state', 've.modified_by'))
 							->from($db->quoteName('#__jevents_vevdetail'))
 							->leftJoin($db->quoteName('#__jevents_vevent') . 'AS ve ON ve.ev_id = evdet_id')
 							->where($db->quoteName('ve.state') . ' = 1')
@@ -123,14 +129,18 @@ $limit = 4;
 							}?>
 						</div><!-- /.box-body -->
 					</div><!-- /.box -->
-				</div><!-- /.col -->
-				<div class="span6">
 					<div class="box box-info">
 						<div class="box-header with-border">
 							<h3 class="box-title"><?php echo JText::_('JEV_CPANEL_RECENTLY_EDITED_EVENTS'); ?></h3>
+                            <div class="box-tools pull-right">
+                                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                                </button>
+                                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i>
+                                </button>
+                            </div>
 							<span class="label label-danger pull-right"></span>
 						</div><!-- /.box-header -->
-						<div class="box-body">
+						<div class="box-body" style="display:none;">
 							<p><?php echo JText::_('JEV_CPANEL_RECENTLY_EDITED_EVENTS_DESC'); ?></p>
 
 							<?php
@@ -147,7 +157,7 @@ $limit = 4;
 							// Order it by the ordering field.
 
 							$query
-								->select(array('evdet_id','dtstart', 'dtend', 'summary', 'modified', 'ed.ev_id', 'ed.state'))
+								->select(array('evdet_id','dtstart', 'dtend', 'summary', 'modified', 'ed.ev_id', 'ed.state' , 'ed.modified_by'))
 								->from($db->quoteName('#__jevents_vevdetail'))
 								->leftJoin($db->quoteName('#__jevents_vevent') . 'AS ed ON ed.ev_id = evdet_id')
 								->where($db->quoteName('ed.state') . ' = 1')
@@ -167,7 +177,7 @@ $limit = 4;
 								echo '<ul class="todo-list">';
 								foreach ($results as $row)
 								{
-									$user = JFactory::getUser($row->created_by);
+									$user = JFactory::getUser($row->modified_by);
 									echo '<li><span class="text">' . $row->summary . '</span>
 									 <span class="label label-info"> ' . JText::sprintf("JEV_BY_SPRINT", $user->name) . '</span>
 										<div class="tools">
@@ -183,17 +193,18 @@ $limit = 4;
 							?>
 						</div><!-- /.box-body -->
 					</div><!-- /.box -->
-				</div><!-- /.col -->
-			</div>
-			<div class="row">
-				<div class="span6">
 					<div class="box box-warning">
 						<div class="box-header with-border">
                             <h3 class="box-title"><?php echo JText::_('JEV_CPANEL_RECENTLY_UNPUBLISHED'); ?></h3>
-
+                            <div class="box-tools pull-right">
+                                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                                </button>
+                                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i>
+                                </button>
+                            </div>
 							<span class="label label-danger pull-right"></span>
 						</div><!-- /.box-header -->
-						<div class="box-body">
+						<div class="box-body" style="display:none;">
 							<p><?php echo JText::_('JEV_CPANEL_RECENTLY_UNPUBLISHED_DESC'); ?></p>
 
 							<?php
@@ -209,7 +220,7 @@ $limit = 4;
 							// Select all records from the user profile table where key begins with "custom.".
 
 							$query
-								->select(array('evdet_id','dtstart', 'dtend', 'summary', 'modified', 'ed.ev_id', 'ed.state'))
+								->select(array('evdet_id','dtstart', 'dtend', 'summary', 'modified', 'ed.ev_id', 'ed.state', 'ed.modified_by'))
 								->from($db->quoteName('#__jevents_vevdetail'))
 								->leftJoin($db->quoteName('#__jevents_vevent') . 'AS ed ON ed.ev_id = evdet_id')
 								->where($db->quoteName('ed.state') . ' = 0')
@@ -229,7 +240,7 @@ $limit = 4;
 								echo '<ul class="todo-list">';
 								foreach ($results as $row)
 								{
-									$user = JFactory::getUser($row->created_by);
+									$user = JFactory::getUser($row->modified_by);
 									echo '<li><span class="text">' . $row->summary . '</span>
 									 <span class="label label-warning"> ' . JText::sprintf("JEV_BY_SPRINT", $user->name) . '</span>
 										<div class="tools">
@@ -247,14 +258,18 @@ $limit = 4;
 							?>
 						</div><!-- /.box-body -->
 					</div><!-- /.box -->
-				</div><!-- /.col -->
-				<div class="span6">
 					<div class="box box-danger">
 						<div class="box-header with-border">
 							<h3 class="box-title"><?php echo JText::_('JEV_CPANEL_RECENTLY_TRASHED_EVENTS'); ?></h3>
+                            <div class="box-tools pull-right">
+                                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                                </button>
+                                <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i>
+                                </button>
+                            </div>
 							<span class="label label-danger pull-right"></span>
 						</div><!-- /.box-header -->
-						<div class="box-body">
+						<div class="box-body" style="display:none;">
 							<p><?php echo JText::_('JEV_CPANEL_RECENTLY_TRASHED_EVENTS_DESC');?> </p>
 
 							<?php
@@ -271,7 +286,7 @@ $limit = 4;
 							// Order it by the ordering field.
 
 							$query
-								->select(array('evdet_id','dtstart', 'dtend', 'summary', 'modified', 'ed.ev_id', 'ed.state'))
+								->select(array('evdet_id','dtstart', 'dtend', 'summary', 'modified', 'ed.ev_id', 'ed.state', 'ed.modified_by'))
 								->from($db->quoteName('#__jevents_vevdetail'))
 								->leftJoin($db->quoteName('#__jevents_vevent') . 'AS ed ON ed.ev_id = evdet_id')
 								->where($db->quoteName('ed.state') . ' = -1')
@@ -291,7 +306,7 @@ $limit = 4;
 								echo '<ul class="todo-list">';
 								foreach ($results as $row)
 								{
-									$user = JFactory::getUser($row->created_by);
+									$user = JFactory::getUser($row->modified_by);
 									echo '<li><span class="text">' . $row->summary . '</span>
 									 <span class="label label-danger"> ' . JText::sprintf("JEV_BY_SPRINT", $user->name) . '</span>
 										<div class="tools">

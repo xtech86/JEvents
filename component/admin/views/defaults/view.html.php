@@ -40,7 +40,7 @@ class AdminDefaultsViewDefaults extends JEventsAbstractView
 
 		JHTML::_('behavior.tooltip');
 
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		$uri =  JFactory::getURI();
 
 		// Get data from the model
@@ -82,10 +82,7 @@ class AdminDefaultsViewDefaults extends JEventsAbstractView
 		$this->assignRef('user', $user);
 		$this->assignRef('items', $items);
 
-		if (JevJoomlaVersion::isCompatible("3.0"))
-		{
-			$this->sidebar = JHtmlSidebar::render();
-		}
+		$this->sidebar = JHtmlSidebar::render();
 
 		parent::displaytemplate($tpl);
 
@@ -122,7 +119,7 @@ class AdminDefaultsViewDefaults extends JEventsAbstractView
 
 
 
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		$uri =  JFactory::getURI();
 
 		// Get data from the model
@@ -150,6 +147,8 @@ class AdminDefaultsViewDefaults extends JEventsAbstractView
 
 		$this->assignRef('item', $item);
 		$this->assignRef('requiredfields', $requiredfields);
+
+		$this->sidebar = JHtmlSidebar::render();
 
 		parent::displaytemplate($tpl);
 

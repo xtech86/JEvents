@@ -12,21 +12,20 @@ defined('_JEXEC') or die('Restricted access');
 
 JHTML::_('behavior.tooltip');
 
-$db   = JFactory::getDBO();
+$db   = JFactory::getDbo();
 $user = JFactory::getUser();
 
 // get configuration object
 $cfg = JEVConfig::getInstance();
 
 $pathIMG        = JURI::root() . 'administrator/images/';
-$pathJeventsIMG = JURI::root() . "administrator/components/" . JEV_COM_COMPONENT . "/assets/images/";
+$pathJeventsIMG = JURI::root() . 'administrator/components/' . JEV_COM_COMPONENT . '/assets/images/';
 
 global $task;
 JHTML::_('behavior.tooltip');
 
-
 $bar     = JToolBar::getInstance('newtoolbar');
-$toolbar = $bar->getItems() ? $bar->render() : "";
+$toolbar = $bar->getItems() ? $bar->render() : '';
 
 ?>
 
@@ -38,7 +37,7 @@ $toolbar = $bar->getItems() ? $bar->render() : "";
 	<!-- Left side column. contains the sidebar -->
 	<aside class="main-sidebar">
 		<!-- sidebar: style can be found in sidebar.less -->
-		<?php echo JEventsHelper:: addAdminSidebar($toolbar); ?>
+		<?php echo $this->sidebar; ?>
 		<!-- /.sidebar -->
 	</aside>
 	<!-- =============================================== -->
@@ -47,8 +46,8 @@ $toolbar = $bar->getItems() ? $bar->render() : "";
 		<!-- Content Header (Page header) -->
 		<section class="content-header">
 			<h1>
-				<?php echo JText::_("ICALS"); ?>
-				<small><?php echo JText::_("JEV_ICALS_DESC"); ?></small>
+				<?php echo JText::_('ICALS'); ?>
+				<small><?php echo JText::_('JEV_ICALS_DESC'); ?></small>
 			</h1>
 		</section>
 

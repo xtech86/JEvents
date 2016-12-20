@@ -50,7 +50,7 @@ class AdminIcalrepeatController extends JControllerLegacy
 	{
 		$jinput = JFactory::getApplication()->input;
 
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		$publishedOnly = false;
 		$cid = $jinput->get('cid', array(0), 'array');
 		
@@ -147,7 +147,7 @@ class AdminIcalrepeatController extends JControllerLegacy
 			$this->view->setModel($model, true);
 		}
 
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		$cid = JRequest::getVar('cid', array(0));
 		ArrayHelper::toInteger($cid);
 		if (is_array($cid) && count($cid) > 0)
@@ -167,7 +167,7 @@ class AdminIcalrepeatController extends JControllerLegacy
 			$id = JRequest::getInt("evid", 0);
 		}
 
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		$query = "SELECT rpt.eventid"
 				. "\n FROM (#__jevents_vevent as ev, #__jevents_icsfile as icsf)"
 				. "\n LEFT JOIN #__jevents_repetition as rpt ON rpt.eventid = ev.ev_id"
@@ -340,7 +340,7 @@ class AdminIcalrepeatController extends JControllerLegacy
 	{
 		JRequest::checkToken('default') or jexit('Invalid Token');
 
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		$publishedOnly = true;
 		$id = JRequest::getInt('evid', 0);
 
@@ -450,7 +450,7 @@ class AdminIcalrepeatController extends JControllerLegacy
 			return false;
 		}
 
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		$rpt = new iCalRepetition($db);
 		$rpt->load($rp_id);
 
@@ -618,7 +618,7 @@ class AdminIcalrepeatController extends JControllerLegacy
 
 		// Change the underlying event repeat rule details  !!
 		$query = "SELECT * FROM #__jevents_rrule WHERE rr_id=" . $event->_rr_id;
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		$db->setQuery($query);
 		$this->rrule = null;
 		$this->rrule = $db->loadObject();
@@ -732,7 +732,7 @@ class AdminIcalrepeatController extends JControllerLegacy
 			$cid = array(intval($cid));
 			ArrayHelper::toInteger($cid);
 
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		foreach ($cid as $id)
 		{
 
@@ -846,7 +846,7 @@ class AdminIcalrepeatController extends JControllerLegacy
 			$cid = array(intval($cid));
 		ArrayHelper::toInteger($cid);
 
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		foreach ($cid as $id)
 		{
 
@@ -961,7 +961,7 @@ class AdminIcalrepeatController extends JControllerLegacy
 
 	private function targetMenu($itemid = 0, $name)
 	{
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 
 		// assemble menu items to the array
 		$options = array();

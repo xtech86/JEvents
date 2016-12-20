@@ -20,7 +20,7 @@ class SaveIcalEvent {
 	public static function save($array, &$queryModel, $rrule, $dryrun = false){
 
 		$cfg = JEVConfig::getInstance();
-		$db	= JFactory::getDBO();
+		$db	= JFactory::getDbo();
 		$user = JFactory::getUser();
 		$jinput = JFactory::getApplication()->input;
 
@@ -175,7 +175,7 @@ class SaveIcalEvent {
 			}
 		}
 
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		$success = true;
 		//echo "class = ".get_class($vevent);
 		if (!$dryrun){

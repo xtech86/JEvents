@@ -45,6 +45,8 @@ if ($this->item->name == 'icalevent.list_block2' && $this->item->value == "" && 
 	$this->item->value = file_get_contents(JPATH_SITE . '/components/com_jevents/views/float/defaults/icalevent.list_block2.html');
 }
 
+echo $this->sidebar;
+
 $this->replaceLabels($this->item->value);
 ?>		
 <div id="jevents">

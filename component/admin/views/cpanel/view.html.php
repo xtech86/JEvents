@@ -928,25 +928,22 @@ class AdminCpanelViewCpanel extends JEventsAbstractView
 		jimport('joomla.html.pane');
 
 		$document = JFactory::getDocument();
-		$document->setTitle(JText::_('JEVENTS') . ' :: ' . JText::_('JEVENTS'));
+		$document->setTitle(JText::_('JEVENTS') . ' - ' . JText::_('JEVENTS'));
 
-		JToolBarHelper::title(JText::_('JEVENTS') . ' :: ' . JText::_('JEVENTS'), 'jevents');
+		JToolBarHelper::title(JText::_('JEVENTS') . ' - ' . JText::_('JEVENTS'), 'jevents');
 
 		JEventsHelper::addSubmenu();
 
 		$params = JComponentHelper::getParams(JEV_COM_COMPONENT);
 
-                if (ini_get("max_input_vars")>0 && ini_get("max_input_vars")<=1000){
+        if (ini_get("max_input_vars")>0 && ini_get("max_input_vars")<=1000){
 
-					JFactory::getApplication()->enqueueMessage('234 - ' . JText::sprintf("MAX_INPUT_VARS_LOW_WARNING",ini_get("max_input_vars")), 'warning');
+			JFactory::getApplication()->enqueueMessage('234 - ' . JText::sprintf("MAX_INPUT_VARS_LOW_WARNING",ini_get("max_input_vars")), 'warning');
 
-				}
-                
-
-		if (JevJoomlaVersion::isCompatible("3.0"))
-		{
-			$this->sidebar = JHtmlSidebar::render();
 		}
+
+		JEventsHelper::addSubmenu();
+		$this->sidebar = JHtmlSidebar::render();
 
 	}
 
@@ -980,6 +977,7 @@ class AdminCpanelViewCpanel extends JEventsAbstractView
 	protected  function setUpdateUrls()
 	{
 		$params = JComponentHelper::getParams(JEV_COM_COMPONENT);
+
 
 		$updates = array(
 			array("element"=>"pkg_jevents","name"=>"com_jevents", "type"=>"package"),

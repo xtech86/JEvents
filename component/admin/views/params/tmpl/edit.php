@@ -59,7 +59,9 @@ $toolbar = $bar->getItems() ? $bar->render() : "";
 	<!-- Left side column. contains the sidebar -->
 	<aside class="main-sidebar">
 		<!-- sidebar: style can be found in sidebar.less -->
-		<?php echo JEventsHelper::addAdminSidebar($toolbar); ?>
+		<?php
+    		echo $this->sidebar;
+        ?>
 		<!-- /.sidebar -->
 	</aside>
 	<!-- =============================================== -->
@@ -275,7 +277,7 @@ $toolbar = $bar->getItems() ? $bar->render() : "";
 
 												$hasconfig = true;
 												$class     = isset($field->class) ? $field->class : "";
-												echo $intro;
+
 												if (StringHelper::strlen($class) > 0)
 												{
 													$class = " class='$class'";
@@ -450,7 +452,7 @@ SCRIPT;
 
                                                         $hasconfig = true;
                                                         $html[] = $field->renderField();
-                                                        /*
+
                                                         $class = $field->class;
 
 													if (StringHelper::strlen($class) > 0)

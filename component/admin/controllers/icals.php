@@ -54,7 +54,7 @@ class AdminIcalsController extends JControllerForm {
 		$this->_checkValidCategories();
 
 		$option = JEV_COM_COMPONENT;
-		$db	= JFactory::getDBO();
+		$db	= JFactory::getDbo();
 
 		
 		$catid		= intval( JFactory::getApplication()->getUserStateFromRequest( "catid{$option}", 'catid', 0 ));
@@ -169,7 +169,7 @@ class AdminIcalsController extends JControllerForm {
 
 		$item =new stdClass();
 		if ($editItem!=null){
-			$db	= JFactory::getDBO();
+			$db	= JFactory::getDbo();
 			$query = "SELECT * FROM #__jevents_icsfile as ics where ics.ics_id=$editItem";
 
 			$db->setQuery( $query );
@@ -200,7 +200,7 @@ class AdminIcalsController extends JControllerForm {
 			$redirect_task="day.listevents";
 		}
               $query = "SELECT icsf.* FROM #__jevents_icsfile as icsf";
-			$db	= JFactory::getDBO();
+			$db	= JFactory::getDbo();
 			$db->setQuery($query);
 			$allICS = $db->loadObjectList();
                     foreach ($allICS as $currentICS){
@@ -236,7 +236,7 @@ class AdminIcalsController extends JControllerForm {
 		$icsid = intval(JRequest::getVar('icsid',0));
 		if ($icsid>0){
 			$query = "SELECT icsf.* FROM #__jevents_icsfile as icsf WHERE ics_id=$icsid";
-			$db	= JFactory::getDBO();
+			$db	= JFactory::getDbo();
 			$db->setQuery($query);
 			$currentICS = $db->loadObjectList();
 			if (count($currentICS)>0){
@@ -261,7 +261,7 @@ class AdminIcalsController extends JControllerForm {
 			$cid=0;
 		}
 
-		$db	= JFactory::getDBO();
+		$db	= JFactory::getDbo();
 
 		// include ical files
 		
@@ -408,7 +408,7 @@ class AdminIcalsController extends JControllerForm {
 			$cid=0;
 		}
 
-		$db	= JFactory::getDBO();
+		$db	= JFactory::getDbo();
 
 		// include ical files
 		
@@ -490,7 +490,7 @@ class AdminIcalsController extends JControllerForm {
 			return;
 		}
 
-		$db	= JFactory::getDBO();
+		$db	= JFactory::getDbo();
 		foreach ($cid as $id) {
 			$sql = "UPDATE #__jevents_icsfile SET state=$newstate where ics_id='".$id."'";
 			$db->setQuery($sql);
@@ -520,7 +520,7 @@ class AdminIcalsController extends JControllerForm {
 			return;
 		}
 
-		$db	= JFactory::getDBO();
+		$db	= JFactory::getDbo();
 		foreach ($cid as $id) {
 			$sql = "UPDATE #__jevents_icsfile SET autorefresh=$newstate where ics_id='".$id."'";
 			$db->setQuery($sql);
@@ -550,7 +550,7 @@ class AdminIcalsController extends JControllerForm {
 			return;
 		}
 
-		$db	= JFactory::getDBO();
+		$db	= JFactory::getDbo();
 		// set all to not default first
 		$sql = "UPDATE #__jevents_icsfile SET isdefault=0";
 		$db->setQuery($sql);
@@ -621,7 +621,7 @@ class AdminIcalsController extends JControllerForm {
 		$cid	= JRequest::getVar(	'cid',	array(0) );
 		ArrayHelper::toInteger($cid);
 
-		$db	= JFactory::getDBO();
+		$db	= JFactory::getDbo();
 
 		// check this won't create orphan events
 		$query = "SELECT ev_id FROM #__jevents_vevent WHERE icsid in (".implode(",",$cid).")";
@@ -643,7 +643,7 @@ class AdminIcalsController extends JControllerForm {
 	}
 
 	function _deleteICal($cid){
-		$db	= JFactory::getDBO();
+		$db	= JFactory::getDbo();
 		$icsids = implode(",",$cid);
 
 		$query = "SELECT ev_id FROM #__jevents_vevent WHERE icsid IN ($icsids)";
@@ -688,7 +688,7 @@ class AdminIcalsController extends JControllerForm {
 		// TODO switch this after migration
 		$component_name = "com_jevents";
 
-		$db	= JFactory::getDBO();
+		$db	= JFactory::getDbo();
 		$query = "SELECT COUNT(*) AS count FROM #__categories WHERE extension = '$component_name' AND `published` = 1;";  // RSH 9/28/10 added check for valid published, J!1.6 sets deleted categoris to published = -2
 		$db->setQuery($query);
 		$count = intval($db->loadResult());

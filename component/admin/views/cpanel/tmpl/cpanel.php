@@ -33,7 +33,10 @@ $limit = 4;
 	<!-- Left side column. contains the sidebar -->
 	<aside class="main-sidebar">
 		<!-- sidebar: style can be found in sidebar.less -->
-		<?php echo JEventsHelper:: addAdminSidebar($toolbar); ?>
+		<?php
+        echo $this->sidebar;
+
+		?>
 		<!-- /.sidebar -->
 	</aside>
 	<!-- =============================================== -->
@@ -129,11 +132,11 @@ $limit = 4;
 							}?>
 						</div><!-- /.box-body -->
 					</div><!-- /.box -->
-					<div class="box box-info">
+					<div class="box box-info collapsed-box">
 						<div class="box-header with-border">
 							<h3 class="box-title"><?php echo JText::_('JEV_CPANEL_RECENTLY_EDITED_EVENTS'); ?></h3>
                             <div class="box-tools pull-right">
-                                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-plus"></i>
                                 </button>
                                 <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i>
                                 </button>
@@ -193,11 +196,11 @@ $limit = 4;
 							?>
 						</div><!-- /.box-body -->
 					</div><!-- /.box -->
-					<div class="box box-warning">
+					<div class="box box-warning collapsed-box">
 						<div class="box-header with-border">
                             <h3 class="box-title"><?php echo JText::_('JEV_CPANEL_RECENTLY_UNPUBLISHED'); ?></h3>
                             <div class="box-tools pull-right">
-                                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-plus"></i>
                                 </button>
                                 <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i>
                                 </button>
@@ -258,11 +261,11 @@ $limit = 4;
 							?>
 						</div><!-- /.box-body -->
 					</div><!-- /.box -->
-					<div class="box box-danger">
+					<div class="box box-danger collapsed-box">
 						<div class="box-header with-border">
 							<h3 class="box-title"><?php echo JText::_('JEV_CPANEL_RECENTLY_TRASHED_EVENTS'); ?></h3>
                             <div class="box-tools pull-right">
-                                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-plus"></i>
                                 </button>
                                 <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i>
                                 </button>

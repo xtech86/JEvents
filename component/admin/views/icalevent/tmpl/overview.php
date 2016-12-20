@@ -18,7 +18,7 @@ use Joomla\String\StringHelper;
 JHTML::_('behavior.tooltip');
 JHTML::_('behavior.modal');
 
-$db = JFactory::getDBO();
+$db = JFactory::getDbo();
 $user = JFactory::getUser();
 
 $params = JComponentHelper::getParams( JEV_COM_COMPONENT );
@@ -55,7 +55,7 @@ $toolbar = $bar->getItems() ? $bar->render() : "";
 	<!-- Left side column. contains the sidebar -->
 	<aside class="main-sidebar">
 		<!-- sidebar: style can be found in sidebar.less -->
-		<?php echo JEventsHelper:: addAdminSidebar($toolbar); ?>
+		<?php echo $this->sidebar; ?>
 		<!-- /.sidebar -->
 	</aside>
 	<!-- =============================================== -->

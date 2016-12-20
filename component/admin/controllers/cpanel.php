@@ -20,7 +20,7 @@ class AdminCpanelController extends JControllerAdmin
 	 * Controler for the Control Panel
 	 * @param array		configuration
 	 */
-	function __construct($config = array())
+	public function __construct($config = array())
 	{
 		parent::__construct($config);
 		$this->registerTask('show', 'cpanel');
@@ -31,19 +31,19 @@ class AdminCpanelController extends JControllerAdmin
 	function cpanel()
 	{
 		
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
                 
-                // Enable Jevents Installer Plugin
-               // $query = "UPDATE #__extensions SET enabled=1 WHERE folder='installer' and type='plugin' and element='jeventsinstaller'";
-               // $db->setQuery($query);
-               // $db->execute();
-            
-                // Make sure RSVP Pro and RSVP are not both enabled
-                $rsvpplugin = JPluginHelper::isEnabled("jevents", "jevrsvp");
-                $rsvpproplugin = JPluginHelper::isEnabled("jevents", "jevrsvppro");
-                if ($rsvpproplugin && $rsvpplugin) {
-                    JFactory::getApplication()->enqueueMessage(JText::_("JEV_INSTALLED_RSVP_AND_RSVPPRO_INCOMPATIBLE"), "ERROR");
-                }
+        // Enable JEvents Installer Plugin
+        // $query = "UPDATE #__extensions SET enabled=1 WHERE folder='installer' and type='plugin' and element='jeventsinstaller'";
+        // $db->setQuery($query);
+        // $db->execute();
+
+        // Make sure RSVP Pro and RSVP are not both enabled
+        $rsvpplugin = JPluginHelper::isEnabled("jevents", "jevrsvp");
+        $rsvpproplugin = JPluginHelper::isEnabled("jevents", "jevrsvppro");
+        if ($rsvpproplugin && $rsvpplugin) {
+            JFactory::getApplication()->enqueueMessage(JText::_("JEV_INSTALLED_RSVP_AND_RSVPPRO_INCOMPATIBLE"), "ERROR");
+        }
                 
 		// Add one category by default if none exist already
 		$sql = "SELECT id from #__categories where extension='com_jevents'";
@@ -186,7 +186,7 @@ class AdminCpanelController extends JControllerAdmin
 	function fixExceptions()
 	{
 
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		$db->setQuery("SELECT * FROM #__jevents_exception where exception_type=1 AND (oldstartrepeat='0000-00-00 00:00:00' OR  oldstartrepeat is null) ORDER BY eventid ASC, startrepeat asc");
 		//$db->setQuery("SELECT * FROM #__jevents_exception where exception_type=1 ORDER BY eventid ASC, startrepeat asc");
 		$rows = $db->loadObjectList("rp_id");
@@ -461,7 +461,7 @@ class AdminCpanelController extends JControllerAdmin
 				{
 					$oldPackage = true;
 
-					$db = JFactory::getDBO();
+					$db = JFactory::getDbo();
 					// Add one category by default if none exist already
 					$sql = "SELECT element from #__extensions WHERE type = 'file'";
 					$db->setQuery($sql);
@@ -804,7 +804,7 @@ class AdminCpanelController extends JControllerAdmin
 	}
 
 	private function fixOrphanEvents() {
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		$hasOrphans = false;
 
 		$sql = "SELECT ev.ev_id from #__jevents_vevent as ev
@@ -904,7 +904,7 @@ WHERE ics.ics_id is null
 
 	private function createOrphanCalendar() {
 		$catid=$this->createOrphanCategory();
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		// Add orphan native calendar by default if none exist already
 		$sql = "SELECT ics_id from #__jevents_icsfile WHERE icaltype=2 and label='Orphans'";
 		$db->setQuery($sql);
@@ -925,7 +925,7 @@ WHERE ics.ics_id is null
 
 
 	private function createOrphanCategory() {
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 
 		$sql = "SELECT id from #__categories where extension='com_jevents' AND title='Orphans'";
 		$db->setQuery($sql);

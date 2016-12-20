@@ -37,12 +37,15 @@ class AdminParamsViewParams extends JEventsAbstractView
 		$this->toolbarSave('params.save');
 		$this->toolbarCancel('cpanel.cpanel');
 
+		JEventsHelper::addSubmenu();
+		$this->sidebar = JHtmlSidebar::render();
+
 		$model = $this->getModel();
 
 		JHTML::_('behavior.tooltip');
 
 		// Get the actions for the asset.
-		$actions = JAccess::getActions(JEV_COM_COMPONENT, "component");
+		$actions = JAccess::getActions(JEV_COM_COMPONENT, 'component');
 
 		jimport('joomla.form.form');
 
@@ -52,8 +55,6 @@ class AdminParamsViewParams extends JEventsAbstractView
 		// Get the form.
 		$modelForm = $model->getForm();
 
-		//$component = isset($this->component)?$this->component : $this->get('Component');
-		
 		$component = $this->get('Component');
 		// Bind the form to the data.
 		if ($modelForm && $component->params)

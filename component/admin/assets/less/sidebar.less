@@ -5,21 +5,21 @@
 //Main Sidebar
 // ``` .left-side has been deprecated as of 2.0.0 in favor of .main-sidebar ```
 
-.main-sidebar,
-.left-side {
+.main-sidebar, .left-side {
   position: absolute;
   top: 0;
   left: 0;
   padding-top: 50px;
+  padding-bottom:40px;
   min-height: 100%;
   width: @sidebar-width;
   z-index: 810;
   //Using disposable variable to join statements with a comma
   @transition-rule: @transition-speed @transition-fn,
-    width @transition-speed @transition-fn;
+  width @transition-speed @transition-fn;
   .transition-transform(@transition-rule);
   @media (max-width: @screen-header-collapse) {
-      padding-top: 100px;
+    padding-top: 100px;
 
   }
   @media (max-width: @screen-xs-max) {

@@ -84,7 +84,7 @@ class AdminIcaleventViewIcalevent extends JEventsAbstractView
 		// get list of creators
 		$created_by = JFactory::getApplication()->getUserStateFromRequest("createdbyIcalEvents", 'created_by', '');
 		$sql = "SELECT distinct u.id, u.* FROM #__jevents_vevent as jev LEFT JOIN #__users as u on u.id=jev.created_by order by u.name ";
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		$db->setQuery($sql);
 		$users = $db->loadObjectList();
 		$userOptions = array();
@@ -101,7 +101,9 @@ class AdminIcaleventViewIcalevent extends JEventsAbstractView
 				JText::_('JEV_EVENT_CREATOR'), 'created_by', JHtml::_('select.options', $userOptions, 'value', 'text', $created_by)
 		);
 
-		$this->filters = JHtmlSidebar::render();
+		//$this->filters = JHtmlSidebar::render();
+		JEventsHelper::addSubmenu();
+		$this->sidebar = JHtmlSidebar::render();
 
 		$params = JComponentHelper::getParams(JEV_COM_COMPONENT);
 		//$section = $params->get("section",0);
@@ -128,7 +130,7 @@ class AdminIcaleventViewIcalevent extends JEventsAbstractView
 
 		// WHY THE HELL DO THEY BREAK PUBLIC FUNCTIONS !!!
 		JEVHelper::script('editicalJQ.js', 'components/' . JEV_COM_COMPONENT . '/assets/js/');
-                  JEVHelper::script('JevStdRequiredFieldsJQ.js', 'components/' . JEV_COM_COMPONENT . '/assets/js/');
+        JEVHelper::script('JevStdRequiredFieldsJQ.js', 'components/' . JEV_COM_COMPONENT . '/assets/js/');
 
 		if ($this->row->title() <= "")
 		{
@@ -165,9 +167,12 @@ class AdminIcaleventViewIcalevent extends JEventsAbstractView
 		{
 			if (JEVHelper::isEventEditor())
 				$this->toolbarApply('icalevent.apply', "JEV_SAVE");
-			$this->toolbarSave('icalevent.save');
-			$this->toolbarSave2new('icalevent.savenew', "JEV_SAVE_NEW");
+			    $this->toolbarSave('icalevent.save');
+			    $this->toolbarSave2new('icalevent.savenew', "JEV_SAVE_NEW");
 		}
+
+		JEventsHelper::addSubmenu();
+		$this->sidebar = JHtmlSidebar::render();
 
 		$this->toolbarCancel('icalevent.list');
 		//JToolBarHelper::help( 'screen.icalevent.edit', true);
@@ -272,7 +277,7 @@ class AdminIcaleventViewIcalevent extends JEventsAbstractView
 		//$access = JAccess::check($user->id, "core.deleteall", "com_jevents");
 		$access = $user->authorise('core.admin', 'com_jevents') || $user->authorise('core.deleteall', 'com_jevents');
 
-		$db = JFactory::getDBO();
+		$db = JFactory::getDbo();
 		if (($jevuser && $jevuser->candeleteall) || $access)
 		{
 			$params = JComponentHelper::getParams(JEV_COM_COMPONENT);

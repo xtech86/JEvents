@@ -12,7 +12,7 @@ defined('_JEXEC') or die('Restricted access');
 
 
 global $task, $catid;
-$db     = JFactory::getDBO();
+$db     = JFactory::getDbo();
 $editor = JFactory::getEditor();
 
 // clean any existing cache files
@@ -33,7 +33,7 @@ $toolbar = $bar->getItems() ? $bar->render() : "";
 	<!-- Left side column. contains the sidebar -->
 	<aside class="main-sidebar">
 		<!-- sidebar: style can be found in sidebar.less -->
-		<?php echo JEventsHelper::addAdminSidebar($toolbar); ?>
+		<?php echo $this->sidebar; ?>
 		<!-- /.sidebar -->
 	</aside>
 	<!-- =============================================== -->

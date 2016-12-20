@@ -34,6 +34,7 @@ class AdminIcalsViewIcals extends JEventsAbstractView
 		$this->toolbardeleteList('Delete Ical and all associated events and repeats?', 'icals.delete');
 
 		JEventsHelper::addSubmenu();
+		$this->sidebar = JHtmlSidebar::render();
 
 		JHTML::_('behavior.tooltip');
 	}
@@ -59,7 +60,7 @@ class AdminIcalsViewIcals extends JEventsAbstractView
 		{
 			// get authorised users
 			$sql = "SELECT u.* FROM #__jev_users as jev LEFT JOIN #__users as u on u.id=jev.user_id where jev.published=1 and jev.cancreate=1";
-			$db  = JFactory::getDBO();
+			$db  = JFactory::getDbo();
 			$db->setQuery($sql);
 			$users = $db->loadObjectList();
 		}
@@ -119,6 +120,8 @@ class AdminIcalsViewIcals extends JEventsAbstractView
 		$this->users = $userList;
 
 		JHTML::_('behavior.tooltip');
+		JEventsHelper::addSubmenu();
+		$this->sidebar = JHtmlSidebar::render();
 
 		$this->setLayout("edit");
 

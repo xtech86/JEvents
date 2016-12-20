@@ -444,6 +444,14 @@ SCRIPT;
 
 													$hasconfig = true;
 													$class     = isset($field->class) ? $field->class : "";
+                                                        if ($field->fieldname=="whitelist"){
+                                                            $x = 1;
+                                                        }
+
+                                                        $hasconfig = true;
+                                                        $html[] = $field->renderField();
+                                                        /*
+                                                        $class = $field->class;
 
 													if (StringHelper::strlen($class) > 0)
 													{

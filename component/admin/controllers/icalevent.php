@@ -313,15 +313,15 @@ class AdminIcaleventController extends JControllerAdmin
 		}
 		else if ($order == 'created')
 		{
-			$order =  "\n GROUP BY  ev.ev_id ORDER BY ev.created $dir";
+			$order = ($this->_largeDataSet ? "\n GROUP BY  ev.ev_id ORDER BY ev.created $dir" : "\n GROUP BY  ev.ev_id ORDER BY ev.created $dir");
 		}
 		else if ($order == 'modified')
 		{
-			$order = "\n GROUP BY  ev.ev_id ORDER BY modified $dir";
+			$order = ($this->_largeDataSet ? "\n GROUP BY  ev.ev_id ORDER BY modified $dir" : "\n GROUP BY  ev.ev_id ORDER BY modified $dir");
 		}
 		else
 		{
-			$order = "\n GROUP BY  ev.ev_id ORDER BY detail.summary $dir";
+			$order = ($this->_largeDataSet ? "\n GROUP BY  ev.ev_id ORDER BY detail.summary $dir" : "\n GROUP BY  ev.ev_id ORDER BY detail.summary $dir");
 		}
 		// only include repeat id since we need it if we call plugins on the resultant data
 		$query = "SELECT ev.* " .  ($this->_largeDataSet ? "" :", rpt.rp_id") . ", ev.state as evstate, detail.*, ev.created as created, max(detail.modified) as modified,  a.title as _groupname " . $anonfields
@@ -1182,13 +1182,13 @@ class AdminIcaleventController extends JControllerAdmin
 		if ($event = SaveIcalEvent::save($array, $this->queryModel, $rrule))
 		{
 			$row = new jIcalEventRepeat($event);
-			if (JEVHelper::canPublishEvent($row))
+			if (!JEVHelper::canPublishEvent($row) && !$event->state)
 			{
-				$msg = JText::_("Event_Saved", true);
+				$msg = JText::_("EVENT_SAVED_UNDER_REVIEW", true);
 			}
 			else
 			{
-				$msg = JText::_("EVENT_SAVED_UNDER_REVIEW", true);
+				$msg = JText::_("EVENT_SAVED", true);
 			}
 			if ($clearout)
 			{
@@ -1795,7 +1795,7 @@ class AdminIcaleventController extends JControllerAdmin
 		$icslist = JHTML::_('select.genericlist', $icsfiles, 'icsFile', 'class="inputbox" size="1" onchange="document.adminForm.submit();"', 'value', 'text', $icsFile);
 
 		// get list of creators
-		$sql = "SELECT distinct u.id, u.* FROM #__jevents_vevent as jev LEFT JOIN #__users as u on u.id=jev.created_by order by u.name ";
+		$sql = "SELECT distinct u.id, u.name, u.username FROM #__jevents_vevent as jev LEFT JOIN #__users as u on u.id=jev.created_by ORDER BY u.name";
 		$db = JFactory::getDbo();
 		$db->setQuery($sql);
 		$users = $db->loadObjectList();

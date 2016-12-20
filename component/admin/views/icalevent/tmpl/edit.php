@@ -221,58 +221,69 @@ $toolbar = $bar->getItems() ? $bar->render() : "";
 									}
 									?>
 
-									Joomla.submitbutton = function (pressbutton) {
-										if (pressbutton.substr(0, 6) == 'cancel' || !(pressbutton == 'icalevent.save' || pressbutton == 'icalrepeat.save' || pressbutton == 'icalevent.savenew' || pressbutton == 'icalrepeat.savenew' || pressbutton == 'icalevent.apply' || pressbutton == 'icalrepeat.apply')) {
-											if (document.adminForm['catid']) {
-												// restore catid to input value
-												document.adminForm['catid'].value = 0;
-												document.adminForm['catid'].disabled = true;
-											}
-											submitform(pressbutton);
-											return;
-										}
-										var form = document.adminForm;
-										var editorElement = jevjq('#jevcontent');
-										if (editorElement.length) {
-											<?php
-											$editorcontent = $this->editor->save('jevcontent');
-											if (!$editorcontent ) {
-											// These are problematic editors like JCKEditor that don't follow the Joomla coding patterns !!!
-											$editorcontent = $this->editor->getContent('jevcontent');
-											echo "var editorcontent =" . $editorcontent . "\n";
-											?>
-											try {
-												jevjq('#jevcontent').html(editorcontent);
-											}
-											catch (e) {
-											}
-											<?php
-											}
-											echo $editorcontent;
-											?>
-										}
-										try {
-											if (!JevStdRequiredFields.verify(document.adminForm)) {
-												return;
-											}
-											if (!JevrRequiredFields.verify(document.adminForm)) {
-												return;
-											}
-										}
-										catch (e) {
-
-										}
-										// do field validation
-										if (form.catid && form.catid.value == 0 && form.catid.options && form.catid.options.length) {
-											alert('<?php echo JText::_('JEV_SELECT_CATEGORY', true); ?>');
-										}
-										else if (form.ics_id.value == "0") {
-											alert("<?php echo html_entity_decode(JText::_('JEV_MISSING_ICAL_SELECTION', true)); ?>");
-										}
-										else if (form.valid_dates.value == "0") {
-											alert("<?php echo JText::_("JEV_INVALID_DATES", true); ?>");
-										}
-										else {
+			Joomla.submitbutton = function(pressbutton) {
+				if (pressbutton.substr(0, 6) == 'cancel' || !(pressbutton == 'icalevent.save' || pressbutton == 'icalrepeat.save' || pressbutton == 'icalevent.savenew' || pressbutton == 'icalrepeat.savenew' || pressbutton == 'icalevent.apply' || pressbutton == 'icalrepeat.apply')) {
+					if (document.adminForm['catid']) {
+						// restore catid to input value
+						document.adminForm['catid'].value = 0;
+						document.adminForm['catid'].disabled = true;
+					}
+					submitform(pressbutton);
+					return;
+				}
+				var form = document.adminForm;
+				var editorElement = jevjq('#jevcontent');
+				if (editorElement.length)
+				{
+					<?php
+					$editorcontent = $this->editor->save('jevcontent');
+					echo $editorcontent."\n";
+                                        // Tiny MCE has changed what onSave method does so we need to use onGetContent
+                                        $getContent = $this->editor->getContent('jevcontent');
+                                        if ($getContent){
+                                            ?>
+                                               // tinyMCE chooses a random editor so we have to specify the one we want
+                                               if (tinyMCE){
+                                                    try {
+                                                        tinyMCE.EditorManager.setActive(tinyMCE.get("jevcontent"));
+                                                    }
+                                                    catch (e) {
+                                                    }
+                                               }
+                                            <?php
+                                            echo "var getContent =".$getContent."\n";
+                                            ?>
+                                            try {
+                                                jevjq('#jevcontent').html(getContent);
+                                            }
+                                            catch (e) {
+                                            }
+                                            <?php
+                                        }
+					?>
+				}
+				try {
+					if (!JevStdRequiredFields.verify(document.adminForm)){
+						return;
+					}
+					if (!JevrRequiredFields.verify(document.adminForm)) {
+						return;
+					}
+				}
+				catch (e) {
+                                        var x = e;
+				}
+				// do field validation
+				if (form.catid && form.catid.value == 0 && form.catid.options && form.catid.options.length) {
+					alert('<?php echo JText::_('JEV_SELECT_CATEGORY', true); ?>');
+				}
+				else if (form.ics_id.value == "0") {
+					alert("<?php echo html_entity_decode(JText::_('JEV_MISSING_ICAL_SELECTION', true)); ?>");
+				}
+				else if (form.valid_dates.value == "0") {
+					alert("<?php echo JText::_("JEV_INVALID_DATES", true); ?>");
+				}
+				 else {
 
 											if (editorElement.length) {
 												<?php

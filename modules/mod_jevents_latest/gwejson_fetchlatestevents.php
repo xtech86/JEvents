@@ -18,7 +18,7 @@ function ProcessJsonRequest(&$requestObject, $returnData) {
     
     ob_clean();
     ob_start();
-    $db = JFactory::getDBO();
+    $db = JFactory::getDbo();
 
     $query = 'SELECT id, title, module, position, content, showtitle,  params'
                     . ' FROM #__modules AS m'

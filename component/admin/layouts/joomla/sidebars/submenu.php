@@ -37,13 +37,10 @@ foreach ($displayData->list as $key => $item) {
 	if($item[7] != 0) {
 		$sections[$item[3]][$item[5]][$item[7]]['sub_links'][] = $item;
 
-	} else if ($item[5] == 0)
+	} else
     {
-	    $sections[$item[3]][$item[5]][] = $item;
-    } else  {
-	    $sections[$item[3]][$item[5]][$prev_key] = $item;
+	    $sections[$item[3]][$item[5]][$item[6]] = $item;
     }
-	$prev_key = $key;
 }
 
 //New sidebar
@@ -90,9 +87,9 @@ foreach ($sections as $section) {
                 foreach ($sub_links as $sub_link) {
                     //Check if it's a theme OR Config option since we handle these differently.
                     if ($sub_link[8] > '' && preg_match('/config_edit/', $sub_link[8])) {
-	                    echo '<li class="' . $sub_link[8] . '"><a ' . $sub_link[1] . '"><i class="fa ' . $sub_link[4] . '"></i><span>' . $sub_link[0] . '</span>';
+	                    echo '<li class="' . $sub_link[8] . '"><a ' . $sub_link[1] . '"><i class="fa ' . $sub_link[4] . '"></i><span>' . $sub_link[0] . '</span></a></li>';
                     } else {
-                    echo '<li class="' . $sub_link[8] . '"><a href="' . $sub_link[1] . '"><i class="fa ' . $sub_link[4] . '"></i><span>' . $sub_link[0] . '</span>';
+                    echo '<li class="' . $sub_link[8] . '"><a href="' . $sub_link[1] . '"><i class="fa ' . $sub_link[4] . '"></i><span>' . $sub_link[0] . '</span></a></li>';
                     }
                 }
                 echo '</ul>';
@@ -107,56 +104,3 @@ foreach ($sections as $section) {
     <?php
 }
 
-
-?>
-<!-- OLD Joomla! SIDEBAR Below
-<div id="j-toggle-sidebar-wrapper hello" style="display: none !important;">
-	<div id="j-toggle-button-wrapper" class="j-toggle-button-wrapper">
-		<?php echo JLayoutHelper::render('joomla.sidebars.toggle'); ?>
-	</div>
-	<div id="sidebar" class="sidebar">
-		<div class="sidebar-nav">
-			<?php if ($displayData->displayMenu) : ?>
-			<ul id="submenu" class="nav nav-list">
-				<?php foreach ($displayData->list as $item) :
-				if (isset ($item[2]) && $item[2] == 1) : ?>
-					<li class="active">
-				<?php else : ?>
-					<li>
-				<?php endif;
-				if ($displayData->hide) : ?>
-					<a class="nolink"><?php echo $item[0]; ?></a>
-				<?php else :
-					if (strlen($item[1])) : ?>
-						<a href="<?php echo JFilterOutput::ampReplace($item[1]); ?>"><?php echo $item[0]; ?></a>
-					<?php else : ?>
-						<?php echo $item[0]; ?>
-					<?php endif;
-				endif; ?>
-				</li>
-				<?php endforeach; ?>
-			</ul>
-			<?php endif; ?>
-			<?php if ($displayData->displayMenu && $displayData->displayFilters) : ?>
-			<hr />
-			<?php endif; ?>
-			<?php if ($displayData->displayFilters) : ?>
-			<div class="filter-select hidden-phone">
-				<h4 class="page-header"><?php echo JText::_('JSEARCH_FILTER_LABEL');?></h4>
-				<?php foreach ($displayData->filters as $filter) : ?>
-					<label for="<?php echo $filter['name']; ?>" class="element-invisible"><?php echo $filter['label']; ?></label>
-					<select name="<?php echo $filter['name']; ?>" id="<?php echo $filter['name']; ?>" class="span12 small" onchange="this.form.submit()">
-						<?php if (!$filter['noDefault']) : ?>
-							<option value=""><?php echo $filter['label']; ?></option>
-						<?php endif; ?>
-						<?php echo $filter['options']; ?>
-					</select>
-					<hr class="hr-condensed" />
-				<?php endforeach; ?>
-			</div>
-			<?php endif; ?>
-		</div>
-	</div>
-	<div id="j-toggle-sidebar"></div>
-</div>
--->

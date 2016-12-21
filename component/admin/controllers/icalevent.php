@@ -380,8 +380,8 @@ class AdminIcaleventController extends JControllerAdmin
 		$attribs = 'class="inputbox" size="1" onchange="document.adminForm.submit();"';
 		$clist = JEventsHTML::buildCategorySelect($catid, $attribs, null, $showUnpublishedCategories, false, $catidtop, "catid");
 
-		$options[] = JHTML::_('select.option', '0', JText::_('JEV_NO'));
-		$options[] = JHTML::_('select.option', '1', JText::_('JEV_YES'));
+		$options[] = JHTML::_('select.option', '0', JText::_('JEV_SHOW_PAST_EVENTS_YES'));
+		$options[] = JHTML::_('select.option', '1', JText::_('JEV_SHOW_PAST_EVENTS_NO'));
 		$plist = JHTML::_('select.genericlist', $options, 'hidepast', 'class="inputbox" size="1" onchange="document.adminForm.submit();"', 'value', 'text', $hidepast);
 
 

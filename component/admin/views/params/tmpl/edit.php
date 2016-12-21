@@ -18,6 +18,8 @@ use Joomla\String\StringHelper;
 
 $version = JEventsVersion::getInstance();
 
+$jinput = JFactory::getApplication()->input;
+
 $haslayouts = false;
 foreach (JEV_CommonFunctions::getJEventsViewList() as $viewfile)
 {
@@ -107,7 +109,8 @@ $toolbar = $bar->getItems() ? $bar->render() : "";
 						<div class="box-body jev_config">
 
 							<?php
-							echo JHtml::_('bootstrap.startPane', 'myParamsTabs', array('active' => 'JEV_TAB_COMPONENT'));
+
+                            echo JHtml::_('bootstrap.startPane', 'myParamsTabs', array('active' => $jinput->get('default_tab', 'JEV_TAB_COMPONENT')));
 							$fieldSets = $this->form->getFieldsets();
 
 							foreach ($fieldSets as $name => $fieldSet)
@@ -214,7 +217,6 @@ $toolbar = $bar->getItems() ? $bar->render() : "";
 
 							if ($haslayouts)
 							{
-
 								// Now get layout specific parameters
 								//JForm::addFormPath(JPATH_COMPONENT ."/views/");
 								foreach (JEV_CommonFunctions::getJEventsViewList() as $viewfile)

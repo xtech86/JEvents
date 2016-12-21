@@ -281,6 +281,24 @@ body.com_jevents #jev_adminui .row > div {
 body.com_jevents #jev_adminui .cpanel_cpanel .span6 .label {
   float: right;
 }
+body.com_jevents #jev_adminui table.header_row td {
+  padding-top: 9px;
+  padding-bottom: 0;
+}
+body.com_jevents #jev_adminui table.header_row select {
+  height: 28px !important;
+}
+body.com_jevents #jev_adminui table.header_row select,
+body.com_jevents #jev_adminui table.header_row input {
+  margin-bottom: 0 !important;
+  width: auto;
+}
+body.com_jevents #jev_adminui.sidebar-collapse ul.sidebar-menu ul.treeview-menu li a i {
+  margin-left: -10px;
+}
+body.com_jevents #jev_adminui.sidebar-collapse ul.sidebar-menu ul.treeview-menu {
+  width: 200px !important;
+}
 body.com_jevents li {
   line-height: 20px;
 }

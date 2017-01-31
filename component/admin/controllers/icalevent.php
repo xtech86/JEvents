@@ -434,7 +434,7 @@ class AdminIcaleventController extends JControllerAdmin
 			$this->view = $this->getView("icalevent", "html", "AdminIcaleventView");
 		}
 		else {
-			$this->view = $this->getView("icalevent", "html");
+			$this->view = $this->getView("icalevent", "html", "AdminIcaleventView");
 		}
 
 		// Get/Create the model
@@ -615,11 +615,11 @@ class AdminIcaleventController extends JControllerAdmin
 		$this->view->assign('clist', $clist);
 		$this->view->assign('repeatId', $repeatId);
 		$this->view->assign('glist', $glist);
-		
+
 		// for Admin interface only
 		$this->view->assign('with_unpublished_cat', JFactory::getApplication()->isAdmin());
 		$this->view->assignRef('dataModel', $this->dataModel);
-		
+
 		// Keep following fields for backwards compataibility only
 		// only those who can publish globally can set priority field
 		if (JEVHelper::isEventPublisher(true))

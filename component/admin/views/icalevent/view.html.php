@@ -125,7 +125,7 @@ class AdminIcaleventViewIcalevent extends JEventsAbstractView
 		//Define to keep editor happy that it is defined.
 		$editStrings = "";
 		include(JEV_ADMINLIBS . "editStrings.php");
-		$document->addScriptDeclaration($editStrings);
+        $document->addScriptDeclaration($editStrings);
 
 		// WHY THE HELL DO THEY BREAK PUBLIC FUNCTIONS !!!
 		JEVHelper::script('editicalJQ.js', 'components/' . JEV_COM_COMPONENT . '/assets/js/');

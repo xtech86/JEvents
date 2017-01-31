@@ -99,7 +99,7 @@ $limit = 4;
 							$query
 							->select(array('evdet_id','dtstart', 'dtend', 'summary', 'modified', 've.ev_id', 've.created', 've.created_by', 've.state', 've.modified_by'))
 							->from($db->quoteName('#__jevents_vevdetail'))
-							->leftJoin($db->quoteName('#__jevents_vevent') . 'AS ve ON ve.ev_id = evdet_id')
+							->leftJoin($db->quoteName('#__jevents_vevent') . 'AS ve ON ve.detail_id = evdet_id')
 							->where($db->quoteName('ve.state') . ' = 1')
 							->order('ve.created ASC')
 							->setLimit($limit);
@@ -162,7 +162,7 @@ $limit = 4;
 							$query
 								->select(array('evdet_id','dtstart', 'dtend', 'summary', 'modified', 'ed.ev_id', 'ed.state' , 'ed.modified_by'))
 								->from($db->quoteName('#__jevents_vevdetail'))
-								->leftJoin($db->quoteName('#__jevents_vevent') . 'AS ed ON ed.ev_id = evdet_id')
+								->leftJoin($db->quoteName('#__jevents_vevent') . 'AS ed ON ed.detail_id = evdet_id')
 								->where($db->quoteName('ed.state') . ' = 1')
 								->order('modified ASC')
 								->setLimit($limit);
@@ -225,7 +225,7 @@ $limit = 4;
 							$query
 								->select(array('evdet_id','dtstart', 'dtend', 'summary', 'modified', 'ed.ev_id', 'ed.state', 'ed.modified_by'))
 								->from($db->quoteName('#__jevents_vevdetail'))
-								->leftJoin($db->quoteName('#__jevents_vevent') . 'AS ed ON ed.ev_id = evdet_id')
+								->leftJoin($db->quoteName('#__jevents_vevent') . 'AS ed ON ed.detail_id = evdet_id')
 								->where($db->quoteName('ed.state') . ' = 0')
 								->order('modified ASC')
 								->setLimit($limit);
@@ -291,7 +291,7 @@ $limit = 4;
 							$query
 								->select(array('evdet_id','dtstart', 'dtend', 'summary', 'modified', 'ed.ev_id', 'ed.state', 'ed.modified_by'))
 								->from($db->quoteName('#__jevents_vevdetail'))
-								->leftJoin($db->quoteName('#__jevents_vevent') . 'AS ed ON ed.ev_id = evdet_id')
+								->leftJoin($db->quoteName('#__jevents_vevent') . 'AS ed ON ed.detail_id = evdet_id')
 								->where($db->quoteName('ed.state') . ' = -1')
 								->order('modified ASC')
 								->setLimit($limit);

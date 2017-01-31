@@ -662,7 +662,6 @@ $toolbar = $bar->getItems() ? $bar->render() : "";
 									?>
 								</div>
 								<?php
-								$output = ob_get_clean();
 								if (!$this->loadEditFromTemplate('icalevent.edit_page', $this->row, 0, $this->searchtags, $this->replacetags, $this->blanktags))
 								{
 									echo $output;

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * copyright (C) 2012-2016 GWE Systems Ltd - All rights reserved
+ * copyright (C) 2012-2017 GWE Systems Ltd - All rights reserved
  * @license GNU/GPLv3 www.gnu.org/licenses/gpl-3.0.html
  * */
 // Check to ensure this file is included in Joomla!
@@ -149,7 +149,8 @@ CREATE TABLE IF NOT EXISTS #__jevents_vevent(
                         
 	PRIMARY KEY  (ev_id),
 	INDEX (icsid),
-	INDEX stateidx (state)
+	INDEX stateidx (state),
+        INDEX evaccess (access)                        
 ) $charset;
 SQL;
 		$db->setQuery($sql);
@@ -520,14 +521,19 @@ SQL;
 
 		if (!array_key_exists("evaccess", $icols))
 		{
+                    // What is curtent value of sql_mode
+                    $db->setQuery("SELECT @@sql_mode");
+                    $sql_mode = @$db->loadResult();
+                    
                     $db->setQuery("SET SESSION sql_mode=(SELECT REPLACE(@@sql_mode,'NO_ZERO_DATE',''))");
                     @$db->execute();
-                    //select @@sql_mode;
                     $sql = "ALTER TABLE #__jevents_vevent ADD INDEX evaccess (access)";
                     $db->setQuery($sql);
                     @$db->execute();
-                    $db->setQuery("SET SESSION sql_mode=(SELECT CONCAT(@@sql_mode,',NO_ZERO_DATE'))");
-                    @$db->execute();
+                    
+                    // Return to old value
+                    $db->setQuery("SET SESSION sql_mode=(".$db->quote($sql_mode).")");
+                    @$db->execute();                    
 		}
                                 
 		$sql = "SHOW COLUMNS FROM #__jevents_vevdetail";
@@ -568,7 +574,7 @@ SQL;
 			$db->setQuery($sql);
 			@$db->execute();
 		}
-		if (array_key_exists("extra_info", $cols))
+		if (!array_key_exists("extra_info", $cols))
 		{
 			$sql = "ALTER TABLE #__jevents_vevdetail modify extra_info text NOT NULL";
 			$db->setQuery($sql);

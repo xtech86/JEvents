@@ -169,6 +169,9 @@ body.view-.layout-.task- .btn.btn-subhead .subhead-collapse,
 body.admin.com_jevents.view-.layout-.task-cpanel\.cpanel .btn.btn-subhead .subhead-collapse {
   display: none;
 }
+body.com_jevents .box-body.custom_layouts textarea#value {
+  width: 96% !important;
+}
 body.com_jevents #isisJsData {
   display: none;
 }
@@ -302,8 +305,8 @@ body.com_jevents #jev_adminui.sidebar-collapse ul.sidebar-menu ul.treeview-menu 
 body.com_jevents li {
   line-height: 20px;
 }
-body.com_jevents section.content.ov_info .span3 {
-  width: 25%;
+body.com_jevents section.content.ov_info .span3,
+body.com_jevents section.content.ov_info .span6 {
   box-sizing: border-box;
   display: inline-block;
   margin: 0;

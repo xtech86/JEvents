@@ -33,7 +33,7 @@ class JevExportHelper {
 		$urlString['trp'] = "trp=false";
 		$urlString['websiteName'] = "sprop=".$eventData['sitename'];
 		$urlString['websiteURL'] = "sprop=name:".$eventData['siteurl'];
-		$urlString['details'] = "details=".$eventData['details'];
+		$urlString['details'] = "details=".$eventData['details'] . ' ' . $eventData['siteurl'];
 		$link = "http://www.google.com/calendar/event?action=TEMPLATE&".implode("&", $urlString);
 
 		return $link;

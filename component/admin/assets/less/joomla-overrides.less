@@ -8,6 +8,13 @@ body.admin.view-.layout-.task-, body.admin.com_jevents.view-.layout-.task-cpanel
 }
 body.com_jevents {
 
+  .box-body {
+    &.custom_layouts {
+      textarea#value {
+        width: 96% !important;
+      }
+    }
+  }
 
   #isisJsData {display:none;}
   > .container-fluid.container-main {
@@ -188,8 +195,7 @@ body.com_jevents {
 
   section.content {
     &.ov_info {
-      .span3 {
-        width: 25%;
+      .span3, .span6 {
         box-sizing: border-box;
         display: inline-block;
         margin: 0;

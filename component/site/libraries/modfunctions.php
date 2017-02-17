@@ -1,10 +1,10 @@
 <?php
 /**
- * JEvents Component for Joomla 1.5.x
+ * JEvents Component for Joomla! 3.x
  *
  * @version     $Id: modfunctions.php 3549 2012-04-20 09:26:21Z geraintedwards $
  * @package     JEvents
- * @copyright   Copyright (C) 2008-2015 GWE Systems Ltd, 2006-2008 JEvents Project Group
+ * @copyright   Copyright (C) 2008-2017 GWE Systems Ltd, 2006-2008 JEvents Project Group
  * @license     GNU/GPLv2, see http://www.gnu.org/licenses/gpl-2.0.html
  * @link        http://www.jevents.net
  */
@@ -13,16 +13,20 @@
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
+use Joomla\Utilities\ArrayHelper;
+use Joomla\String\StringHelper;
+
 function findAppropriateMenuID (&$catidsOut, &$modcatids, &$catidList, $modparams, &$showall){
 	// Itemid, search for menuid with lowest access rights
 	$user = JFactory::getUser();
 	$db	= JFactory::getDBO();
+	$jinput = JFactory::getApplication()->input;
 
 	// Do we ignore category filters?
 	$ignorecatfilter = 0;
 	if (isset($modparams->ignorecatfilter) && $modparams->ignorecatfilter){
 		$ignorecatfilter = $modparams->ignorecatfilter;
-		JRequest::setVar("category_fv",0);
+		$jinput->set("category_fv", 0);
 	}
 	
 	$menu = JFactory::getApplication()->getMenu();
@@ -99,7 +103,7 @@ function findAppropriateMenuID (&$catidsOut, &$modcatids, &$catidList, $modparam
 		foreach ($newcats as $newcat){
 			if ( !in_array( $newcat,$modcatids )){
 				$modcatids[]=$newcat;
-				$catidList .= (strlen($catidList)>0?",":"").$newcat;
+				$catidList .= (JString::strlen($catidList)>0?",":"").$newcat;
 			}
 		}				
 	}
@@ -110,7 +114,7 @@ function findAppropriateMenuID (&$catidsOut, &$modcatids, &$catidList, $modparam
 			if (!isset($modparams->$nextCID)) break;
 			if ($modparams->$nextCID>0 && !in_array($modparams->$nextCID,$modcatids)){
 				$modcatids[]=$modparams->$nextCID;
-				$catidList .= (strlen($catidList)>0?",":"").$modparams->$nextCID;
+				$catidList .= (JString::strlen($catidList)>0?",":"").$modparams->$nextCID;
 			}
 		}
 	}
@@ -129,9 +133,9 @@ function findAppropriateMenuID (&$catidsOut, &$modcatids, &$catidList, $modparam
 	// if ignoring catid filter then force to blank
 	if ($ignorecatfilter) $catidsin = "";
 	
-	if (strlen($catidsin)>0){
+	if (JString::strlen($catidsin)>0){
 		$catidsin = explode("|",$catidsin);
-		JArrayHelper::toInteger($catidsin);
+		ArrayHelper::toInteger($catidsin);
 	}
 	else {
 		// if no catids from the URL then stick to the module catids

@@ -1,16 +1,19 @@
 <?php
 /**
- * JEvents Component for Joomla 1.5.x
+ * JEvents Component for Joomla! 3.x
  *
  * @version     $Id: icals.php 3549 2012-04-20 09:26:21Z geraintedwards $
  * @package     JEvents
- * @copyright   Copyright (C) 2008-2015 GWE Systems Ltd
+ * @copyright   Copyright (C) 2008-2017 GWE Systems Ltd
  * @license     GNU/GPLv2, see http://www.gnu.org/licenses/gpl-2.0.html
  * @link        http://www.jevents.net
  */
 defined('JPATH_BASE') or die('Direct Access to this location is not allowed.');
 
 include_once(JEV_ADMINPATH . "/controllers/icals.php");
+
+use Joomla\Utilities\ArrayHelper;
+use Joomla\String\StringHelper;
 
 class ICalsController extends AdminIcalsController
 {
@@ -188,7 +191,7 @@ class ICalsController extends AdminIcalsController
 				if (!in_array($y, $years))
 					$years[] = $y;
 			}
-			JArrayHelper::toInteger($years);
+			ArrayHelper::toInteger($years);
 		}
 		else if ($years != "NONE")
 		{
@@ -198,7 +201,7 @@ class ICalsController extends AdminIcalsController
 				list($y, $m, $d) = JEVHelper::getYMD();
 				$years = array($y);
 			}
-			JArrayHelper::toInteger($years);
+			ArrayHelper::toInteger($years);
 		}
 		else
 		{
@@ -207,9 +210,13 @@ class ICalsController extends AdminIcalsController
 		}
 
 		// Lockin hte categories from the URL
+		$Itemid = JRequest::getInt("Itemid",0);
+		if (!$Itemid){
+			JRequest::setVar("Itemid",1);
+		}
 		$this->dataModel->setupComponentCatids();
 
-		$dispatcher = JDispatcher::getInstance();
+		$dispatcher = JEventDispatcher::getInstance();
 		// just incase we don't have jevents plugins registered yet
 		JPluginHelper::importPlugin("jevents");
 
@@ -247,6 +254,7 @@ class ICalsController extends AdminIcalsController
 		$this->view->assign("dataModel",$this->dataModel) ;
 		$this->view->assign("outlook2003icalexport", $outlook2003icalexport);
 		$this->view->assign("icalEvents", $icalEvents);
+		$this->view->assign("withrepeats", true);
 
 		$this->view->export();
 		return;
@@ -276,11 +284,13 @@ class ICalsController extends AdminIcalsController
 			if ($user->id)
 			{
 				$this->setRedirect(JURI::root(), JText::_('JEV_NOTAUTH_CREATE_EVENT'));
+				$this->redirect();
 			}
 			else
 			{
 				$comuser = version_compare(JVERSION, '1.6.0', '>=') ? "com_users" : "com_user";
 				$this->setRedirect(JRoute::_("index.php?option=$comuser&view=login"), JText::_('JEV_NOTAUTH_CREATE_EVENT'));
+				$this->redirect();
 			}
 			return;
 		}
@@ -352,7 +362,9 @@ class ICalsController extends AdminIcalsController
 		{
 			if (count($nativeCals) == 0 || !is_array($nativeCals))
 			{
-				JError::raiseWarning(870, JText::_('INVALID_CALENDAR_STRUCTURE'));
+
+				JFactory::getApplication()->enqueueMessage(JText::_('INVALID_CALENDAR_STRUCTURE'), 'warning');
+
 			}
 
 			$icsid = current($nativeCals)->ics_id;
@@ -405,11 +417,13 @@ class ICalsController extends AdminIcalsController
 			if ($user->id)
 			{
 				$this->setRedirect(JURI::root(), JText::_('JEV_NOTAUTH_CREATE_EVENT'));
+				$this->redirect();
 			}
 			else
 			{
 				$comuser = version_compare(JVERSION, '1.6.0', '>=') ? "com_users" : "com_user";
 				$this->setRedirect(JRoute::_("index.php?option=$comuser&view=login"), JText::_('JEV_NOTAUTH_CREATE_EVENT'));
+				$this->redirect();
 			}
 			return;
 		}
@@ -433,14 +447,17 @@ class ICalsController extends AdminIcalsController
 		if ($catid == 0)
 		{
 			// Paranoia, should not be here, validation is done by java script
-			JError::raiseError('Fatal error', JText::_('JEV_E_WARNCAT'));
+			// Just load the ical event list on redirect for now.
+			$redirect_task = "icalevent.list";
+			JFactory::getApplication()->enqueueMessage(JTExt::_('JEV_FATAL_ERROR') .  JText::_('JEV_E_WARNCAT'), 'error');
+
 			$this->setRedirect("index.php?option=" . JEV_COM_COMPONENT . "&task=$redirect_task", JText::_('JEV_E_WARNCAT'));
 			$this->redirect();
 			return;
 		}
 
 		// I need a better check and expiry information etc.
-		if (strlen($uploadURL) > 0)
+		if (JString::strlen($uploadURL) > 0)
 		{
 			$icsFile = iCalICSFile::newICSFileFromURL($uploadURL, $icsid, $catid, $access, $state, $icsLabel, $autorefresh, $ignoreembedcat);
 		}
@@ -449,7 +466,7 @@ class ICalsController extends AdminIcalsController
 			$file = $_FILES['upload'];
 			if ($file['size'] == 0)
 			{//|| !($file['type']=="text/calendar" || $file['type']=="application/octet-stream")){
-				JError::raiseWarning(0, 'empty upload file');
+				JFactory::getApplication()->enqueueMessage(JText::_('JEV_EMPTY_FILE_UPLOAD'), 'warning');
 				$icsFile = false;
 			}
 			else
@@ -507,7 +524,7 @@ class ICalsController extends AdminIcalsController
 			
 			JRequest::setVar("tmpl", "component");
 		
-			//$dispatcher = JDispatcher::getInstance();
+			//$dispatcher = JEventDispatcher::getInstance();
 			// just incase we don't have jevents plugins registered yet
 			//JPluginHelper::importPlugin("jevents");
 			//$dispatcher->trigger('onExportRow', array(&$row));
@@ -588,12 +605,12 @@ class ICalsController extends AdminIcalsController
 		{
 			$output .= JString::substr($input, 0, $line_max - 1);
 			$input = JString::substr($input, $line_max - 1);
-			if (strlen($input) > 0)
+			if (JString::strlen($input) > 0)
 			{
 				$output .= $eol . " ";
 			}
 		}
-		if (strlen($input) > 0)
+		if (JString::strlen($input) > 0)
 		{
 			$output .= $input;
 		}
@@ -623,7 +640,7 @@ class ICalsController extends AdminIcalsController
 			  }
 			  }
 			 */
-			if ((strlen($outline) + 1) >= $line_max)
+			if ((JString::strlen($outline) + 1) >= $line_max)
 			{ // CRLF is not counted
 				$output .= $outline . $eol . $newline; // soft line break; "\r\n" is okay
 				$outline = $c;
@@ -677,7 +694,7 @@ class ICalsController extends AdminIcalsController
 			$transitions = array_slice($transitions, $tzindex);
 			if (count($transitions) >= 2)
 			{
-				$lastyear = $params->get("com_latestyear", 2020);
+				$lastyear = JEVHelper::getMaxYear();
 				echo "BEGIN:VTIMEZONE\n";
 				echo "TZID:$current_timezone\n";
 				for ($t = 0; $t < count($transitions); $t++)

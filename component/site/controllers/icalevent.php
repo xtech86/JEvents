@@ -1,10 +1,10 @@
 <?php
 /**
- * JEvents Component for Joomla 1.5.x
+ * JEvents Component for Joomla! 3.x
  *
  * @version     $Id: icalevent.php 3549 2012-04-20 09:26:21Z geraintedwards $
  * @package     JEvents
- * @copyright   Copyright (C) 2008-2015 GWE Systems Ltd
+ * @copyright   Copyright (C) 2008-2017 GWE Systems Ltd
  * @license     GNU/GPLv2, see http://www.gnu.org/licenses/gpl-2.0.html
  * @link        http://www.jevents.net
  */
@@ -35,23 +35,27 @@ class ICalEventController extends AdminIcaleventController   {
 
 		// Do we have to be logged in to see this event
 		$user = JFactory::getUser();
-		if (JRequest::getInt("login",0) && $user->id==0)
+
+		$jinput = JFactory::getApplication()->input;
+
+		if ($jinput->getInt("login", 0) && $user->id==0)
 		{			
 			$uri = JURI::getInstance();
 			$link = $uri->toString();
 			$comuser= version_compare(JVERSION, '1.6.0', '>=') ? "com_users":"com_user";
-			$link = 'index.php?option='.$comsser.'&view=login&return='.base64_encode($link);
+			$link = 'index.php?option='.$comuser.'&view=login&return='.base64_encode($link);
 			$link = JRoute::_($link, false);
 			$this->setRedirect($link,JText::_('JEV_LOGIN_TO_VIEW_EVENT'));
+			$this->redirect();
 			return;
 		}
 				
-		$evid =JRequest::getInt("rp_id",0);
+		$evid =$jinput->getInt("rp_id", 0);
 		if ($evid==0){
-			$evid =JRequest::getInt("evid",0);
+			$evid = $jinput->getInt("evid", 0);
 			// if cancelling from save of copy and edit use the old event id
 			if ($evid==0){
-				$evid =JRequest::getInt("old_evid",0);
+				$evid =$jinput->getInt("old_evid", 0);
 			}
 			// In this case I do not have a repeat id so I find the first one that matches
 			$datamodel = new JEventsDataModel("JEventsAdminDBModel");
@@ -63,15 +67,15 @@ class ICalEventController extends AdminIcaleventController   {
 				$evid=$repeat->rp_id();
 			}			
 		}
-		$pop = intval(JRequest::getVar( 'pop', 0 ));
-		$uid = urldecode((JRequest::getVar( 'uid', "" )));
+		$pop = intval($jinput->getInt('pop', 0 ));
+		$uid = urldecode(($jinput->getString('uid', "")));
 		list($year,$month,$day) = JEVHelper::getYMD();
 		$Itemid	= JEVHelper::getItemid();
 
 		// seth month and year to be used by mini-calendar if needed
 		if (isset($repeat)) {
-			if (!JRequest::getVar("month",0)) JRequest::setVar("month",$repeat->mup());
-			if (!JRequest::getVar("year",0)) JRequest::setVar("year",$repeat->yup());
+			if (!$jinput->getInt("month", 0)) $jinput->set("month", $repeat->mup());
+			if (!$jinput->getInt("year", 0))  $jinput->set("year", $repeat->yup());
 		}
 
 		$document = JFactory::getDocument();
@@ -120,13 +124,14 @@ class ICalEventController extends AdminIcaleventController   {
 		if (!$is_event_editor || ($user->id==0 && JRequest::getInt("evid",0)>0)){
 			if ($user->id){
 				$this->setRedirect(JURI::root(),JText::_('JEV_NOTAUTH_CREATE_EVENT'));
+				$this->redirect();
 				//throw new Exception( JText::_('ALERTNOTAUTH'), 403);
 			}
 			else {
 				$uri = JURI::getInstance();
 				$link = $uri->toString();
-				$comuser= version_compare(JVERSION, '1.6.0', '>=') ? "com_users":"com_user";
-				$this->setRedirect(JRoute::_("index.php?option=$comuser&view=login&return=".base64_encode($link)),JText::_('JEV_NOTAUTH_CREATE_EVENT'));
+				$this->setRedirect(JRoute::_("index.php?option=com_users&view=login&return=".base64_encode($link)),JText::_('JEV_NOTAUTH_CREATE_EVENT'));
+				$this->redirect();
 			}
 			return;
 		}
@@ -177,7 +182,17 @@ class ICalEventController extends AdminIcaleventController   {
 		JHtml::_('stylesheet', 'system/adminlist.css', array(), true);
 		parent::select();
 	}
-	
+
+	public function edit_cancel() {
+		$session = JFactory::getSession();
+                $params = JComponentHelper::getParams(JEV_COM_COMPONENT);
+-               $fallback = $params->get("editreturnto", "day.listevents");
+		$ref = $session->get('jev_referrer',$fallback, 'extref');
+
+		$this->setRedirect($ref);
+		$this->redirect();
+
+	}
 	
 		
 }

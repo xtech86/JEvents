@@ -8,12 +8,11 @@ defined('_JEXEC') or die('Restricted access');
 	 * @param Jevent or descendent $row
 	 */
 function DefaultEventManagementDialog($view,$row, $mask, $bootstrap = false) {
-	if (!$bootstrap) {
-		return $view->eventManagementDialog16($row, $mask);
-	}
-	JevHtmlBootstrap::modal("action_dialogJQ".$row->rp_id());
 
+	JevHtmlBootstrap::modal("action_dialogJQ".$row->rp_id());
+	$jinput = JFactory::getApplication()->input;
 	$user = JFactory::getUser();
+
 	if ($user->get("id")==0) return "";
 	if( (JEVHelper::canEditEvent($row) || JEVHelper::canPublishEvent($row)|| JEVHelper::canDeleteEvent($row)) ) { 
 
@@ -22,12 +21,12 @@ function DefaultEventManagementDialog($view,$row, $mask, $bootstrap = false) {
 		if ($params->get("editpopup",0) && JEVHelper::isEventCreator())
 		{
 			JevHtmlBootstrap::modal();
-			JEVHelper::script('editpopup.js','components/'.JEV_COM_COMPONENT.'/assets/js/');
+			JEVHelper::script('editpopupJQ.js','components/'.JEV_COM_COMPONENT.'/assets/js/');
 			$popup=true;
 			$popupw = $params->get("popupw",800);
 			$popuph = $params->get("popuph",600);
 		}
-		if (JRequest::getInt("pop",0)){
+		if ($jinput->getInt("pop", 0)){
 			// do not call the modal scripts if already in a popup window!
 			$popup=false;
 		}
@@ -42,7 +41,7 @@ function DefaultEventManagementDialog($view,$row, $mask, $bootstrap = false) {
 		$editCopyLink = $popup?"javascript:jevEditPopupNoHeader('".$editCopyLink."');":$editCopyLink;
 		$deleteImg = JHtml::image('com_jevents/icons-32/discard.png',JText::_("DELETE_EVENT"),null,true);
 		$deleteLink = $row->deleteLink();
-		if ($row->until()!=$row->dtstart() || $row->count()>1){
+		if ($row->until()!=$row->dtstart() || $row->count()>1 || $row->freq()=="IRREGULAR"){
 
 			$hasrepeat = true;
 

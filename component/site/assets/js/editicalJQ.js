@@ -1,9 +1,9 @@
 /**
- * JEvents Component for Joomla 1.5.x
+ * JEvents Component for Joomla! 3.x
  *
- * @version     $Id: editical.js 3576 2012-05-01 14:11:04Z geraintedwards $
+ * @version     $Id: editicalJQ.js 3576 2012-05-01 14:11:04Z geraintedwards $
  * @package     JEvents
- * @copyright   Copyright (C) 2008-2015 GWE Systems Ltd, 2006-2008 JEvents Project Group
+ * @copyright   Copyright (C) 2008-2017 GWE Systems Ltd, 2006-2008 JEvents Project Group
  * @license     GNU/GPLv2, see http://www.gnu.org/licenses/gpl-2.0.html
  * @link        http://www.jevents.net
  */
@@ -342,7 +342,7 @@ function checkEndTime() {
 	endDate.setMinutes(endtimeparts[1]);
 
 	var jevmultiday = document.getElementById('jevmultiday');
-	if (end_date.value>start_date.value){
+	if (endDate.dateFromYMD(end_date.value)>startDate.dateFromYMD(start_date.value)){
 		jevmultiday.style.display='block';
 	}
 	else {
@@ -376,6 +376,13 @@ function checkDates(elem){
 	checkEndTime();
 	checkUntil();
 	updateRepeatWarning();
+        // update the by day type checkboxes
+        fixRepeatDates();
+        try {
+		initialiseBootstrapButtons()
+	}
+	catch(e) {};
+
 }
 
 function reformatStartEndDates() {
@@ -424,7 +431,13 @@ function setEndDateWhenNotRepeating(){
 	
 	endDate = new Date();
 	endDate = endDate.dateFromYMD(end_date.value);	
-	
+
+	// if the end date is not visible then always set the end date to match the start date
+	enddate_container = jQuery('.jevenddate');
+	if (enddate_container.css("display")=="none"){
+		end_date.value = start_date.value;
+	}
+
 	if (startDate>endDate){
 		end_date.value = start_date.value;
 		normaliseElem(end_date);
@@ -445,11 +458,11 @@ function toggleView12Hour(){
 	if (document.adminForm.view12Hour.checked) {
 		document.getElementById('start_24h_area').style.display="none";
 		document.getElementById('end_24h_area').style.display="none";
-		document.getElementById('start_12h_area').style.display="inline";
-		document.getElementById('end_12h_area').style.display="inline";
+		document.getElementById('start_12h_area').style.display="inline-block";
+		document.getElementById('end_12h_area').style.display="inline-block";
 	} else {
-		document.getElementById('start_24h_area').style.display="inline";
-		document.getElementById('end_24h_area').style.display="inline";
+		document.getElementById('start_24h_area').style.display="inline-block";
+		document.getElementById('end_24h_area').style.display="inline-block";
 		document.getElementById('start_12h_area').style.display="none";
 		document.getElementById('end_12h_area').style.display="none";
 	}
@@ -528,6 +541,7 @@ function toggleAllDayEvent()
 			epm.disabled=true;
 
 			jQuery('.jevendtime').css('display','none');
+            jQuery('.jevnoeendtime').css('display', 'none');
 
 		}
 	}
@@ -544,7 +558,7 @@ function toggleAllDayEvent()
 		sam.disabled=false;
 		spm.disabled=false;
 
-		jQuery('.jevstarttime').css('display','inline');
+		jQuery('.jevstarttime').css('display','inline-block');
 
 		if (!noendchecked){
 			hide_end.disabled=false;
@@ -563,7 +577,8 @@ function toggleAllDayEvent()
 			eam.disabled=false;
 			epm.disabled=false;
 
-			jQuery('.jevendtime').css('display','inline');
+			jQuery('.jevendtime').css('display','inline-block');
+			jQuery('.jevnoeendtime').css('display','inline-block');
 
 		}
 		else {
@@ -633,7 +648,7 @@ function toggleNoEndTime(){
 		eam.disabled=false;
 		epm.disabled=false;
 
-		jQuery('.jevendtime').css('display','inline');
+		jQuery('.jevendtime').css('display','inline-block');
 
 	}
 
@@ -654,18 +669,26 @@ function toggleNoEndTime(){
 function toggleGreyBackground(inputtype,inputelem, tomatch) {
 	if (inputtype==tomatch){
 		inputelem.disabled = false;
-		inputelem.parent()[0].style.backgroundColor="#ffffff";
-		if (inputelem.parent('fieldset').find('legend')){
-			inputelem.parent('fieldset').find('legend').css("background-color","#ffffff");
-			jevjq("#"+inputtype).css("background-color","#ffffff");
+		//inputelem.closest('fieldset').css("background-color","#ffffff");
+                inputelem.closest('fieldset').removeClass("roundedgrey");
+		inputelem.closest('fieldset').css("opacity","1");
+		if (inputelem.closest('fieldset').find('legend')){
+			//inputelem.closest('fieldset').find('legend').css("background-color","#ffffff");
+			//jevjq("#"+inputtype).css("background-color","#ffffff");
+			inputelem.closest('fieldset').find('legend').removeClass("roundedgrey");
+			jevjq("#"+inputtype).removeClass("roundedgrey");
 		}
 	}
 	else {
 		inputelem.disabled = true;
-		inputelem.parent()[0].style.backgroundColor="#dddddd";
-		if (inputelem.parent('fieldset').find('legend')){
-			inputelem.parent('fieldset').find('legend').css("background-color","#dddddd");
-			jevjq("#"+inputtype).css("background-color","#dddddd");
+		//inputelem.closest('fieldset').css("background-color","#dddddd");
+                inputelem.closest('fieldset').addClass("roundedgrey");
+		inputelem.closest('fieldset').css("opacity","0.7");
+		if (inputelem.closest('fieldset').find('legend')){
+			//inputelem.closest('fieldset').find('legend').css("background-color","#dddddd");
+			//jevjq("#"+inputtype).css("background-color","#dddddd");
+			inputelem.closest('fieldset').find('legend').addClass("roundedgrey");
+			jevjq("#"+inputtype).addClass("roundedgrey");
 		}
 	}
 }
@@ -719,6 +742,7 @@ function toggleFreq(freq , setup)
 	var bymonthday = document.getElementById('bymonthday');
 	var bymonth = document.getElementById('bymonth');
 	var byday = document.getElementById('byday');
+	var byirregular = document.getElementById('byirregular');
 	var weekofmonth = document.getElementById('weekofmonth');
 	var intervalLabel = document.getElementById('interval_label');
 	switch (freq) {
@@ -730,6 +754,7 @@ function toggleFreq(freq , setup)
 				byweekno.style.display="none";
 				bymonthday.style.display="none";
 				byday.style.display="none";
+				byirregular.style.display="none";
 
 				// must also reset freq to 1 and count to 1
 				document.getElementById('rinterval').value="1";
@@ -749,8 +774,9 @@ function toggleFreq(freq , setup)
 				byweekno.style.display="none";
 				bymonthday.style.display="none";
 				byday.style.display="none";
+				byirregular.style.display="none";
 
-				fixRepeatDates(true);
+				if (!setup) fixRepeatDates(true);
 			}
 			break;
 		case "MONTHLY":
@@ -759,6 +785,7 @@ function toggleFreq(freq , setup)
 				myDiv.style.display="block";
 				byyearday.style.display="none";
 				bymonth.style.display="none";
+				byirregular.style.display="none";
 				byweekno.style.display="none";
 				bymonthday.style.display="block";
 				document.getElementById('jevbmd').checked="checked";
@@ -776,12 +803,20 @@ function toggleFreq(freq , setup)
 				bymonth.style.display="none";
 				byweekno.style.display="none";
 				bymonthday.style.display="none";
+				byirregular.style.display="none";
 				byday.style.display="block";
 				document.getElementById('jevbd').checked="checked";
+				// needed for after switching to month repeat and then toi wekely
+				jQuery("#jevbd").closest('fieldset').css("background-color","#ffffff");
+				jQuery("#jevbd").parent().css("background-color","#ffffff");
+				jQuery("#byday").css("background-color","#ffffff");
+				jQuery("#jevbd").closest('fieldset').css("opacity","1");
+
 				//toggleWhichBy("byday");
 				weekofmonth.style.display="none";
 				// always set week nums false for weekly events
 				toggleWeekNums(false);
+                                fixRepeatDates(false);
 			}
 			break;
 		case "DAILY":
@@ -793,6 +828,7 @@ function toggleFreq(freq , setup)
 				byweekno.style.display="none";
 				bymonthday.style.display="none";
 				byday.style.display="none";
+				byirregular.style.display="none";
 				document.getElementById('jevbd').checked="checked";
 				//toggleWhichBy("byday");
 				weekofmonth.style.display="none";
@@ -800,14 +836,15 @@ function toggleFreq(freq , setup)
 			break;
 		case "IRREGULAR":
 			{
-				intervalLabel.innerHTML=jevirregular;
 				myDiv.style.display="block";
 				byyearday.style.display="none";
 				bymonth.style.display="none";
 				byweekno.style.display="none";
 				bymonthday.style.display="none";
 				byday.style.display="none";
-				document.getElementById('jevirregular').checked="checked";
+				byirregular.style.display="block";
+				document.getElementById('interval_div').style.display = "none";
+				
 				weekofmonth.style.display="none";
 			}
 			break;
@@ -830,7 +867,7 @@ function fixRepeatDates(checkYearDay){
 	startDate = startDate.dateFromYMD(start_date.value);	
 	
 	// special case where we first press yearly repeat - should check for 28 Feb
-	if (checkYearDay) {
+	if (checkYearDay && (document.adminForm.evid.value==0 || document.adminForm.updaterepeats.value==1)) {
 		yearStart = new Date(startDate.getFullYear(),0,0,0,0,0,0);
 		days = ((startDate-yearStart)/(24*60*60*1000));
 		if (days>60){
@@ -880,7 +917,9 @@ function fixRepeatDates(checkYearDay){
 	// variable bd is reserved in MSIE 8 ?
 	var bd = document.adminForm["weekdays[]"];
 	for(var day=0;day<bd.length;day++){
-		bd[day].checked=false;
+		if (parseInt(jQuery("#evid").val())==0) {
+			bd[day].checked=false;
+		}
 	}
 	bd[startDate.getDay()].checked=true;
 
@@ -921,8 +960,13 @@ function resetYMD(){
 	document.adminForm.day.value = startDate.getDate();
 }
 
-
+// This variable blocks this check until an edited repeat/event has been fully loaded
+var setupRepeatsRun = false;
+var AllDayNoEndTimeSetup = false;
 function updateRepeatWarning(){
+	if (!setupRepeatsRun || !AllDayNoEndTimeSetup) {
+		return;
+	}
 	if (jevjq("input[name=freq]:checked").length){
 		var currentFreq = jevjq("input[name=freq]:checked").val().toUpperCase();
 		if (document.adminForm.updaterepeats && currentFreq!="NONE")
@@ -941,14 +985,14 @@ jQuery.fn.formToJson =  function(){
 			var value = el.value;
 			if (value === false || !name || el.disabled) return;
 			// multi selects
-			if (name.contains('[]') && (el.tagName.toLowerCase() =='select' ) && el.multiple==true){
+			if (name.indexOf('[]')>=0 && (el.tagName.toLowerCase() =='select' ) && el.multiple==true){
 				name = name.substr(0,name.length-2);
 				if (!json[name]) json[name] = [];
 				jevjq(el).find('option').each(function(eldx, opt){
 					if (opt.selected ==true) json[name].push(opt.value);
 				});
 			}
-			else if (name.contains('[]') && (el.type=='radio' || el.type=='checkbox') ){
+			else if (name.indexOf('[]')>=0 && (el.type=='radio' || el.type=='checkbox') ){
 				if (!json[name]) json[name] = [];
 				if (el.checked==true) json[name].push(value);
 			}
@@ -1021,6 +1065,10 @@ function checkConflict(checkurl, pressbutton, jsontoken, client, repeatid,  redi
 					container.append("<a href='"+overlap.url+"' target='_blank'>"+overlap.conflictMessage+"</a><br/>")
 				});
 				hasConflicts = true;
+				// Make sure the message is visible
+				//jQuery("#jevoverlapwarning").get(0).scrollIntoView();
+				//jQuery('html, body').animate({	scrollTop: jQuery("#jevoverlapwarning").offset().top	}, 200);
+				jQuery('html, body').animate({	scrollTop: jQuery("#jevents").offset().top	}, 200);
 			}
 		}
 	})
@@ -1035,26 +1083,38 @@ function checkConflict(checkurl, pressbutton, jsontoken, client, repeatid,  redi
 jevjq(document).on('ready', function() {
 	try {
 		if(Browser.firefox) {
-			jevjq("#adminForm").autocomplete='off';
+			jevjq("#adminForm").attr("autocomplete",'off');
 		}
 	}
 	catch(e){	
 	}
-}); 
-
-jevjq(document).on('ready', function(){
 
 	if (jevjq('#view12Hour')){
 		jevjq('#view12Hour').on('click', function(){toggleView12Hour();});
 	}
 
 	hideEmptyJevTabs();
-});
 
-jevjq(document).on('ready', function(){
 	toggleAllDayEvent();
 	toggleNoEndTime();
+	AllDayNoEndTimeSetup = true;
+
+	// get the count until box to trigger the switch if the date field is touched!
+	jevjq('#cu_until').on('click', function(){enableRepeatUntil();});
+	jevjq('#cu_until').on('mousedown', function(){enableRepeatUntil();});
+	jevjq('#cu_count').on('click', function(){enableRepeatCount();});
+	jevjq('#cu_count').on('mousedown', function(){enableRepeatCount();});
 });
+
+function enableRepeatUntil() {
+	jevjq("#cuu").prop("checked", 1);
+	toggleCountUntil('cu_until');
+}
+
+function enableRepeatCount() {
+	jevjq("#cuc").prop("checked", 1);
+	toggleCountUntil('cu_count');
+}
 
 // Hide empty tabs and their links
 function hideEmptyJevTabs() {
@@ -1086,3 +1146,21 @@ function hideEmptyJevTabs() {
 			})
 		}
 	}
+
+function selectIrregularDate() {
+	var selectElem = jQuery("#irregularDates");
+
+	var repeatDate = new Date();
+	repeatDate  = repeatDate.dateFromYMD(jQuery("#irregular").val());
+	repeatDate = repeatDate.getFullYear()+"-"+(repeatDate.getMonth()+1)+"-"+repeatDate.getDate();
+
+	var option = jQuery("<option>", {
+		"value" : repeatDate,
+		"text" : jQuery("#irregular").val(),
+		"selected" : true
+	});
+	selectElem.append(option);
+	//selectElem.chosen();
+	selectElem.trigger("chosen:updated");
+	selectElem.trigger("liszt:updated");
+}

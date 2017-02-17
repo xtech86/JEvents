@@ -1,10 +1,10 @@
 <?php
 /**
- * JEvents Component for Joomla 1.5.x
+ * JEvents Component for Joomla! 3.x
  *
  * @version     $Id: select.php 3548 2012-04-20 09:25:43Z geraintedwards $
  * @package     JEvents
- * @copyright   Copyright (C)  2008-2015 GWE Systems Ltd
+ * @copyright   Copyright (C)  2008-2017 GWE Systems Ltd
  * @license     GNU/GPLv2, see http://www.gnu.org/licenses/gpl-2.0.html
  * @link        http://www.jevents.net
  */
@@ -12,20 +12,22 @@ defined('_JEXEC') or die('Restricted access');
 
 JHTML::_('behavior.tooltip');
 
+use Joomla\String\StringHelper;
+
 $db = JFactory::getDBO();
 $user = JFactory::getUser();
-
+$jinput = JFactory::getApplication()->input;
 // get configuration object
 $cfg = JEVConfig::getInstance();
 $this->_largeDataSet = $cfg->get('largeDataSet', 0);
-$orderdir = JRequest::getCmd("filter_order_Dir", 'asc');
-$order = JRequest::getCmd("filter_order", 'start');
+$orderdir = $jinput->getCmd("filter_order_Dir", 'asc');
+$order = $jinput->getCmd("filter_order", 'start');
 $pathIMG = JURI::root() . 'administrator/images/';
 $document = JFactory::getDocument();
 $document->addStyleDeclaration("body, input, select, table {font-size:11px;}
 	table.filters, table.filters tr,table.filters td {border-width:0px!important;font-size:11px;}
 	table.filters {margin-bottom:10px}");
-$function = JRequest::getCmd('function', 'jSelectEvent');
+$function = $jinput->getCmd('function', 'jSelectEvent');
 ?>
 <form action="<?php echo JRoute::_('index.php?option=com_jevents&task=icalevent.select&tmpl=component&function=' . $function . '&' . JSession::getFormToken() . '=1'); ?>" method="post" name="adminForm" id="adminForm">
 	<table cellpadding="4" cellspacing="0" class="filters">
@@ -44,7 +46,7 @@ $function = JRequest::getCmd('function', 'jSelectEvent');
 				<input type="text" name="search" value="<?php echo $this->search; ?>" class="inputbox" onChange="document.adminForm.submit();" />
 			</td>
 		</tr>
-<?php if (!JRequest::getInt("nomenu"))
+<?php if (!$jinput->getInt("nomenu", null))
 { ?>
 			<tr>
 				<td colspan="2" align="right"><?php echo JText::_('JEV_TARGET_MENU'); ?> </td>
@@ -53,10 +55,10 @@ $function = JRequest::getCmd('function', 'jSelectEvent');
 <?php } ?>
 	</table>
 
-	<table  class="adminlist   table table-striped">
+	<table  class="adminlist   table table-striped jevbootstrap">
 		<thead>
 			<tr>
-				<th class="title" width="50%" nowrap="nowrap">
+				<th class="title" width="40%" nowrap="nowrap">
 <?php echo JHTML::_('grid.sort', 'JEV_ICAL_SUMMARY', 'title', $orderdir, $order, "icalevent.list"); ?>
 				<th width="10%" nowrap="nowrap"><?php echo JText::_('REPEATS'); ?></th>
 				<th width="10%" nowrap="nowrap"><?php echo JText::_('JEV_EVENT_CREATOR'); ?></th>
@@ -105,7 +107,7 @@ $function = JRequest::getCmd('function', 'jSelectEvent');
 				?>
 				<tr class="row<?php echo $k; ?>">
 					<td >
-						<a href="#select" onclick="return window.parent.<?php echo $function; ?>('<?php echo $link; ?>','<?php echo addslashes(htmlspecialchars($repeat->title())); ?>' , ($('Itemid')?$('Itemid').value:0) , <?php echo $repeat->ev_id(); ?>, <?php echo $repeat->rp_id(); ?>)" title="<?php echo JText::_('JEV_SELECT_EVENT'); ?>"><?php echo $row->title(); ?></a>
+						<a href="#select" onclick="return window.parent.<?php echo $function; ?>('<?php echo $link; ?>','<?php echo addslashes(htmlspecialchars($repeat->title())); ?>' , (jQuery('#Itemid').length?jQuery('#Itemid').val():0) , <?php echo $repeat->ev_id(); ?>, <?php echo $repeat->rp_id(); ?>)" title="<?php echo JText::_('JEV_SELECT_EVENT'); ?>"><?php echo $row->title(); ?></a>
 					</td>
 					<td align="center">
 						<?php
@@ -113,7 +115,7 @@ $function = JRequest::getCmd('function', 'jSelectEvent');
 						{
 							if (JFactory::getApplication()->isAdmin())
 							{
-								$img = JHTML::_('image', 'admin/featured.png', '', array('title' => ''), true);
+								$img ='<span class="icon-list"> </span>';
 							}
 							else
 							{
@@ -144,8 +146,8 @@ $function = JRequest::getCmd('function', 'jSelectEvent');
 						else
 						{
 							$times = '<table style="border: 1px solid #666666; width:100%;">';
-							$times .= '<tr><td>' . JText::_('JEV_FROM') . ' : ' . ($row->alldayevent() ? substr($row->publish_up(), 0, 10) : $row->publish_up()) . '</td></tr>';
-							$times .= '<tr><td>' . JText::_('JEV_TO') . ' : ' . (($row->noendtime() || $row->alldayevent()) ? substr($row->publish_down(), 0, 10) : $row->publish_down()) . '</td></tr>';
+							$times .= '<tr><td>' . JText::_('JEV_FROM') . ' : ' . ($row->alldayevent() ? JString::substr($row->publish_up(), 0, 10) : $row->publish_up()) . '</td></tr>';
+							$times .= '<tr><td>' . JText::_('JEV_TO') . ' : ' . (($row->noendtime() || $row->alldayevent()) ? JString::substr($row->publish_down(), 0, 10) : $row->publish_down()) . '</td></tr>';
 							$times .="</table>";
 							echo $times;
 						}

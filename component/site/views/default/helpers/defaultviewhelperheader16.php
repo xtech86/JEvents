@@ -1,28 +1,29 @@
 <?php 
 defined('_JEXEC') or die('Restricted access');
+
 jimport( 'joomla.application.module.helper' );
+
+use Joomla\String\StringHelper;
 
 function DefaultViewHelperHeader16($view){
 
-	$task = JRequest::getString("jevtask");
+	$jinput = JFactory::getApplication()->input;
+
+	$task = $jinput->getString('jevtask', '');
 	$view->loadModules("jevprejevents");
 	$view->loadModules("jevprejevents_".$task);
 	
-	$dispatcher	= JDispatcher::getInstance();
+	$dispatcher	= JEventDispatcher::getInstance();
 	$dispatcher->trigger( 'onJEventsHeader', array($view));
 
 	$cfg		= JEVConfig::getInstance();
 	$version	= JEventsVersion::getInstance();
-	$jevtype	= JRequest::getVar('jevtype');
-	$evid		= JRequest::getInt('evid');
-	$pop		= JRequest::getInt('pop', 0);
+	$jevtype	= $jinput->get('jevtype', null, null);
+	$evid		= $jinput->getInt('evid', '');
+	$pop		= $jinput->getInt('pop', '0');
 	$params = JComponentHelper::getParams(JEV_COM_COMPONENT);
 
-	echo "\n" . '<!-- '
-	. $version->getLongVersion() . ', '
-	. utf8_encode(@html_entity_decode($version->getLongCopyright(), ENT_COMPAT, 'ISO-8859-1')) . ', '
-	. $version->getUrl()
-	. ' -->' . "\n";
+	$view->copyrightComment();
 
 	// stop crawler and set meta tag
 	JEVHelper::checkRobotsMetaTag();
@@ -61,7 +62,7 @@ function DefaultViewHelperHeader16($view){
 		<h2 class="contentheading" ><?php echo $t_headline;?></h2>
 		<?php
 	}
-	$task = JRequest::getString("jevtask");
+	$task = $jinput->getString('jevtask', '');
 	ob_start();
 	$view->information16();
 	$info = ob_get_clean();
@@ -86,21 +87,21 @@ function DefaultViewHelperHeader16($view){
 
 		if ($pop) { ?>
 			<li class="print-icon">
-			<a href="javascript:void(0);" onclick="javascript:window.print(); return false;" title="<?php echo JText::_('JEV_CMN_PRINT'); ?>">
-		              	<?php echo JHTML::_('image', 'media/system/images/printButton.png', JText::_('JEV_CMN_PRINT'), array("title"=>JText::_('JEV_CMN_PRINT')),false);?>
+			<a href="javascript:void(0);" rel="nofollow" onclick="javascript:window.print(); return false;" title="<?php echo JText::_('JEV_CMN_PRINT'); ?>">
+		              	<span class="icon-print"> </span>
 			</a>
 			</li> <?php
 		} else { ?>
 			<li class="print-icon">
-			<a href="javascript:void(0);" onclick="window.open('<?php echo $print_link; ?>', 'win2', 'status=no,toolbar=no,scrollbars=yes,titlebar=no,menubar=no,resizable=yes,width=600,height=600,directories=no,location=no');" title="<?php echo JText::_('JEV_CMN_PRINT'); ?>">
-				<?php echo JHTML::_('image', 'media/system/images/printButton.png', JText::_('JEV_CMN_PRINT'), array("title"=>JText::_('JEV_CMN_PRINT')),false);?>
+			<a href="javascript:void(0);" rel="nofollow" onclick="window.open('<?php echo $print_link; ?>', 'win2', 'status=no,toolbar=no,scrollbars=yes,titlebar=no,menubar=no,resizable=yes,width=600,height=600,directories=no,location=no');" title="<?php echo JText::_('JEV_CMN_PRINT'); ?>">
+				<span class="icon-print"> </span>
 			</a>
 			</li> <?php
 		}
 	}
 	if ($cfg->get('com_email_icon_view', 1)){
 
-		$task = JRequest::getString("jevtask");
+		$task = $jinput->getString('jevtask', '');
 		$link = 'index.php?option=' . JEV_COM_COMPONENT
 		. '&task=' . $task
 		. ($evid ? '&evid=' . $evid : '')
@@ -112,7 +113,7 @@ function DefaultViewHelperHeader16($view){
 		. $view->datamodel->getCatidsOutLink()
 		;
 		$link =JRoute::_($link);
-		//if (strpos($link,"/")===0) $link = substr($link,1);
+		//if (strpos($link,"/")===0) $link = JString::substr($link,1);
 		$uri	        = JURI::getInstance(JURI::base());
 		$root = $uri->toString( array('scheme', 'host', 'port') );
 
@@ -122,8 +123,8 @@ function DefaultViewHelperHeader16($view){
 
 		?>
 		<li class="email-icon">
-			<a href="javascript:void(0);" onclick="javascript:window.open('<?php echo $url;?>','emailwin','width=400,height=350,menubar=yes,resizable=yes'); return false;" title="<?php echo JText::_( 'EMAIL' ); ?>">
-				<?php echo JHTML::_('image', 'media/system/images/emailButton.png', JText::_('EMAIL'), array("title"=>JText::_('EMAIL')),false);?>
+			<a href="javascript:void(0);" rel="nofollow" onclick="javascript:window.open('<?php echo $url;?>','emailwin','width=400,height=350,menubar=yes,resizable=yes'); return false;" title="<?php echo JText::_( 'EMAIL' ); ?>">
+				<span class="icon-envelope"> </span>
 			</a>
 		</li>
 		<?php

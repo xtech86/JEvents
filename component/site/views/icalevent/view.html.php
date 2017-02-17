@@ -1,15 +1,17 @@
 <?php
 /**
- * JEvents Component for Joomla 1.5.x
+ * JEvents Component for Joomla! 3.x
  *
  * @version     $Id: view.html.php 2979 2011-11-10 13:50:14Z geraintedwards $
  * @package     JEvents
- * @copyright   Copyright (C) 2008-2015 GWE Systems Ltd
+ * @copyright   Copyright (C) 2008-2017 GWE Systems Ltd
  * @license     GNU/GPLv2, see http://www.gnu.org/licenses/gpl-2.0.html
  * @link        http://www.jevents.net
  */
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die();
+
+use Joomla\String\StringHelper;
 
 /**
  * HTML View class for the component frontend
@@ -43,11 +45,13 @@ class ICalEventViewIcalevent extends AdminIcaleventViewIcalevent
 	function edit($tpl = null)
 	{
 		$document = JFactory::getDocument();
+		// Set editstrings var just incase and to avoid IDE reporting not set.
+		$editStrings = "";
 		include(JEV_ADMINLIBS . "/editStrings.php");
 		$document->addScriptDeclaration($editStrings);
 
-		JEVHelper::script('editical.js', 'components/' . JEV_COM_COMPONENT . '/assets/js/');
-                  JEVHelper::script('JevStdRequiredFields.js', 'components/' . JEV_COM_COMPONENT . '/assets/js/');
+		JEVHelper::script('editicalJQ.js', 'components/' . JEV_COM_COMPONENT . '/assets/js/');
+                  JEVHelper::script('JevStdRequiredFieldsJQ.js', 'components/' . JEV_COM_COMPONENT . '/assets/js/');
 
 		if ($this->row->title() <= "")
 		{
@@ -70,14 +74,14 @@ class ICalEventViewIcalevent extends AdminIcaleventViewIcalevent
 			if ($this->editCopy)
 			{
 				
-				if (JEVHelper::isEventEditor())
+				if (JEVHelper::isEventEditor() || JEVHelper::canEditEvent($this->row))
 					$this->toolbarConfirmButton("icalevent.apply", JText::_("JEV_SAVE_COPY_WARNING"), 'apply', 'apply', 'JEV_SAVE', false);
 				//$this->toolbarConfirmButton("icalevent.savenew", JText::_("JEV_SAVE_COPY_WARNING"), 'save', 'save', 'JEV_SAVE_NEW', false);
                                 $this->toolbarConfirmButton("icalevent.save", JText::_("JEV_SAVE_COPY_WARNING"), 'save', 'save', 'JEV_SAVE_CLOSE', false);
 			}
 			else
 			{
-                            if (JEVHelper::isEventEditor())
+                            if (JEVHelper::isEventEditor() || JEVHelper::canEditEvent($this->row))
 					$this->toolbarConfirmButton("icalevent.apply", JText::_("JEV_SAVE_ICALEVENT_WARNING"), 'apply', 'apply', 'JEV_SAVE', false);
 				//$this->toolbarConfirmButton("icalevent.savenew", JText::_("JEV_SAVE_ICALEVENT_WARNING"), 'save', 'save', 'JEV_SAVE_NEW', false);
                             $this->toolbarConfirmButton("icalevent.save", JText::_("JEV_SAVE_ICALEVENT_WARNING"), 'save', 'save', 'JEV_SAVE_CLOSE', false);
@@ -85,50 +89,54 @@ class ICalEventViewIcalevent extends AdminIcaleventViewIcalevent
 			}
 		}
 		else
-		{
-			
-			if (JEVHelper::isEventEditor())
+		{	
+			$canEditOwn = false;
+			$params = JComponentHelper::getParams(JEV_COM_COMPONENT);
+			if (!$params->get("authorisedonly", 0)){
+				$juser = JFactory::getUser();
+				$canEditOwn = $juser->authorise('core.edit.own', 'com_jevents');
+			}
+			if (JEVHelper::isEventEditor() || $canEditOwn)
 				$this->toolbarButton("icalevent.apply", 'apply', 'apply', 'JEV_SAVE', false);
 			//JToolBarHelper::save('icalevent.savenew', "JEV_Save_New");
                         $this->toolbarButton("icalevent.save", 'save', 'save', 'JEV_SAVE_CLOSE', false);
 		}
 
 		$params = JComponentHelper::getParams(JEV_COM_COMPONENT);
-                $evedrd = $params->get("editreturnto", "day.listevents");
+
+                $evedrd = 'icalevent.edit_cancel';
+
+                //Set previous page
+                $session = JFactory::getSession();
+                $input = new JInput($_SERVER);
+                $session->set('jev_referrer', $input->getString('HTTP_REFERER', null), 'extref');
+                
 		if ($params->get("editpopup", 0))
 		{
 			$document->addStyleDeclaration("div#toolbar-box{margin:10px 10px 0px 10px;} div#jevents {margin:0px 10px 10px 10px;} ");
-			$this->toolbarButton("icalevent.close", 'cancel', 'cancel', 'Cancel', false);
+			$this->toolbarButton("icalevent.close", 'cancel', 'cancel', 'JEV_SUBMITCANCEL',  false);
 			JRequest::setVar('tmpl', 'component'); //force the component template
 		}
 		else
 		{
 			if ($this->id > 0)
 			{
-				$this->toolbarButton("icalrepeat.detail", 'cancel', 'cancel', 'Cancel', false);
+				$this->toolbarButton("icalrepeat.detail", 'cancel', 'cancel', 'JEV_SUBMITCANCEL', false);
 			}
 			else
 			{
-				$this->toolbarButton($evedrd, 'cancel', 'cancel', 'Cancel', false);
+				$this->toolbarButton($evedrd, 'cancel', 'cancel', 'JEV_SUBMITCANCEL', false);
 			}
 		}
 
 		// I pass in the rp_id so that I can return to the repeat I was viewing before editing
 		$this->assign("rp_id", JRequest::getInt("rp_id", 0));
 
-		$this->setCreatorLookup();
-
 		$this->_adminStart();
 
-		if (JevJoomlaVersion::isCompatible("3.0")  )
-		{
-			// load Joomla javascript classes
-			JHTML::_('behavior.core');
-			$this->setLayout("edit");
-		}
-		else  {
-			$this->setLayout("editjq");
-		}
+		// load Joomla javascript classes
+		JHTML::_('behavior.core');
+		$this->setLayout("edit");
 
 		JEVHelper::componentStylesheet($this, "editextra.css");		
 		jimport('joomla.filesystem.file');
@@ -151,7 +159,7 @@ class ICalEventViewIcalevent extends AdminIcaleventViewIcalevent
 	function _adminStart()
 	{
 
-		$dispatcher = JDispatcher::getInstance();
+		$dispatcher = JEventDispatcher::getInstance();
 		list($this->year, $this->month, $this->day) = JEVHelper::getYMD();
 		$this->Itemid = JEVHelper::getItemid();
 		$this->datamodel = new JEventsDataModel();
@@ -190,7 +198,7 @@ class ICalEventViewIcalevent extends AdminIcaleventViewIcalevent
 		?>
 		</div>
 		<?php
-		$dispatcher = JDispatcher::getInstance();
+		$dispatcher = JEventDispatcher::getInstance();
 		$dispatcher->trigger('onJEventsFooter', array($this));
 
 	}
@@ -227,7 +235,7 @@ class ICalEventViewIcalevent extends AdminIcaleventViewIcalevent
 	{
 		if (strpos($name, "_") === 0)
 		{
-			$name = "ViewHelper" . ucfirst(substr($name, 1));
+			$name = "ViewHelper" . ucfirst(JString::substr($name, 1));
 		}
 		$helper = ucfirst($this->jevlayout) . ucfirst($name);
 		if (!$this->loadHelper($helper))

@@ -14,14 +14,20 @@ class GeraintViewNavTableBarIconic extends DefaultViewNavTableBarIconic {
 		$this->Itemid = JEVHelper::getItemid();
 		$this->cat = $this->view->datamodel->getCatidsOutLink();
 		$this->task = $task;
-		
+
+		$jinput = JFactory::getApplication()->input;
+
 		$cfg = JEVConfig::getInstance();
                 //Lets check if we should show the nav on event details 
                 if ($task == "icalrepeat.detail" && $cfg->get('shownavbar_detail', 1) == 0) { return;}
 		
 		$this->iconstoshow = $cfg->get('iconstoshow', array('byyear', 'bymonth', 'byweek', 'byday', 'search'));
 		
-		if (JRequest::getInt( 'pop', 0 )) return;		
+
+		if ($jinput->getInt( 'pop', 0 )) return;
+
+		$colspan = 1;
+
     	?>
     	<div class="ev_navigation">
     		<table  >
@@ -29,7 +35,10 @@ class GeraintViewNavTableBarIconic extends DefaultViewNavTableBarIconic {
     	    		<?php 
     	    		if($cfg->get('com_calUseIconic', 1) != 2  && $task!="range.listevents"){
     	    			echo $this->_lastYearIcon($dates, $alts);
-    	    			echo $this->_lastMonthIcon($dates, $alts);
+				if ( $task!="year.listevents") {
+					echo $this->_lastMonthIcon($dates, $alts);
+					$colspan = 2;
+				}
     	    		}
     	    		if (in_array("byyear", $this->iconstoshow)) echo $this->_viewYearIcon($view_date);
     	    		if (in_array("bymonth", $this->iconstoshow)) echo $this->_viewMonthIcon($view_date);
@@ -38,14 +47,16 @@ class GeraintViewNavTableBarIconic extends DefaultViewNavTableBarIconic {
     	    		if (in_array("search", $this->iconstoshow)) echo $this->_viewSearchIcon($view_date);
     	    		if (in_array("bymonth", $this->iconstoshow)) echo $this->_viewJumptoIcon($view_date);
     	    		if($cfg->get('com_calUseIconic', 1) != 2  && $task!="range.listevents"){
-	    	    		echo $this->_nextMonthIcon($dates, $alts);
+				if ( $task!="year.listevents") {
+					echo $this->_nextMonthIcon($dates, $alts);
+				}
     		    		echo $this->_nextYearIcon($dates, $alts);
     	    		}
     	    		?>
                 </tr>
     			<tr class="icon_labels" align="center" valign="top">
     				<?php   if($cfg->get('com_calUseIconic', 1) != 2  && $task!="range.listevents"){ ?>
-	        		<td colspan="2"></td>
+	        		<td colspan="<?php echo $colspan;?>"></td>
 	        		<?php } ?>
     				<?php if (in_array("byyear", $this->iconstoshow))   { ?><td><?php echo JText::_('JEV_VIEWBYYEAR');?></td><?php } ?>
     				<?php if (in_array("bymonth", $this->iconstoshow))   { ?><td><?php echo JText::_('JEV_VIEWBYMONTH');?></td><?php } ?>
@@ -54,7 +65,7 @@ class GeraintViewNavTableBarIconic extends DefaultViewNavTableBarIconic {
     				<?php if (in_array("search", $this->iconstoshow))   { ?><td><?php echo JText::_('JEV_SEARCH_TITLE');?></td><?php } ?>
     				<?php if (in_array("bymonth", $this->iconstoshow))   { ?><td><?php echo  JText::_('JEV_JUMPTO');?></td><?php } ?>
     				<?php   if($cfg->get('com_calUseIconic', 1) != 2  && $task!="range.listevents"){ ?>
-	        		<td colspan="2"></td>
+	        		<td colspan="<?php echo $colspan;?>"></td>
 	        		<?php } ?>
                 </tr>
                 <?php

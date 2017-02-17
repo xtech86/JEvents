@@ -1,10 +1,10 @@
 <?php
 /**
- * JEvents Component for Joomla 1.5.x
+ * JEvents Component for Joomla! 3.x
  *
  * @version     $Id: jevents.defines.php 3090 2011-12-11 10:00:17Z geraintedwards $
  * @package     JEvents
- * @copyright   Copyright (C) 2008-2015 GWE Systems Ltd
+ * @copyright   Copyright (C) 2008-2017 GWE Systems Ltd
  * @license     GNU/GPLv2, see http://www.gnu.org/licenses/gpl-2.0.html
  * @link        http://www.jevents.net
  */
@@ -74,9 +74,9 @@ JLoader::register('JToolbarButtonJevlink', JEV_ADMINPATH . "libraries/jevtoolbar
 JLoader::register('JToolbarButtonJevconfirm', JEV_ADMINPATH . "libraries/jevtoolbarbuttons.php");
 
 //Joomla 2.5
-JLoader::register('JButtonJev', JEV_ADMINPATH . "libraries/jevbuttons.php");
-JLoader::register('JButtonJevlink', JEV_ADMINPATH . "libraries/jevbuttons.php");
-JLoader::register('JButtonJevconfirm', JEV_ADMINPATH . "libraries/jevbuttons.php");
+//JLoader::register('JButtonJev', JEV_ADMINPATH . "libraries/jevbuttons.php");
+//JLoader::register('JButtonJevlink', JEV_ADMINPATH . "libraries/jevbuttons.php");
+//JLoader::register('JButtonJevconfirm', JEV_ADMINPATH . "libraries/jevbuttons.php");
 
 // TODO retire this sometime?
 JLoader::register('JEV_CommonFunctions',JEV_PATH."libraries/commonfunctions.php");

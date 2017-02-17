@@ -210,7 +210,6 @@
 	background-color: #ffffff;
 }
 .jevbootstrap a {
-	color: inherit;
 	text-decoration: none;
 }
 .jevbootstrap a:hover,
@@ -4410,6 +4409,8 @@
 	max-height: 400px;
 	padding: 15px;
 	overflow-y: auto;
+	box-sizing:padding-box;
+	width:100%;
 }
 .jevbootstrap .modal-form {
 	margin-bottom: 0;

@@ -1,16 +1,18 @@
 <?php
 
 /**
- * JEvents Component for Joomla 1.5.x
+ * JEvents Component for Joomla! 3.x
  *
  * @version     $Id: modlatest.php 1142 2010-09-08 10:10:52Z geraintedwards $
  * @package     JEvents
- * @copyright   Copyright (C) 2008-2015 GWE Systems Ltd
+ * @copyright   Copyright (C) 2008-2017 GWE Systems Ltd
  * @license     GNU/GPLv2, see http://www.gnu.org/licenses/gpl-2.0.html
  * @link        http://www.jevents.net
  */
 
 defined( 'JPATH_BASE' ) or die( 'Direct Access to this location is not allowed.' );
+
+$params = JComponentHelper::getParams(JEV_COM_COMPONENT);
 
 @ob_end_clean();
 @ob_end_clean();
@@ -76,7 +78,7 @@ if (!empty($this->icalEvents))
 	$this->icalEvents = array_values($this->icalEvents);
 			
 	// Call plugin on each event
-	$dispatcher = JDispatcher::getInstance();
+	$dispatcher = JEventDispatcher::getInstance();
 	ob_start();
 	JEVHelper::onDisplayCustomFieldsMultiRow($this->icalEvents);
 	ob_end_clean();
@@ -89,6 +91,42 @@ if (!empty($this->icalEvents))
 			$a = $a->getOriginalFirstRepeat();
 		}
 		if (!$a) continue;
+                
+                // if an irregular repeat then skip it :(
+                // TODO create it as a daily repeat using the irregular values as exceptions
+                if (isset($a->_freq) && $a->_freq=="IRREGULAR"){
+                    continue;
+                }
+
+		// Fix for end time of first repeat if its an exception
+		if (array_key_exists($a->ev_id(), $exceptiondata) && array_key_exists($a->rp_id(),$exceptiondata[$a->ev_id()]))
+		{
+			$exception = $exceptiondata[$a->ev_id()][$a->rp_id()];
+			// if its the first repeat that has had its end time changes we have not stored this data so need to determine it again
+			if ($exception->startrepeat ==  $exception->oldstartrepeat && $exception->exception_type==1) {
+				// look for repeats that are not exceptions
+				$testrepeat = $a->getFirstRepeat(false);
+				if ($testrepeat){
+					$enddatetime = $a->getUnixStartTime() + ($testrepeat->getUnixEndTime() - $testrepeat->getUnixStartTime());
+					$a->_endrepeat =  JevDate::strftime("%Y-%m-%d %H:%M:%S", $enddatetime);
+					$a->_dtend = $enddatetime;
+					$a->_unixendtime = $enddatetime;
+				}
+			}
+			// If start AND end date/times have changed
+			elseif ($exception->exception_type==1)  {
+				// look for repeats that are not exceptions
+				$testrepeat = $a->getFirstRepeat(false);
+				if ($testrepeat){
+					$oldstart = strtotime($exception->oldstartrepeat);
+					$enddatetime = $oldstart + ($testrepeat->getUnixEndTime() - $testrepeat->getUnixStartTime());
+					$a->_endrepeat =  JevDate::strftime("%Y-%m-%d %H:%M:%S", $enddatetime);
+					$a->_dtend = $enddatetime;
+					$a->_unixendtime = $enddatetime;
+				}
+			}
+		}
+
 		$html .= "BEGIN:VEVENT\r\n";
 		$html .= "UID:" . $a->uid() . "\r\n";
 		$html .= "CATEGORIES:" . $a->catname() . "\r\n";
@@ -108,7 +146,16 @@ if (!empty($this->icalEvents))
 		}
 		// We Need to wrap this according to the specs
 		/* $html .= "DESCRIPTION:".preg_replace("'<[\/\!]*?[^<>]*?>'si","",preg_replace("/\n|\r\n|\r$/","",$a->content()))."\n"; */
-		$html .= $this->setDescription($a->content()) . "\r\n";
+
+		//Check if we should include the link to the event
+		if ($params->get('source_url', 0) == 1) {
+			$link = $a->viewDetailLink($a->yup(),$a->mup(),$a->dup(),true, $params->get('default_itemid', 0));
+			$uri =  JURI::getInstance(JURI::base());
+			$root = $uri->toString(array('scheme', 'host', 'port'));
+			$html .= $this->setDescription($a->content() . ' ' .JText::_('JEV_EVENT_IMPORTED_FROM') .$root . JRoute::_($link, true, -1)) . "\r\n";
+		} else {
+			$html .= $this->setDescription($a->content()) . "\r\n";
+		}
 
 		if ($a->hasContactInfo())
 			$html .= "CONTACT:" . $this->replacetags($a->contact_info()) . "\r\n";
@@ -223,6 +270,9 @@ if (!empty($this->icalEvents))
 		}
 
 		$html .= "SEQUENCE:" . $a->_sequence . "\r\n";
+		$deletes = array();
+		$changed = array();
+		$changedexceptions = array();
 		if ($a->hasrepetition() && $this->withrepeats)
 		{
 			$html .= 'RRULE:';
@@ -280,9 +330,6 @@ if (!empty($this->icalEvents))
 				$exceptions = $exceptiondata[$a->ev_id()];
 			}
 
-			$deletes = array();
-			$changed = array();
-			$changedexceptions = array();
 			if (count($exceptions) > 0)
 			{
 				foreach ($exceptions as $exception)
@@ -378,7 +425,6 @@ if (!empty($this->icalEvents))
 					// Do not use JevDate version since this sets timezone to config value!								
 					$chstart = strftime("%Y%m%dT%H%M%SZ", $chstart);
 					$chend = strftime("%Y%m%dT%H%M%SZ", $chend);
-					$stamptime = strftime("%Y%m%dT%H%M%SZ", time());
 					$originalstart = strftime("%Y%m%dT%H%M%SZ", $originalstart);
 					// Change back
 					date_default_timezone_set($current_timezone);
@@ -387,10 +433,22 @@ if (!empty($this->icalEvents))
 				{
 					$chstart = JevDate::strftime("%Y%m%dT%H%M%S", $chstart);
 					$chend = JevDate::strftime("%Y%m%dT%H%M%S", $chend);
-					$stamptime = JevDate::strftime("%Y%m%dT%H%M%S", time());
 					$originalstart = JevDate::strftime("%Y%m%dT%H%M%S", $originalstart);
 				}
-				$html .= "DTSTAMP$tzid:" . $stamptime . "\r\n";
+                                
+                                if ( is_callable("date_default_timezone_set")) {
+                                        // Change timezone to UTC
+                                        $current_timezone = date_default_timezone_get();
+                                        date_default_timezone_set("UTC");			
+                                        $stamptime = JevDate::strftime("%Y%m%dT%H%M%SZ", time());
+                                        // Change back
+                                        date_default_timezone_set($current_timezone);				
+                                }
+                                else {
+                                        $stamptime = JevDate::strftime("%Y%m%dT%H%M%SZ", time());
+                                }
+                                
+				$html .= "DTSTAMP:" . $stamptime . "\r\n";
 				$html .= "DTSTART$tzid:" . $chstart . "\r\n";
 				$html .= "DTEND$tzid:" . $chend . "\r\n";
 				$html .= "RECURRENCE-ID$tzid:" . $originalstart . "\r\n";

@@ -110,10 +110,23 @@ class IcaleventsModelicalevent extends JModelAdmin
 		include_once JPATH_COMPONENT."/tables/translate.php";
 		$translation = new TableTranslate();
 		$success =  $translation->save($array);
+                
+                if ($success) {
+                    $dispatcher = JEventDispatcher::getInstance();
+                    $dispatcher->trigger('onSaveTranslation', array($array), true);
+                }                    
+
 		return $success;
 	}
 
-		/**
+	public function deleteTranslation()
+	{
+		include_once JPATH_COMPONENT."/tables/translate.php";
+		$translation = new TableTranslate();
+		$translation->delete(JRequest::getInt("trans_translation_id"));
+	}
+
+	/**
 	 * Auto-populate the model state.
 	 *
 	 * Note. Calling getState in this method will result in recursion.

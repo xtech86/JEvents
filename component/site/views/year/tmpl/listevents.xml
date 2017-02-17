@@ -21,7 +21,7 @@
 		</fieldset>
 		//-->
 		<fieldset name="basic" addfieldpath="/administrator/components/com_jevents/fields/" >
-			<field name="com_calViewName" type="jevview" default="" label="JEV_VIEWNAME" description="JEV_TIP_VIEWNAME"/>
+			<field name="com_calViewName" type="jevview" except="float" default="" label="JEV_VIEWNAME" description="JEV_TIP_VIEWNAME"/>
 			<field name="darktemplate" class="btn-group" type="jevboolean" default=""  label="JEV_DARK_TEMPLATE" description="JEV_DARK_TEMPLATE_DESC"/>
 
 			<field name="com_calUseIconic" type="list" default="1" label="JEV_ICONIC_NAVBAR" description="" difficulty="2">
@@ -59,7 +59,7 @@
 				<option value="0">JEV_NO</option>
 				<option value="1">JEV_YES</option>
 			</field>		
-			<field name="com_showrepeats" type="jevboolean" default="0" menu="hide" label="JEV_VIEW_REPEAT_YEAR_LIST" description="" />			
+			<field name="com_showrepeats" type="jevboolean" class="btn-group" default="0" menu="hide" label="JEV_VIEW_REPEAT_YEAR_LIST" description="" />
 
 			<field name="extras0" type="jevextras" default="" label='ADDITIONAL_CONSTRAINTS'  description='ADDITIONAL_MENU_CONSTRAINTS_FROM_ADDONS'  />
 			<field name="extras1" type="jevextras" default="" label='ADDITIONAL_CONSTRAINTS'  description='ADDITIONAL_MENU_CONSTRAINTS_FROM_ADDONS'  />

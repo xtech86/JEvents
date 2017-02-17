@@ -409,12 +409,18 @@ class JevHtmlBootstrap
 		$opt['container'] = isset($params['container']) ? $params['container'] : 'body';
 		//$opt['template'] = isset($params['template']) ? $params['template'] : '<div class="popover" role="tooltip"><div class="arrow"></div><h3 class="popover-title"></h3><div class="popover-content"></div></div>';
 
+		// Custom option to control display on touch devices
+		$opt['mouseonly'] = isset($params['mouseonly']) ? $params['mouseonly'] : false;
+
 		$options = json_encode($opt); //JHtml::getJSObject($opt);
 
 		// Attach the popover to the document
 		JFactory::getDocument()->addScriptDeclaration(
 			"jQuery(document).ready(function()
 			{
+				if (".$options.".mouseonly && 'ontouchstart' in document.documentElement) {
+					return;
+				}
 				if (jQuery('$selector').length){
 					jQuery('" . $selector . "').popover(" . $options . ");
 				}
@@ -903,11 +909,20 @@ class JevHtmlBootstrap
 	 */
 	public static function loadCss($includeMainCss = true, $direction = 'ltr', $attribs = array())
 	{
+		$params = JComponentHelper::getParams('com_jevents');
 		// Load Bootstrap main CSS
 		if ($includeMainCss)
 		{
-			JHtml::_('stylesheet', 'com_jevents/bootstrap.css', $attribs, true);
-			JHtml::_('stylesheet', 'com_jevents/bootstrap-responsive.css', $attribs, true);
+			switch ($params->get("bootstrapcss", 1))
+			{
+				case 1:
+					JHtml::_('stylesheet', 'com_jevents/bootstrap.css', $attribs, true);
+					JHtml::_('stylesheet', 'com_jevents/bootstrap-responsive.css', $attribs, true);
+					break;
+				case 2:
+					JHtmlBootstrap::loadCss();
+					break;
+			}
 			//JHtml::_('stylesheet', 'com_jevents/jevbootstrap/bootstrap-extended.css', $attribs, true);
 		}
 

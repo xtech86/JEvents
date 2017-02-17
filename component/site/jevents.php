@@ -1,11 +1,11 @@
 <?php
 
 /**
- * JEvents Component for Joomla 1.5.x
+ * JEvents Component for Joomla! 3.x
  *
  * @version     $Id: jevents.php 3551 2012-04-20 09:41:37Z geraintedwards $
  * @package     JEvents
- * @copyright   Copyright (C) 2008-2015 GWE Systems Ltd
+ * @copyright   Copyright (C) 2008-2017 GWE Systems Ltd
  * @license     GNU/GPLv2, see http://www.gnu.org/licenses/gpl-2.0.html
  * @link        http://www.jevents.net
  */
@@ -17,7 +17,7 @@ jimport('joomla.filesystem.path');
 /*
   $db	= JFactory::getDBO();
   $db->setQuery("SET SESSION query_cache_type = OFF");
-  $db->query();
+  $db->execute();
 
   $cfg = JEVConfig::getInstance();
   $cfg->set('jev_debug', 1);
@@ -32,26 +32,19 @@ $browser = JBrowser::getInstance();
 $registry = JRegistry::getInstance("jevents");
 // In Joomla 1.6 JComponentHelper::getParams(JEV_COM_COMPONENT) is a clone so the menu params do not propagate so we force this here!
 
-if (JevJoomlaVersion::isCompatible("3.0")){
-	// This loads jQuery too!
-	JevHtmlBootstrap::framework();
+// Load Joomla Core scripts for sites that don't load MooTools;
+JHtml::_('behavior.core', true);
 
-	// jQnc not only fixes noConflict it creates the jQuery alias we use in JEvents "jevqc" so we always need it
-        JEVHelper::script("components/com_jevents/assets/js/jQnc.js");
-	if ( JComponentHelper::getParams(JEV_COM_COMPONENT)->get("fixjquery",1)){
-		// this script should come after all the URL based scripts in Joomla so should be a safe place to know that noConflict has been set
-		JFactory::getDocument()->addScriptDeclaration( "checkJQ();");
-	}
-}
-else {
-	// This loads jQuery too!
-	JevHtmlBootstrap::framework();
+// This loads jQuery too!
+JevHtmlBootstrap::framework();
+
+// jQnc not only fixes noConflict it creates the jQuery alias we use in JEvents "jevqc" so we always need it
 	JEVHelper::script("components/com_jevents/assets/js/jQnc.js");
-	if ( JComponentHelper::getParams(JEV_COM_COMPONENT)->get("fixjquery",1)){
-		// this script should come after all the URL based scripts in Joomla so should be a safe place to know that noConflict has been set
-		JFactory::getDocument()->addScriptDeclaration( "checkJQ();");
-	}
+if ( JComponentHelper::getParams(JEV_COM_COMPONENT)->get("fixjquery",1)){
+	// this script should come after all the URL based scripts in Joomla so should be a safe place to know that noConflict has been set
+	JFactory::getDocument()->addScriptDeclaration( "checkJQ();");
 }
+
 if (JComponentHelper::getParams(JEV_COM_COMPONENT)->get("bootstrapcss", 1)==1)
 {
 	// This version of bootstrap has maximum compatibility with JEvents due to enhanced namespacing
@@ -59,11 +52,16 @@ if (JComponentHelper::getParams(JEV_COM_COMPONENT)->get("bootstrapcss", 1)==1)
 	// Responsive version of bootstrap with maximum compatibility with JEvents due to enhanced namespacing
 	JHTML::stylesheet("com_jevents/bootstrap-responsive.css", array(), true);
 }
+else if (JComponentHelper::getParams(JEV_COM_COMPONENT)->get("bootstrapcss", 1)==2)
+{
+	JHtmlBootstrap::loadCss();
+}
 
 
 $newparams = JFactory::getApplication('site')->getParams();
 // Because the application sets a default page title,
 // we need to get it from the menu item itself
+// WP TODO sort out menus!
 $menu = JFactory::getApplication()->getMenu()->getActive();
 if ($menu)
 {
@@ -91,6 +89,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
 $component =  JComponentHelper::getComponent(JEV_COM_COMPONENT);
 $component->params = & $newparams;
 
+JEVHelper::setupWordpress();
+
 $isMobile = $browser->isMobile();
 // Joomla isMobile method doesn't identify all android phones
 if (!$isMobile && isset($_SERVER['HTTP_USER_AGENT']))
@@ -114,12 +114,13 @@ if ($isMobile || strpos(JFactory::getApplication()->getTemplate(), 'mobile_') ==
 		JRequest::setVar("jevsmartphone", 1);
 		if (JFolder::exists(JEV_VIEWS . "/smartphone"))
 		{
-			JRequest::setVar("jEV", "smartphone");
+                    JRequest::setVar("jEV", "smartphone");
 		}
-		$params->set('iconicwidth', 485);
-		$params->set('extpluswidth', 485);
-		$params->set('ruthinwidth', 485);
+		$params->set('iconicwidth', "scalable");
+		$params->set('extpluswidth', "scalable");
+		$params->set('ruthinwidth', "scalable");
 	}
+        $params->set("isSmartphone",1);
 }
 
 // See http://www.php.net/manual/en/timezones.php
@@ -161,6 +162,11 @@ if (strpos($cmd, '.') != false)
 	// We have a defined controller/task pair -- lets split them out
 	list($controllerName, $task) = explode('.', $cmd);
 
+        // check view input is compatible - can be a problem on some form submissions
+        if (JRequest::getCmd("view","")!="" &&  JRequest::getCmd("view","")!=$controllerName){
+            JRequest::setVar("view",$controllerName);
+        }
+        
 	// Define the controller name and path
 	$controllerName = strtolower($controllerName);
 	$controllerPath = JPATH_COMPONENT . '/' . 'controllers' . '/' . $controllerName . '.php';
@@ -172,7 +178,8 @@ if (strpos($cmd, '.') != false)
 	}
 	else
 	{
-		return JError::raiseError(404, 'Invalid Controller - ' . $controllerName);
+		JFactory::getApplication()->enqueueMessage('404 - '.  JText::sprintf("JLIB_APPLICATION_ERROR_INVALID_CONTROLLER_CLASS", $controllerName), 'error');
+
 		//JFactory::getApplication()->enqueueMessage('Invalid Controller - ' . $controllerName);
 		$cmd = "month.calendar";
 		list($controllerName, $task) = explode('.', $cmd);

@@ -1,16 +1,18 @@
 <?php
 /**
- * JEvents Component for Joomla 1.5.x
+ * JEvents Component for Joomla! 3.x
  *
  * @version     $Id: view.html.php 3257 2012-02-10 13:16:38Z geraintedwards $
  * @package     JEvents
- * @copyright   Copyright (C) 2008-2015 GWE Systems Ltd
+ * @copyright   Copyright (C) 2008-2017 GWE Systems Ltd
  * @license     GNU/GPLv2, see http://www.gnu.org/licenses/gpl-2.0.html
  * @link        http://www.jevents.net
  */
 
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die();
+
+use Joomla\String\StringHelper;
 
 /**
  * HTML View class for the component frontend
@@ -33,8 +35,9 @@ class ICalsViewIcals extends JEventsAbstractView
 
 		// See http://www.jevents.net/forum/viewtopic.php?f=23&t=21939&p=115231#wrap
 		// can we use 	X-ALT-DESC;FMTTYPE=text/html: as well as DESCRIPTION
-		
-		$icalformatted = JRequest::getInt("icf", 0);
+		$jinput = JFactory::getApplication()->input;
+
+		$icalformatted = $jinput->getInt("icf", 0);
 		if (!$icalformatted)
 			$description = $this->replacetags($desc);
 		else
@@ -89,11 +92,11 @@ class ICalsViewIcals extends JEventsAbstractView
 		while (JString::strlen($input)>=$line_max){
 			$output .= JString::substr($input,0,$line_max-1);
 			$input = JString::substr($input,$line_max-1);
-			if (strlen($input)>0){
+			if (JString::strlen($input)>0){
 		  		 $output .= $eol." ";
 			}
 		}
-		if (strlen($input)>0){
+		if (JString::strlen($input)>0){
 			$output .= $input;
 		}
 		return $output;
@@ -122,7 +125,7 @@ class ICalsViewIcals extends JEventsAbstractView
 			  }
 			  }
 			 */
-			if ((strlen($outline) + 1) >= $line_max)
+			if ((JString::strlen($outline) + 1) >= $line_max)
 			{ // CRLF is not counted
 				$output .= $outline . $eol . $newline; // soft line break; "\r\n" is okay
 				$outline = $c;

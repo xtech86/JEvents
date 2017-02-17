@@ -1,14 +1,17 @@
 <?php
 /**
- * JEvents Component for Joomla 1.5.x
+ * JEvents Component for Joomla! 3.x
  *
  * @version     $Id: cpanel.php 3119 2011-12-20 14:34:33Z geraintedwards $
  * @package     JEvents
- * @copyright   Copyright (C)  2008-2015 GWE Systems Ltd
+ * @copyright   Copyright (C)  2008-2017 GWE Systems Ltd
  * @license     GNU/GPLv2, see http://www.gnu.org/licenses/gpl-2.0.html
  * @link        http://www.jevents.net
  */
 defined('_JEXEC') or die('Restricted access');
+
+use Joomla\String\StringHelper;
+
 $params = JComponentHelper::getParams(JEV_COM_COMPONENT);
 $version = JEventsVersion::getInstance();
 
@@ -25,7 +28,7 @@ if (!empty($this->sidebar))
 		//Version Checking etc
 		?>
 		<div class="jev_version">
-			<?php echo JText::sprintf('JEV_CURRENT_VERSION', substr($version->getShortVersion(), 1)); ?>
+			<?php echo JText::sprintf('JEV_CURRENT_VERSION', JString::substr($version->getShortVersion(), 1)); ?>
 		</div>
 	</div>
 <?php
@@ -54,11 +57,12 @@ $fullspan = 12;
 
 				if (JEVHelper::isAdminUser())
 				{
+                                    if ($params->get("authorisedonly", 0)) {
 					$link = "index.php?option=" . JEV_COM_COMPONENT . "&task=user.list";
 					$this->_quickiconButtonWHover($link, "cpanel/AuthorisedCool.png", "cpanel/AuthorisedHot.png", JText::_('JEV_MANAGE_USERS'), "/administrator/components/" . JEV_COM_COMPONENT . "/assets/images/");
-
-					// new version
-					$link = "index.php?option=" . JEV_COM_COMPONENT . "&task=params.edit";
+                                    }
+					// new version - Joomla 3.5 does its stuff using AJAX and assumes its ONLY called from com_config :(
+					$link = "index.php?option=" . JEV_COM_COMPONENT . "&task=params.edit&view=component&component=com_jevents";
 					$this->_quickiconButtonWHover($link, "cpanel/ConfigCool.png", "cpanel/ConfigHot.png", JText::_('JEV_INSTAL_CONFIG'), "/administrator/components/" . JEV_COM_COMPONENT . "/assets/images/");
 				}
 				if (JEVHelper::isAdminUser())
@@ -106,6 +110,21 @@ $fullspan = 12;
 					JFactory::getLanguage()->load("com_rsvppro", JPATH_ADMINISTRATOR);
 					$this->_quickiconButtonWHover($link, "cpanel/RSVPCool.png", "cpanel/RSVPHot.png", JText::_('COM_RSVPPRO'), "/administrator/components/" . JEV_COM_COMPONENT . "/assets/images/");
 				}
+				// Custom Fields				
+				$db = JFactory::getDbo ();
+				$db->setQuery ( "SELECT * FROM #__extensions WHERE element = 'jevcustomfields' AND type='plugin' AND folder='jevents' " );
+				$extension = $db->loadObject();
+				// Stop if user is not authorised to manage JEvents
+				if ($extension && $extension->enabled && JEVHelper::isAdminUser()) {
+					$manifestCache = json_decode($extension->manifest_cache);
+					if (version_compare($manifestCache->version, "3.5.0RC", "ge") )
+					{
+						$link = "index.php?option=com_jevents&task=plugin.jev_customfields.overview";
+						JFactory::getLanguage()->load("plg_jevents_jevcustomfields", JPATH_ADMINISTRATOR);
+						$this->_quickiconButtonWHover($link, "cpanel/CustomFieldsCool.png", "cpanel/CustomFieldsHot.png", JText::_('JEV_CUSTOM_FIELDS'), "/administrator/components/" . JEV_COM_COMPONENT . "/assets/images/");
+					}
+				}
+
 				?>
                 <div class="clear"></div>
             </div>

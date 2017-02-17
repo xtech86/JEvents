@@ -1,10 +1,10 @@
 <?php
 /**
- * JEvents Component for Joomla 1.5.x
+ * JEvents Component for Joomla! 3.x
  *
  * @version     $Id: category.php 1142 2010-09-08 10:10:52Z geraintedwards $
  * @package     JEvents
- * @copyright   Copyright (C) 2008-2015 GWE Systems Ltd
+ * @copyright   Copyright (C) 2008-2017 GWE Systems Ltd
  * @license     GNU/GPLv2, see http://www.gnu.org/licenses/gpl-2.0.html
  * @link        http://www.jevents.net
  */
@@ -19,7 +19,9 @@ class JEventsCategories extends JCategories
 {
 	public function __construct($options = array())
 	{
-		$options['table'] = '#__jevents';
+		$options['table'] = '#__jevents_vevent';
+		$options['field'] = 'catid';
+		$options['key'] = 'ev_id';
 		$options['extension'] = 'com_jevents';
 		parent::__construct($options);
 	}
@@ -40,6 +42,8 @@ class JEventsCategories extends JCategories
 		$puser = $registry->get("jevents.icaluser" , $registry->get("icaluser" , false));
 
 		if (!$puser){
+
+			$this->_options['currentlang'] = 0;
 			return parent::_load($id);
 		}
 		

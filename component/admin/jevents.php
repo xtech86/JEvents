@@ -1,15 +1,16 @@
 <?php
 /**
- * JEvents Component for Joomla 1.5.x
+ * JEvents Component for Joomla! 3.x
  *
  * @version     $Id: jevents.php 3552 2012-04-20 09:41:53Z geraintedwards $
  * @package     JEvents
- * @copyright   Copyright (C)  2008-2015 GWE Systems Ltd
+ * @copyright   Copyright (C)  2008-2017 GWE Systems Ltd
  * @license     GNU/GPLv2, see http://www.gnu.org/licenses/gpl-2.0.html
  * @link        http://www.jevents.net
  */
 
 defined( 'JPATH_BASE' ) or die( 'Direct Access to this location is not allowed.' );
+$jinput = JFactory::getApplication()->input;
 
 if (version_compare(phpversion(), '5.0.0', '<')===true) {
 	echo  '<div style="font:12px/1.35em arial, helvetica, sans-serif;"><div style="margin:0 0 25px 0; border-bottom:1px solid #ccc;"><h3 style="margin:0; font-size:1.7em; font-weight:normal; text-transform:none; text-align:left; color:#2f2f2f;">'.JText::_("JEV_INVALID_PHP1").'</h3></div>'.JText::_("JEV_INVALID_PHP2").'</div>';
@@ -30,32 +31,23 @@ $version = new JVersion();
 $jver = explode( '.', $version->getShortVersion() );
 
 //version_compare(JVERSION,'1.5.0',">=")
-if (!isset($option))  $option = JRequest::getCmd("option"); // 1.6 mod
+if (!isset($option))  $option = $jinput->getCmd("option"); // 1.6 mod
 define("JEV_COM_COMPONENT",$option);
 define("JEV_COMPONENT",str_replace("com_","",$option));
 
 include_once(JPATH_COMPONENT_ADMINISTRATOR.'/'.JEV_COMPONENT.".defines.php");
 
-if (JevJoomlaVersion::isCompatible("3.0")){
-	JHtml::_('jquery.framework');
-	// AIM TO REMOVE THIS - loading of MooTools should not be necessary !!!
-	JHtml::_('behavior.framework', true);
-	JevHtmlBootstrap::framework();
-	JEVHelper::script("components/com_jevents/assets/js/jQnc.js");
-	if ( JComponentHelper::getParams(JEV_COM_COMPONENT)->get("fixjquery",1)){
-		// this script should come after all the URL based scripts in Joomla so should be a safe place to know that noConflict has been set
-		JFactory::getDocument()->addScriptDeclaration( "checkJQ();");
-	}
-}
-else {
-	// Make loading this conditional on config option ??
-	JFactory::getDocument()->addScript("//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js");
-	JevHtmlBootstrap::framework();
-	JEVHelper::script("components/com_jevents/assets/js/jQnc.js");
-	if ( JComponentHelper::getParams(JEV_COM_COMPONENT)->get("fixjquery",1)){
-		// this script should come after all the URL based scripts in Joomla so should be a safe place to know that noConflict has been set
-		JFactory::getDocument()->addScriptDeclaration( "checkJQ();");
-	}
+// Load Joomla Core scripts for sites that don't load MooTools;
+JHtml::_('behavior.core', true);
+
+JHtml::_('jquery.framework');
+// AIM TO REMOVE THIS - loading of MooTools should not be necessary !!!
+JHtml::_('behavior.framework', true);
+JevHtmlBootstrap::framework();
+JEVHelper::script("components/com_jevents/assets/js/jQnc.js");
+if ( JComponentHelper::getParams(JEV_COM_COMPONENT)->get("fixjquery",1)){
+	// this script should come after all the URL based scripts in Joomla so should be a safe place to know that noConflict has been set
+	JFactory::getDocument()->addScriptDeclaration( "checkJQ();");
 }
 
 $registry	= JRegistry::getInstance("jevents");
@@ -106,7 +98,7 @@ if (!version_compare(JVERSION,'1.6.0',">=")){
 @ini_set("zend.ze1_compatibility_mode","Off");
 
 // Split tasl into command and task
-$cmd = JRequest::getCmd('task', 'cpanel.show');
+$cmd = $jinput->get('task', 'cpanel.show');
 
 if (strpos($cmd, '.') != false) {
 	// We have a defined controller/task pair -- lets split them out
@@ -131,15 +123,15 @@ if (strpos($cmd, '.') != false) {
 }
 
 // Make the task available later
-JRequest::setVar("jevtask",$cmd);
-JRequest::setVar("jevcmd",$cmd);
+$jinput->set("jevtask", $cmd);
+$jinput->set("jevcmd", $cmd);
 
 JPluginHelper::importPlugin("jevents");
 
 // Make this a config option - should not normally be needed
 //$db = JFactory::getDBO();
 //$db->setQuery( "SET SQL_BIG_SELECTS=1");
-//$db->query();
+//$db->execute();
 
 // Set the name for the controller and instantiate it
 $controllerClass = ucfirst($controllerName).'Controller';

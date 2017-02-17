@@ -1,16 +1,19 @@
 <?php
 /**
- * JEvents Component for Joomla 1.5.x
+ * JEvents Component for Joomla! 3.x
  *
  * @version     $Id: default_layout.php 3323 2012-03-08 13:37:46Z geraintedwards $
  * @package     JEvents
  * @subpackage  Module JEvents Filter
- * @copyright   Copyright (C) 2008-2015 GWE Systems Ltd
+ * @copyright   Copyright (C) 2008-2017 GWE Systems Ltd
  * @license     GNU/GPLv2, see http://www.gnu.org/licenses/gpl-2.0.html
  * @link        http://www.gwesystems.com
  */
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die();
+
+use Joomla\String\StringHelper;
+
 if (count($filterHTML) > 0)
 {
 
@@ -18,6 +21,7 @@ if (count($filterHTML) > 0)
 	?>
 	<form action="<?php echo $form_link; ?>" id="jeventspost" name="jeventspost<?php echo $module->id; ?>" method="post" class="jevfiltermodule" >
 		<input type='hidden' name='catids' id='catidsfv' value='<?php echo trim($datamodel->catidsOut); ?>' />
+		<input type='hidden' name='option'  value='com_jevents' />		
 		<?php
 		// This forces category settings in URL to reset too since they could be set by SEF
 		$script = "try {JeventsFilters.filters.push({id:'catidsfv',value:0});} catch (e) {}\n";
@@ -35,6 +39,7 @@ if (count($filterHTML) > 0)
 .jevfilterlist, .jevfilterfloatlist {
 	list-style-type: none;
 	display:block;
+	margin-left:0px
 }
 .jevfilterfloatlist li {
 	float:left;
@@ -60,7 +65,7 @@ STYLE;
 						?>
 						<tr>
 							<?php
-							if (strlen($filter["title"]) > 0 && $params->get("showlabels", 1))
+							if (JString::strlen($filter["title"]) > 0 && $params->get("showlabels", 1))
 							{
 								?>
 								<td><?php echo $filter["title"]; ?></td>
@@ -106,7 +111,7 @@ STYLE;
 							{
 								continue;
 							}
-							if (strlen($filter["title"]) > 0  && $params->get("showlabels", 1))
+							if (JString::strlen($filter["title"]) > 0  && $params->get("showlabels", 1))
 							{
 								?>
 								<td><?php echo $filter["title"]; ?></td>
@@ -173,7 +178,7 @@ STYLE;
 						?>
 						<li>
 							<?php
-							if (strlen($filter["title"]) > 0  && $params->get("showlabels", 1))
+							if (JString::strlen($filter["title"]) > 0  && $params->get("showlabels", 1))
 							{
 								?>
 								<?php echo $filter["title"]; ?>

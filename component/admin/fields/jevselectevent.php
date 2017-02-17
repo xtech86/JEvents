@@ -4,7 +4,7 @@
  *
  * @version     $Id: jevselectevent.php 3503 2012-04-10 11:04:26Z geraintedwards $
  * @package     JEvents
- * @copyright   Copyright (C) 2008-2015 GWE Systems Ltd
+ * @copyright   Copyright (C) 2008-2017 GWE Systems Ltd
  * @license     GNU/GPLv2, see http://www.gnu.org/licenses/gpl-2.0.html
  * @link        http://www.jevents.net
  */
@@ -38,14 +38,15 @@ class JFormFieldJEVselectEvent extends JFormField
 		}
 
 		// Load the modal behavior script.
-		JevHtmlBootstrap::modal('a.modal');
+		JLoader::register('JevModal',JPATH_LIBRARIES."/jevents/jevmodal/jevmodal.php");
+		JevModal::modal("a.selectmodal");
 
 		$js = "
 		function jSelectEvent_".$this->id."(link, title, Itemid, evid, rpid) {
-			$('selectedeventtitle').value = title;
-			$('selectedevent').value = evid;
-			$('selectedrepeat').value = rpid;
-			SqueezeBox.close();
+			jQuery('#selectedeventtitle').val( title);
+			jQuery('#selectedevent').val( evid);
+			jQuery('#selectedrepeat').val( rpid);
+			jQuery('#selectEvent').modal('hide');
 			return false;
 		}";
 		
@@ -61,17 +62,24 @@ class JFormFieldJEVselectEvent extends JFormField
 		$rpidfield = $this->form->getField("rp_id", "request");
 		$rp_id = $rpidfield->value;
 		$db	= JFactory::getDBO();
-		$db->setQuery(
-			'SELECT det.summary as title' .
-			' FROM #__jevents_vevdetail as det ' .
-			' LEFT JOIN #__jevents_repetition as rep ON rep.eventdetail_id = det.evdet_id' .
-			' WHERE rep.rp_id = '.(int) $rp_id
-		);
-		$title = $db->loadResult();
-		echo $db->getErrorMsg();
+		$query = $db->getQuery(true);
+		$query
+				->select($db->quoteName('det.summary', 'title'))
+			  	->from($db->quoteName('#__jevents_vevdetail', 'det'))
+				->join('LEFT', $db->quoteName('#__jevents_repetition', 'rep') . ' ON' . ($db->quoteName('rep.eventdetail_id') . ' = ' . $db->quoteName('det.evdet_id')))
+				->where($db->quoteName('rep.rp_id') . ' = ' . (int) $rp_id);
 
-		if ($error = $db->getErrorMsg()) {
-			JError::raiseWarning(500, $error);
+		//Hide the below!
+		//echo $db->getErrorMsg();
+
+		try
+		{
+			$db->setQuery($query);
+			$title = $db->loadResult();
+		}
+		catch (RuntimeException $e){
+			throw new Exception($e->getMessage());
+			JFactory::getApplication()->enqueueMessage('500 - ' . JText::_('JLIB_FORM_ERROR_FIELDS_CATEGORY_ERROR_EXTENSION_EMPTY'), 'errpr');
 		}
 
 		if (empty($title)) {
@@ -80,15 +88,13 @@ class JFormFieldJEVselectEvent extends JFormField
 		$title = htmlspecialchars($title, ENT_QUOTES, 'UTF-8');
 
 		// The current user display field.
-		$html[] = '<div class="fltlft">';
-		$html[] = '  <input type="text" id="selectedeventtitle" value="'.$title.'" disabled="disabled" size="35" />';
-		$html[] = '</div>';
+		$html[] = '<div class="fltlft input-append" >';
+		$html[] = '  <input type="text" id="selectedeventtitle" value="'.$title.'" disabled="disabled" size="50" />';
+
+		$link  = "javascript:jevModalPopup('selectEvent', '".$link ."', '". JText::_("COM_JEVENTS_CHANGE_EVENT_BUTTON" ,  array('jsSafe'=>true) ) . "'); ";
 
 		// The user select button.
-		$html[] = '<div class="button2-left">';
-		$html[] = '  <div class="blank">';
-		$html[] = '	<a class="modal" title="'.JText::_('COM_JEVENTS_CHANGE_EVENT').'"  href="'.$link.'" rel="{handler: \'iframe\', size: {x: 800, y: 450}}">'.JText::_('COM_JEVENTS_CHANGE_EVENT_BUTTON').'</a>';
-		$html[] = '  </div>';
+		$html[] = '	<a class="selectmodal btn btn-primary" title="'.JText::_('COM_JEVENTS_CHANGE_EVENT').'"  href="'.$link.'" ><span class="icon-list icon-white"></span>'.JText::_('COM_JEVENTS_CHANGE_EVENT_BUTTON').'</a>';
 		$html[] = '</div>';
 
 		// The active event id field.

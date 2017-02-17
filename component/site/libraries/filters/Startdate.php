@@ -1,16 +1,18 @@
 <?php
 /**
- * JEvents Component for Joomla 1.5.x
+ * JEvents Component for Joomla! 3.x
  *
  * @version     $Id: Startdate.php 1976 2011-04-27 15:54:31Z geraintedwards $
  * @package     JEvents
- * @copyright   Copyright (C) 2008-2015 GWE Systems Ltd
+ * @copyright   Copyright (C) 2008-2017 GWE Systems Ltd
  * @license     GNU/GPLv2, see http://www.gnu.org/licenses/gpl-2.0.html
  * @link        http://www.jevents.net
  */
 
 defined('_VALID_MOS') or defined('_JEXEC') or die( 'No Direct Access' );
 JLoader::register('JevJoomlaVersion',JPATH_ADMINISTRATOR."/components/com_jevents/libraries/version.php");
+
+use Joomla\String\StringHelper;
 
 // Event repeat startdate fitler
 class jevStartdateFilter extends jevFilter
@@ -55,7 +57,7 @@ class jevStartdateFilter extends jevFilter
 			$this->filter_values[0]=1;
 			// default scenario is only events starting after 2 weeeks ago			
 			$fulldate = date( 'Y-m-d H:i:s',JevDate::strtotime("-2 weeks"));
-			$this->filter_values[1]=substr($fulldate,0,10);
+			$this->filter_values[1]=JString::substr($fulldate,0,10);
 			$this->filter_values[2]=1;
 			return  $this->dmap.".startrepeat>='$fulldate'";
 		}
@@ -65,12 +67,12 @@ class jevStartdateFilter extends jevFilter
 		}
 		else if ($this->filter_values[0]==-1 && $this->filter_values[1]==""){
 			$fulldate = date( 'Y-m-d H:i:s',JevDate::strtotime("+2 weeks"));
-			$this->filter_values[1]=substr($fulldate,0,10);
+			$this->filter_values[1]=JString::substr($fulldate,0,10);
 			$this->_date = $this->filter_values[1];
 		}
 		else if ($this->filter_values[0]==1 && $this->filter_values[1]==""){
 			$fulldate = date( 'Y-m-d H:i:s',JevDate::strtotime("-2 weeks"));
-			$this->filter_values[1]=substr($fulldate,0,10);
+			$this->filter_values[1]=JString::substr($fulldate,0,10);
 			$this->_date = $this->filter_values[1];
 		}
 		$filter="";
@@ -124,7 +126,7 @@ class jevStartdateFilter extends jevFilter
 			$maxyear = JEVHelper::getMaxYear();
 			$document = JFactory::getDocument();
 			
-			$calendar = (JevJoomlaVersion::isCompatible("3.0")) ? 'calendar14.js' : 'calendar12.js'; 
+			$calendar = 'calendar14.js' ;
 		
 			JEVHelper::script($calendar, "components/".JEV_COM_COMPONENT."/assets/js/",true); 
 			JEVHelper::stylesheet("dashboard.css",  "components/".JEV_COM_COMPONENT."/assets/css/",true);  

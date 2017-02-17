@@ -1,9 +1,10 @@
 <?php
 defined('_JEXEC') or die('Restricted access');
 
+use Joomla\String\StringHelper;
+
 function DefaultLoadedFromTemplate($view, $template_name, $event, $mask, $template_value = false, $runplugins = true)
 {
-
 	$db = JFactory::getDBO();
 	// find published template
 	static $templates;
@@ -15,13 +16,15 @@ function DefaultLoadedFromTemplate($view, $template_name, $event, $mask, $templa
 		$rawtemplates = array();
 	}
 	$specialmodules = false;
+	static $allcat_catids;
+	$loadedFromFile = false;
 
 	if (!$template_value)
 	{
 		if (!array_key_exists($template_name, $templates))
 		{
 
-			$db->setQuery("SELECT * FROM #__jev_defaults WHERE state=1 AND name= " . $db->Quote($template_name) . " AND " . 'language in (' . $db->quote(JFactory::getLanguage()->getTag()) . ',' . $db->quote('*') . ')');
+			$db->setQuery("SELECT * FROM #__jev_defaults WHERE state=1 AND name= " . $db->Quote($template_name) . " AND value<>'' AND " . 'language in (' . $db->quote(JFactory::getLanguage()->getTag()) . ',' . $db->quote('*') . ')');
 			$rawtemplates = $db->loadObjectList();
 			$templates[$template_name] = array();
 			if ($rawtemplates){
@@ -33,9 +36,38 @@ function DefaultLoadedFromTemplate($view, $template_name, $event, $mask, $templa
 				}
 			}
 
-			if (count($templates[$template_name])==0) {
-				$templates[$template_name] = null;
-				return false;
+			if (!isset($templates[$template_name]['*'][0])) {
+				try {
+					$viewname = $view->getViewName();
+				}
+				catch (Exception $e){
+					$viewname = "default";
+				}
+				$templatefile = JPATH_BASE . '/' . 'templates' . '/' . JFactory::getApplication()->getTemplate() . '/' . 'html' . '/' . JEV_COM_COMPONENT ."/$viewname/defaults/$template_name.html";
+				if (!JFile::exists($templatefile)){
+					$templatefile = JPATH_BASE . '/' . 'templates' . '/' . JFactory::getApplication()->getTemplate() . '/' . 'html' . '/' . JEV_COM_COMPONENT ."/defaults/$template_name.html";
+				}
+				if (!JFile::exists($templatefile)){
+					$templatefile = JEV_VIEWS."/$viewname/defaults/$template_name.html";
+				}
+				if (!JFile::exists($templatefile)){
+					$templatefile = JEV_ADMINPATH."views/defaults/tmpl/$template_name.html";
+				}
+				// Fall back to html version
+				if (JFile::exists($templatefile))
+				{
+					$loadedFromFile = true;
+                                        if (!isset($templates[$template_name]['*'])){
+                                            $templates[$template_name]['*'] = array();
+                                        }
+					$templates[$template_name]['*'][0] =new stdClass();
+					$templates[$template_name]['*'][0]->value = file_get_contents($templatefile);
+					$templates[$template_name]['*'][0]->params = null;
+					$templates[$template_name]['*'][0]->fromfile = true;
+				}
+				else {
+					return false;
+				}
 			}
 
 			if (isset($templates[$template_name][JFactory::getLanguage()->getTag()]))
@@ -88,6 +120,9 @@ function DefaultLoadedFromTemplate($view, $template_name, $event, $mask, $templa
 							if (is_object($modvals)){
 								$modvals = get_object_vars($modvals);
 							}
+							$modids = array_values($modids);
+							$modvals = array_values($modvals);
+
 							for ($count=0;$count<count($modids) && $count<count($modvals) && trim($modids[$count])!="";$count++) {
 								$templates[$template_name][$catid]->value .= "{{module start:MODULESTART#".$modids[$count]."}}";
 								// cleaned later!
@@ -146,16 +181,17 @@ function DefaultLoadedFromTemplate($view, $template_name, $event, $mask, $templa
 		$specialmodules = $template->params;
 
 		$matchesarray = $template->matchesarray;
+		$loadedFromFile = isset($template->fromfile);
 	}
 	else
 	{
-		if ($runplugins){
+		if ($runplugins && JRequest::getString("option")!="com_jevents"){
 			// This is a special scenario where we call this function externally e.g. from RSVP Pro messages
 			// In this scenario we have not gone through the displaycustomfields plugin
 			static $pluginscalled = array();
 			if (!isset($pluginscalled[$event->rp_id()]))
 			{
-				$dispatcher = JDispatcher::getInstance();
+				$dispatcher = JEventDispatcher::getInstance();
 				JPluginHelper::importPlugin("jevents");
 				$customresults = $dispatcher->trigger('onDisplayCustomFields', array(&$event));
 				$pluginscalled[$event->rp_id()] = $event;
@@ -176,6 +212,9 @@ function DefaultLoadedFromTemplate($view, $template_name, $event, $mask, $templa
 				if (is_object($modvals)){
 					$modvals = get_object_vars($modvals);
 				}
+				$modids = array_values($modids);
+				$modvals = array_values($modvals);
+
 				for ($count=0;$count<count($modids) && $count<count($modvals) && trim($modids[$count])!="";$count++) {
 					$template_value .= "{{module start:MODULESTART#".$modids[$count]."}}";
 					// cleaned later!
@@ -217,10 +256,10 @@ function DefaultLoadedFromTemplate($view, $template_name, $event, $mask, $templa
 			continue;
 		}
 		// translation string
-		if (strpos($strippedmatch, "{{_") === 0 && strpos($strippedmatch, " ") === false)
+		if (JString::strpos($strippedmatch, "{{_") === 0 && JString::strpos($strippedmatch, " ") === false)
 		{
 			$search[] = $strippedmatch;
-			$strippedmatch = substr($strippedmatch, 3, strlen($strippedmatch) - 5);
+			$strippedmatch = JString::substr($strippedmatch, 3, JString::strlen($strippedmatch) - 5);
 			$replace[] = JText::_($strippedmatch);
 			$blank[] = "";
 			continue;
@@ -229,6 +268,11 @@ function DefaultLoadedFromTemplate($view, $template_name, $event, $mask, $templa
 		switch ($strippedmatch) {
 			case "{{TITLE}}":
 				$search[] = "{{TITLE}}";
+				$replace[] = $event->title();
+				$blank[] = "";
+				break;
+			case "{{TRUNCATED_TITLE}}":
+				$search[] = "{{TRUNCATED_TITLE:.*?}}";
 				$replace[] = $event->title();
 				$blank[] = "";
 				break;
@@ -242,21 +286,19 @@ function DefaultLoadedFromTemplate($view, $template_name, $event, $mask, $templa
 			case "{{LINKSTART}}":
 			case "{{LINKEND}}":
 			case "{{TITLE_LINK}}":
-				if ($view)
-				{
+				// no need to repeat this for each of the matching 'case's
+				if (!in_array( "{{LINK}}", $search)) {
 					// Title link
 					$rowlink = $event->viewDetailLink($event->yup(), $event->mup(), $event->dup(), false);
-					$rowlink = JRoute::_($rowlink . $view->datamodel->getCatidsOutLink());
-					ob_start();
-					?>
-					<a class="ev_link_row" href="<?php echo $rowlink; ?>" title="<?php echo JEventsHTML::special($event->title()); ?>">
-						<?php
-						$linkstart = ob_get_clean();
-					}
-					else
+					if ($view)
 					{
-						$rowlink = $linkstart = "";
+						$rowlink = JRoute::_($rowlink . $view->datamodel->getCatidsOutLink());
 					}
+					ob_start();
+						?>
+						<a class="ev_link_row" href="<?php echo $rowlink; ?>" title="<?php echo JEventsHTML::special($event->title()); ?>">
+						<?php
+					$linkstart = ob_get_clean();
 					$search[] = "{{LINK}}";
 					$replace[] = $rowlink;
 					$blank[] = "";
@@ -271,8 +313,8 @@ function DefaultLoadedFromTemplate($view, $template_name, $event, $mask, $templa
 					$search[] = "{{TITLE_LINK}}";
 					$replace[] = $fulllink;
 					$blank[] = "";
-
-					break;
+				}
+				break;
 
 				case "{{TRUNCTITLE}}":
 
@@ -334,13 +376,12 @@ function DefaultLoadedFromTemplate($view, $template_name, $event, $mask, $templa
 
 				case "{{ALLCATEGORIES}}":
 					$search[] = "{{ALLCATEGORIES}}";
-					static $allcat_catids;
 
 					if (!isset($allcat_catids))
 					{
 						$db = JFactory::getDBO();
 						$arr_catids = array();
-						$catsql = "SELECT cat.id, cat.title as name FROM #__categories  as cat WHERE cat.extension='com_jevents' ";
+						$catsql = "SELECT cat.id, cat.title as name, cat.params FROM #__categories  as cat WHERE cat.extension='com_jevents' ";
 						$db->setQuery($catsql);
 						$allcat_catids = $db->loadObjectList('id');
 					}
@@ -374,6 +415,29 @@ function DefaultLoadedFromTemplate($view, $template_name, $event, $mask, $templa
 					$blank[] = "";
 					break;
 
+				case "{{RGBA}}":
+					$bgcolor = $event->bgcolor();
+					$search[] = $strippedmatch;
+					$bgcolor = $bgcolor == "" ? "#ffffff" : $bgcolor;
+                                        // skip the #
+                                        if (strlen($bgcolor) == 7){
+                                            $bgcolor = substr($bgcolor, 1);
+                                        }
+                                        if (strlen($bgcolor) == 6)
+                                            list($r, $g, $b) = array($bgcolor[0].$bgcolor[1],
+                                                                     $bgcolor[2].$bgcolor[3],
+                                                                     $bgcolor[4].$bgcolor[5]);
+                                        elseif (strlen($bgcolor) == 3)
+                                            list($r, $g, $b) = array($bgcolor[0].$bgcolor[0], $bgcolor[1].$bgcolor[1], $bgcolor[2].$bgcolor[2]);
+                                        else
+                                            return false;
+
+                                        $r = hexdec($r); $g = hexdec($g); $b = hexdec($b);
+                                        $replace[] = "rgba($r, $g, $b, 0.3)";
+                                        
+					$blank[] = "";
+					break;
+                                    
 				case "{{FGCOLOUR}}":
 					$search[] = "{{FGCOLOUR}}";
 					$replace[] = $event->fgcolor();
@@ -412,54 +476,72 @@ function DefaultLoadedFromTemplate($view, $template_name, $event, $mask, $templa
 					$blank[] = "";
 					break;
 
-				case "{{CATEGORYLNK}}":
-					$router = JRouter::getInstance("site");
-					$catlinks = array();
-					if ($jevparams->get("multicategory", 0))
-					{
-						$catids = $event->catids();
-						$catdata = $event->getCategoryData();
-					}
-					else
-					{
-						$catids = array($event->catid());
-						$catdata = array($event->getCategoryData());
-					}
+                                case "{{CATEGORYLNK}}" :
+                                case "{{CATEGORYLINK_RAW}}":
+                                    $router = JRouter::getInstance("site");
+                                    $catlinks = array();
+                                    if ($jevparams->get("multicategory", 0))
+                                    {
+                                            $catids = $event->catids();
+                                            $catdata = $event->getCategoryData();
+                                    }
+                                    else
+                                    {
+                                            $catids = array($event->catid());
+                                            $catdata = array($event->getCategoryData());
+                                    }
+                                    // Is this being called from the latest events module - if so then use the target item instead of current Itemid
+                                    $reg =  JRegistry::getInstance("jevents");
+                                    $modparams = $reg->get("jevents.moduleparams", new JRegistry);
+                                    $modItemid = $modparams->get("target_itemid", JFactory::getApplication()->input->getInt("Itemid",0));
+                                    $vars = $router->getVars();
+                                    foreach ($catids as $cat)
+                                    {
+                                            $vars["catids"] = $cat;
+                                            $catname = "xxx";
+                                            foreach ($catdata as $cg)
+                                            {
+                                                    if ($cat == $cg->id)
+                                                    {
+                                                            $catname = $cg->name;
+                                                            break;
+                                                    }
+                                            }
+                                            $eventlink = "index.php?";
+                                            $itemidSet = false;
+                                            foreach ($vars as $key => $val)
+                                            {
+                                                    // this is only used in the latest events module so do not perpetuate it here
+                                                    if ($key == "filter_reset")
+                                                            continue;
+                                                    if ($key == "task" && ($val == "icalrepeat.detail" || $val == "icalevent.detail"))
+                                                    {
+                                                            $val = "week.listevents";
+                                                    }
+                                                    if ($key == "Itemid" && $modItemid){
+                                                            $val = $modItemid;
+                                                            $itemidSet = true;
+                                                    }
+                                                    $eventlink.= $key . "=" . $val . "&";
+                                            }
+                                            if (!$itemidSet && $modItemid) {
+                                                    $eventlink.= "Itemid=".$modItemid;
+                                            }
+                                            $eventlink = JString::substr($eventlink, 0, JString::strlen($eventlink) - 1);
+                                            $eventlink = JRoute::_($eventlink);
 
-					$vars = $router->getVars();
-					foreach ($catids as $cat)
-					{
-						$vars["catids"] = $cat;
-						$catname = "xxx";
-						foreach ($catdata as $cg)
-						{
-							if ($cat == $cg->id)
-							{
-								$catname = $cg->name;
-								break;
-							}
-						}
-						$eventlink = "index.php?";
-						foreach ($vars as $key => $val)
-						{
-							// this is only used in the latest events module so do not perpetuate it here
-							if ($key == "filter_reset")
-								continue;
-							if ($key == "task" && ($val == "icalrepeat.detail" || $val == "icalevent.detail"))
-							{
-								$val = "week.listevents";
-							}
-							$eventlink.= $key . "=" . $val . "&";
-						}
-						$eventlink = substr($eventlink, 0, strlen($eventlink) - 1);
-						$eventlink = JRoute::_($eventlink);
+                                            $catlinks_raw[] = $eventlink;
 
-						$catlinks[] = '<a class="ev_link_cat" href="' . $eventlink . '"  title="' . JEventsHTML::special($catname) . '">' . $catname . '</a>';
-					}
-					$search[] = "{{CATEGORYLNK}}";
-					$replace[] = implode(", ", $catlinks);
-					$blank[] = "";
-					break;
+                                            $catlinks[] = '<a class="ev_link_cat" href="' . $eventlink . '"  title="' . JEventsHTML::special($catname) . '">' . $catname . '</a>';
+                                    }
+                                    $search[] = "{{CATEGORYLNK_RAW}}";
+                                    $replace[] = implode(", ", $catlinks_raw);
+                                    $blank[] = "";
+
+                                    $search[] = "{{CATEGORYLNK}}";
+                                    $replace[] = implode(", ", $catlinks);
+                                    $blank[] = "";
+				break;
 
 				case "{{CATEGORYIMG}}":
 					$search[] = "{{CATEGORYIMG}}";
@@ -473,6 +555,40 @@ function DefaultLoadedFromTemplate($view, $template_name, $event, $mask, $templa
 					$blank[] = "";
 					break;
 
+				case "{{ALLCATEGORYIMGS}}":
+					$search[] = "{{ALLCATEGORYIMGS}}";
+					if (!isset($allcat_catids))
+					{
+						$db = JFactory::getDBO();
+						$arr_catids = array();
+						$catsql = "SELECT cat.id, cat.title as name, cat.params FROM #__categories  as cat WHERE cat.extension='com_jevents' ";
+						$db->setQuery($catsql);
+						$allcat_catids = $db->loadObjectList('id');
+					}
+
+					$db = JFactory::getDbo();
+					$db->setQuery("Select catid from #__jevents_catmap  WHERE evid = " . $event->ev_id());
+					$allcat_eventcats = $db->loadColumn();
+
+					$output = "";
+					if (is_array($allcat_eventcats)) {
+						foreach ($allcat_eventcats as $catid)
+						{
+							if (isset($allcat_catids[$catid]))
+							{
+								$params = json_decode($allcat_catids[$catid]->params);
+								if (isset($params->image) && $params->image!=""){
+									$alt_text = ($params->image_alt == '') ? JText::_('JEV_CAT_ALT_DEFAULT_TEXT', true) : $params->image_alt;
+									$output .= "<img src = '".JURI::root().$params->image."' class='catimage'  alt='" . $alt_text . "' />";
+								}
+							}
+						}
+					}
+                                        
+					$replace[] = $output;
+					$blank[] = "";
+					break;
+                                    
 				case "{{CATDESC}}":
 					$search[] = "{{CATDESC}}";
 					$replace[] = $event->getCategoryDescription();
@@ -493,83 +609,86 @@ function DefaultLoadedFromTemplate($view, $template_name, $event, $mask, $templa
 				case "{{ICALBUTTON}}":
 				case "{{EDITDIALOG}}":
 				case "{{EDITBUTTON}}":
+					// no need to repeat this for each of the matching 'case's
+					if (!in_array( "{{EDITBUTTON}}", $search)) {
 
-					if ($jevparams->get("showicalicon", 0) && !$jevparams->get("disableicalexport", 0))
-					{
-						$cssloaded = true;
-						ob_start();
-						$view->eventIcalButton($event);
-						?>
-						<div class="jevdialogs" style="position:relative;">
-						<?php
-						$search[] = "{{ICALDIALOG}}";
-						if ($view)
+						if ($jevparams->get("showicalicon", 0) && !$jevparams->get("disableicalexport", 0))
 						{
+							$cssloaded = true;
 							ob_start();
-							$view->eventIcalDialog($event, $mask, true);
-							$dialog = ob_get_clean();
-							$replace[] = $dialog;
+							$view->eventIcalButton($event);
+							?>
+							<div class="jevdialogs" style="position:relative;">
+							<?php
+							$search[] = "{{ICALDIALOG}}";
+							if ($view)
+							{
+								ob_start();
+								$view->eventIcalDialog($event, $mask, true);
+								$dialog = ob_get_clean();
+								$replace[] = $dialog;
+							}
+							else
+							{
+								$replace[] = "";
+							}
+							$blank[] = "";
+							echo $dialog;
+							?>
+							</div>
+
+							<?php
+							$search[] = "{{ICALBUTTON}}";
+							$replace[] = ob_get_clean();
+							$blank[] = "";
 						}
 						else
 						{
+							$search[] = "{{ICALBUTTON}}";
 							$replace[] = "";
+							$blank[] = "";
+							$search[] = "{{ICALDIALOG}}";
+							$replace[] = "";
+							$blank[] = "";
 						}
-						$blank[] = "";
-						echo $dialog;
-						?>
-						</div>
-
-						<?php
-						$search[] = "{{ICALBUTTON}}";
-						$replace[] = ob_get_clean();
-						$blank[] = "";
-					}
-					else
-					{
-						$search[] = "{{ICALBUTTON}}";
-						$replace[] = "";
-						$blank[] = "";
-						$search[] = "{{ICALDIALOG}}";
-						$replace[] = "";
-						$blank[] = "";
-					}
-					if ((JEVHelper::canEditEvent($event) || JEVHelper::canPublishEvent($event) || JEVHelper::canDeleteEvent($event)) )
-					{
-						ob_start();
-						$view->eventManagementButton($event);
-						?>
-						<div class="jevdialogs">
-						<?php
-						$search[] = "{{EDITDIALOG}}";
-						if ($view)
+						if ((JEVHelper::canEditEvent($event) || JEVHelper::canPublishEvent($event) || JEVHelper::canDeleteEvent($event)) )
 						{
 							ob_start();
-							$view->eventManagementDialog($event, $mask, true);
-							$dialog = ob_get_clean();
-							$replace[] = $dialog;
+							$view->eventManagementButton($event);
+							?>
+							<div class="jevdialogs">
+							<?php
+							$search[] = "{{EDITDIALOG}}";
+							if ($view)
+							{
+								ob_start();
+								$view->eventManagementDialog($event, $mask, true);
+								$dialog = ob_get_clean();
+								$replace[] = $dialog;
+							}
+							else
+							{
+								$replace[] = "";
+							}
+							$blank[] = "";
+							echo $dialog;
+							?>
+							</div>
+
+							<?php
+							$search[] = "{{EDITBUTTON}}";
+							$replace[] = ob_get_clean();
+							$blank[] = "";
 						}
 						else
 						{
+							$search[] = "{{EDITBUTTON}}";
 							$replace[] = "";
+							$blank[] = "";
+							$search[] = "{{EDITDIALOG}}";
+							$replace[] = "";
+							$blank[] = "";
 						}
-						$blank[] = "";
-						echo $dialog;
-						?>
-						</div>
-
-						<?php
-						$search[] = "{{EDITBUTTON}}";
-						$replace[] = ob_get_clean();
-						$blank[] = "";
-					}
-					else
-					{
-						$search[] = "{{EDITBUTTON}}";
-						$replace[] = "";
-						$blank[] = "";
-						$search[] = "{{EDITDIALOG}}";
-						$replace[] = "";
-						$blank[] = "";
 					}
 
 					break;
@@ -593,6 +712,24 @@ function DefaultLoadedFromTemplate($view, $template_name, $event, $mask, $templa
 					$blank[] = "";
 					break;
 
+				case "{{JEVSTARTED}}":
+				case "{{JEVENDED}}":
+					// no need to repeat this for each of the matching 'case's
+					if (!in_array( "{{JEVSTARTED}}", $search)) {
+
+						$search[] = "{{JEVSTARTED}}";
+
+						$now = new JevDate("+0 seconds");
+						$now = $now->toFormat("%Y-%m-%d %H:%M:%S");
+
+						$replace[] = $event->publish_up() < $now ? JText::_("JEV_EVENT_STARTED") : "";
+						$blank[] = "";
+						$search[] = "{{JEVENDED}}";
+						$replace[] = $event->publish_down() < $now ? JText::_("JEV_EVENT_ENDED") : "";
+						$blank[] = "";
+					}
+					break;
+
 				case "{{REPEATSUMMARY}}":
 				case "{{STARTDATE}}":
 				case "{{ENDDATE}}":
@@ -603,272 +740,339 @@ function DefaultLoadedFromTemplate($view, $template_name, $event, $mask, $templa
 				case "{{ISOSTART}}":
 				case "{{ISOEND}}":
 				case "{{DURATION}}":
+				case "{{COUNTDOWN}}":
 				case "{{MULTIENDDATE}}":
-					if ($template_name == "icalevent.detail_body")
-					{
-						$search[] = "{{REPEATSUMMARY}}";
-						$repeatsummary = $view->repeatSummary($event);
-						if (!$repeatsummary)
+					// no need to repeat this for each of the matching 'case's
+					if (!in_array( "{{COUNTDOWN}}", $search)) {
+
+						if ($template_name == "icalevent.detail_body")
 						{
-							$repeatsummary = $event->repeatSummary();
-						}
-						$replace[] = $repeatsummary;
-						//$replace[] = $event->repeatSummary();
-						$blank[] = "";
-						$row = $event;
-						$start_date = JEventsHTML::getDateFormat($row->yup(), $row->mup(), $row->dup(), 0);
-						$start_time = JEVHelper::getTime($row->getUnixStartTime(), $row->hup(), $row->minup());
-						$stop_date = JEventsHTML::getDateFormat($row->ydn(), $row->mdn(), $row->ddn(), 0);
-						$stop_time = JEVHelper::getTime($row->getUnixEndTime(), $row->hdn(), $row->mindn());
-						$stop_time_midnightFix = $stop_time;
-						$stop_date_midnightFix = $stop_date;
-						if ($row->sdn() == 59 && $row->mindn() == 59)
-						{
-							$stop_time_midnightFix = JEVHelper::getTime($row->getUnixEndTime() + 1, 0, 0);
-							$stop_date_midnightFix = JEventsHTML::getDateFormat($row->ydn(), $row->mdn(), $row->ddn() + 1, 0);
-						}
-
-						$search[] = "{{STARTDATE}}";
-						$replace[] = $start_date;
-						$blank[] = "";
-						$search[] = "{{ENDDATE}}";
-						$replace[] = $stop_date;
-						$blank[] = "";
-						$search[] = "{{STARTTIME}}";
-						$replace[] = $row->alldayevent() ? "" : $start_time;
-						$blank[] = "";
-						$search[] = "{{ENDTIME}}";
-						$replace[] = ($row->noendtime() || $row->alldayevent()) ? "" : $stop_time_midnightFix;
-						$blank[] = "";
-						$search[] = "{{STARTTZ}}";
-						$replace[] = $row->alldayevent() ? "" : $start_time;
-						$blank[] = "";
-						$search[] = "{{ENDTZ}}";
-						$replace[] = ($row->noendtime() || $row->alldayevent()) ? "" : $stop_time_midnightFix;
-						$blank[] = "";
-
-						$rawreplace["{{STARTDATE}}"]= $row->getUnixStartDate();
-						$rawreplace["{{ENDDATE}}"]= $row->getUnixEndDate();
-						$rawreplace["{{STARTTIME}}"] = $row->getUnixStartTime();
-						$rawreplace["{{ENDTIME}}"] = $row->getUnixEndTime();
-						$rawreplace["{{STARTTZ}}"] = $row->yup()."-".$row->mup()."-".$row->dup()." ".$row->hup().":".$row->minup().":".$row->sup();
-						$rawreplace["{{ENDTZ}}"] = $row->ydn()."-".$row->mdn()."-".$row->ddn()." ".$row->hdn().":".$row->mindn().":".$row->sdn();
-						$rawreplace["{{MULTIENDDATE}}"] = $row->endDate() > $row->startDate() ? $stop_date : "";
-
-						$search[] = "{{ISOSTART}}";
-						$replace[] = JEventsHTML::getDateFormat($row->yup(), $row->mup(), $row->dup(), "%Y-%m-%d") . "T" . sprintf('%02d:%02d:00', $row->hup(), $row->minup());
-						$blank[] = "";
-						$search[] = "{{ISOEND}}";
-						$replace[] = JEventsHTML::getDateFormat($row->ydn(), $row->mdn(), $row->ddn(), "%Y-%m-%d") . "T" . sprintf('%02d:%02d:00', $row->hdn(), $row->mindn());
-						$blank[] = "";
-						$search[] = "{{MULTIENDDATE}}";
-						$replace[] = $row->endDate() > $row->startDate() ? $row->getUnixEndDate() : "";
-						$blank[] = "";
-					}
-					else
-					{
-						$row = $event;
-						$start_date = JEventsHTML::getDateFormat($row->yup(), $row->mup(), $row->dup(), 0);
-						$start_time = JEVHelper::getTime($row->getUnixStartTime(), $row->hup(), $row->minup());
-						$stop_date = JEventsHTML::getDateFormat($row->ydn(), $row->mdn(), $row->ddn(), 0);
-						$stop_time = JEVHelper::getTime($row->getUnixEndTime(), $row->hdn(), $row->mindn());
-						$stop_time_midnightFix = $stop_time;
-						$stop_date_midnightFix = $stop_date;
-						if ($row->sdn() == 59 && $row->mindn() == 59)
-						{
-							$stop_time_midnightFix = JEVHelper::getTime($row->getUnixEndTime() + 1, 0, 0);
-							$stop_date_midnightFix = JEventsHTML::getDateFormat($row->ydn(), $row->mdn(), $row->ddn() + 1, 0);
-						}
-						$search[] = "{{STARTDATE}}";
-						$replace[] = $start_date;
-						$blank[] = "";
-						$search[] = "{{ENDDATE}}";
-						$replace[] = $stop_date;
-						$blank[] = "";
-						$search[] = "{{STARTTIME}}";
-						$replace[] = $row->alldayevent() ? "" : $start_time;
-						$blank[] = "";
-						$search[] = "{{ENDTIME}}";
-						$replace[] = ($row->noendtime() || $row->alldayevent()) ? "" : $stop_time_midnightFix;
-						$blank[] = "";
-						$search[] = "{{MULTIENDDATE}}";
-						$replace[] = $row->endDate() > $row->startDate() ? $stop_date : "";
-						$blank[] = "";
-						$search[] = "{{STARTTZ}}";
-						$replace[] = $row->alldayevent() ? "" : $start_time;
-						$blank[] = "";
-						$search[] = "{{ENDTZ}}";
-						$replace[] = ($row->noendtime() || $row->alldayevent()) ? "" : $stop_time_midnightFix;
-						$blank[] = "";
-
-						$rawreplace["{{STARTDATE}}"]= $row->getUnixStartDate();
-						$rawreplace["{{ENDDATE}}"]= $row->getUnixEndDate();
-						$rawreplace["{{STARTTIME}}"] = $row->getUnixStartTime();
-						$rawreplace["{{ENDTIME}}"] = $row->getUnixEndTime();
-						$rawreplace["{{STARTTZ}}"] = $row->yup()."-".$row->mup()."-".$row->dup()." ".$row->hup().":".$row->minup().":".$row->sup();
-						$rawreplace["{{ENDTZ}}"] = $row->ydn()."-".$row->mdn()."-".$row->ddn()." ".$row->hdn().":".$row->mindn().":".$row->sdn();
-						$rawreplace["{{MULTIENDDATE}}"] = $row->endDate() > $row->startDate() ? $row->getUnixEndDate() : "";
-
-						if (strpos($template_value, "{{ISOSTART}}") !== false || strpos($template_value, "{{ISOEND}}") !== false)
-						{
-							$search[] = "{{ISOSTART}}";
-							$replace[] = JEventsHTML::getDateFormat($row->yup(), $row->mup(), $row->dup(), "%Y-%m-%d") . "T" . sprintf('%02d:%02d:00', $row->hup(), $row->minup());
+							$search[] = "{{REPEATSUMMARY}}";
+							$repeatsummary = $view->repeatSummary($event);
+							if (!$repeatsummary)
+							{
+								$repeatsummary = $event->repeatSummary();
+							}
+							if ($jevparams->get("com_repeatview",1)) {
+								$replace[] = $repeatsummary;
+							}
+							else {
+								$replace[] = "";
+							}
+							//$replace[] = $event->repeatSummary();
 							$blank[] = "";
-							$search[] = "{{ISOEND}}";
-							$replace[] = JEventsHTML::getDateFormat($row->ydn(), $row->mdn(), $row->ddn(), "%Y-%m-%d") . "T" . sprintf('%02d:%02d:00', $row->hdn(), $row->mindn());
-							$blank[] = "";
-						}
-
-						// these would slow things down if not needed in the list
-						$dorepeatsummary = (strpos($template_value, "{{REPEATSUMMARY}}") !== false);
-						if ($dorepeatsummary)
-						{
-
-							$cfg = JEVConfig::getInstance();
-							$jevtask = JRequest::getString("jevtask");
-							$jevtask = str_replace(".listevents", "", $jevtask);
-
-							$showyeardate = $cfg->get("showyeardate", 0);
-
 							$row = $event;
-							$times = "";
-							if (($showyeardate && $jevtask == "year") || $jevtask == "search.results" || $jevtask == "month.calendar" || $jevtask == "cat" || $jevtask == "range")
+							$start_date = JEventsHTML::getDateFormat($row->yup(), $row->mup(), $row->dup(), 0);
+							$start_time = JEVHelper::getTime($row->getUnixStartTime(), $row->hup(), $row->minup());
+							$stop_date = JEventsHTML::getDateFormat($row->ydn(), $row->mdn(), $row->ddn(), 0);
+							$stop_time = JEVHelper::getTime($row->getUnixEndTime(), $row->hdn(), $row->mindn());
+							$stop_time_midnightFix = $stop_time;
+							$stop_date_midnightFix = $stop_date;
+							if ($row->sdn() == 59 && $row->mindn() == 59)
+							{
+								$stop_time_midnightFix = JEVHelper::getTime($row->getUnixEndTime() + 1, 0, 0);
+								$stop_date_midnightFix = JEventsHTML::getDateFormat($row->ydn(), $row->mdn(), $row->ddn() + 1, 0);
+							}
+
+							$search[] = "{{STARTDATE}}";
+							$replace[] = $start_date;
+							$blank[] = "";
+							$search[] = "{{ENDDATE}}";
+							$replace[] = $stop_date;
+							$blank[] = "";
+							$search[] = "{{STARTTIME}}";
+							$replace[] = $row->alldayevent() ? "" : $start_time;
+							$blank[] = "";
+							$search[] = "{{ENDTIME}}";
+							$replace[] = ($row->noendtime() || $row->alldayevent()) ? "" : $stop_time_midnightFix;
+							$blank[] = "";
+							$search[] = "{{MULTIENDDATE}}";
+							$replace[]  = $row->endDate() > $row->startDate() ? $stop_date : "";
+							$blank[] = "";
+							$search[] = "{{STARTTZ}}";
+							$replace[] = $row->alldayevent() ? "" : $start_time;
+							$blank[] = "";
+							$search[] = "{{ENDTZ}}";
+							$replace[] = ($row->noendtime() || $row->alldayevent()) ? "" : $stop_time_midnightFix;
+							$blank[] = "";
+
+							$rawreplace["{{STARTDATE}}"]= $row->getUnixStartDate();
+							$rawreplace["{{ENDDATE}}"]= $row->getUnixEndDate();
+							$rawreplace["{{STARTTIME}}"] = $row->alldayevent() ? "" : $row->getUnixStartTime();
+							$rawreplace["{{ENDTIME}}"] =  ($row->noendtime() || $row->alldayevent()) ? "" : $row->getUnixEndTime();
+							$rawreplace["{{STARTTZ}}"] = $row->yup()."-".$row->mup()."-".$row->dup()." ".$row->hup().":".$row->minup().":".$row->sup();
+							$rawreplace["{{ENDTZ}}"] = $row->ydn()."-".$row->mdn()."-".$row->ddn()." ".$row->hdn().":".$row->mindn().":".$row->sdn();
+							$rawreplace["{{MULTIENDDATE}}"] = $row->endDate() > $row->startDate() ? $row->getUnixEndDate() : "";
+
+							if (JString::strpos($template_value, "{{ISOSTART}}") !== false || JString::strpos($template_value, "{{ISOEND}}") !== false)
+							{
+								$search[] = "{{ISOSTART}}";
+								$replace[] = JEventsHTML::getDateFormat($row->yup(), $row->mup(), $row->dup(), "%Y-%m-%d") . "T" . sprintf('%02d:%02d:00', $row->hup(), $row->minup());
+								$blank[] = "";
+								$search[] = "{{ISOEND}}";
+								$replace[] = JEventsHTML::getDateFormat($row->ydn(), $row->mdn(), $row->ddn(), "%Y-%m-%d") . "T" . sprintf('%02d:%02d:00', $row->hdn(), $row->mindn());
+								$blank[] = "";
+							}
+						}
+						else
+						{
+							$row = $event;
+							$start_date = JEventsHTML::getDateFormat($row->yup(), $row->mup(), $row->dup(), 0);
+							$start_time = JEVHelper::getTime($row->getUnixStartTime(), $row->hup(), $row->minup());
+							$stop_date = JEventsHTML::getDateFormat($row->ydn(), $row->mdn(), $row->ddn(), 0);
+							$stop_time = JEVHelper::getTime($row->getUnixEndTime(), $row->hdn(), $row->mindn());
+							$stop_time_midnightFix = $stop_time;
+							$stop_date_midnightFix = $stop_date;
+							if ($row->sdn() == 59 && $row->mindn() == 59)
+							{
+								$stop_time_midnightFix = JEVHelper::getTime($row->getUnixEndTime() + 1, 0, 0);
+								$stop_date_midnightFix = JEventsHTML::getDateFormat($row->ydn(), $row->mdn(), $row->ddn() + 1, 0);
+							}
+							$search[] = "{{STARTDATE}}";
+							$replace[] = $start_date;
+							$blank[] = "";
+							$search[] = "{{ENDDATE}}";
+							$replace[] = $stop_date;
+							$blank[] = "";
+							$search[] = "{{STARTTIME}}";
+							$replace[] = $row->alldayevent() ? "" : $start_time;
+							$blank[] = "";
+							$search[] = "{{ENDTIME}}";
+							$replace[] = ($row->noendtime() || $row->alldayevent()) ? "" : $stop_time_midnightFix;
+							$blank[] = "";
+							$search[] = "{{MULTIENDDATE}}";
+							$replace[] = $row->endDate() > $row->startDate() ? $stop_date : "";
+							$blank[] = "";
+							$search[] = "{{STARTTZ}}";
+							$replace[] = $row->alldayevent() ? "" : $start_time;
+							$blank[] = "";
+							$search[] = "{{ENDTZ}}";
+							$replace[] = ($row->noendtime() || $row->alldayevent()) ? "" : $stop_time_midnightFix;
+							$blank[] = "";
+
+							$rawreplace["{{STARTDATE}}"]= $row->getUnixStartDate();
+							$rawreplace["{{ENDDATE}}"]= $row->getUnixEndDate();
+							$rawreplace["{{STARTTIME}}"] = $row->alldayevent() ? "" : $row->getUnixStartTime();
+							$rawreplace["{{ENDTIME}}"] =  ($row->noendtime() || $row->alldayevent()) ? "" : $row->getUnixEndTime();
+							$rawreplace["{{STARTTZ}}"] = $row->yup()."-".$row->mup()."-".$row->dup()." ".$row->hup().":".$row->minup().":".$row->sup();
+							$rawreplace["{{ENDTZ}}"] = $row->ydn()."-".$row->mdn()."-".$row->ddn()." ".$row->hdn().":".$row->mindn().":".$row->sdn();
+							$rawreplace["{{MULTIENDDATE}}"] = $row->endDate() > $row->startDate() ? $row->getUnixEndDate() : "";
+
+							if (JString::strpos($template_value, "{{ISOSTART}}") !== false || JString::strpos($template_value, "{{ISOEND}}") !== false)
+							{
+								$search[] = "{{ISOSTART}}";
+								$replace[] = JEventsHTML::getDateFormat($row->yup(), $row->mup(), $row->dup(), "%Y-%m-%d") . "T" . sprintf('%02d:%02d:00', $row->hup(), $row->minup());
+								$blank[] = "";
+								$search[] = "{{ISOEND}}";
+								$replace[] = JEventsHTML::getDateFormat($row->ydn(), $row->mdn(), $row->ddn(), "%Y-%m-%d") . "T" . sprintf('%02d:%02d:00', $row->hdn(), $row->mindn());
+								$blank[] = "";
+							}
+
+							// these would slow things down if not needed in the list
+							$dorepeatsummary = (JString::strpos($template_value, "{{REPEATSUMMARY}}") !== false);
+							if ($dorepeatsummary)
 							{
 
-								$start_publish = $row->getUnixStartDate();
-								$stop_publish = $row->getUnixEndDate();
+								$cfg = JEVConfig::getInstance();
+								$jevtask = JRequest::getString("jevtask");
+								$jevtask = str_replace(".listevents", "", $jevtask);
 
-								if ($stop_publish == $start_publish)
+								$showyeardate = $cfg->get("showyeardate", 0);
+
+								$row = $event;
+								$times = "";
+								if (($showyeardate && $jevtask == "year") || $jevtask == "search.results" || $jevtask == "month.calendar" || $jevtask == "cat")
 								{
-									if ($row->noendtime())
+
+									$start_publish = $row->getUnixStartDate();
+									$stop_publish = $row->getUnixEndDate();
+
+									if ($stop_publish == $start_publish)
 									{
-										$times = $start_time;
-									}
-									else if ($row->alldayevent())
-									{
-										$times = "";
-									}
-									else if ($start_time != $stop_time)
-									{
-										$times = $start_time . ' - ' . $stop_time_midnightFix;
+										if ($row->noendtime())
+										{
+											$times = $start_time;
+										}
+										else if ($row->alldayevent())
+										{
+											$times = "";
+										}
+										else if ($start_time != $stop_time)
+										{
+											$times = $start_time . ' - ' . $stop_time_midnightFix;
+										}
+										else
+										{
+											$times = $start_time;
+										}
+
+										$times = $start_date . " " . $times . "<br/>";
 									}
 									else
 									{
-										$times = $start_time;
+										if ($row->noendtime())
+										{
+											$times = $start_time;
+										}
+										else if ($row->alldayevent())
+										{
+											$times = "";
+										}
+										else if ($start_time != $stop_time && !$row->alldayevent())
+										{
+											$times = $start_time . '&nbsp;-&nbsp;' . $stop_time_midnightFix;
+										}
+										$times = $start_date . ' - ' . $stop_date . " " . $times . "<br/>";
 									}
-
-									$times = $start_date . " " . $times . "<br/>";
 								}
-								else
+								else if (($jevtask == "day" || $jevtask == "week"  || $jevtask == "range") && ($row->starttime() != $row->endtime()) && !($row->alldayevent()))
 								{
 									if ($row->noendtime())
 									{
-										$times = $start_time;
+										if ($showyeardate && $jevtask == "year")
+										{
+											$times = $start_time . '&nbsp;-&nbsp;' . $stop_time_midnightFix . '&nbsp;';
+										}
+										else
+										{
+											$times = $start_time . '&nbsp;';
+										}
 									}
 									else if ($row->alldayevent())
 									{
 										$times = "";
 									}
-									else if ($start_time != $stop_time && !$row->alldayevent())
-									{
-										$times = $start_time . '&nbsp;-&nbsp;' . $stop_time_midnightFix;
-									}
-									$times = $start_date . ' - ' . $stop_date . " " . $times . "<br/>";
-								}
-							}
-							else if (($jevtask == "day" || $jevtask == "week" ) && ($row->starttime() != $row->endtime()) && !($row->alldayevent()))
-							{
-								if ($row->noendtime())
-								{
-									if ($showyeardate && $jevtask == "year")
+									else
 									{
 										$times = $start_time . '&nbsp;-&nbsp;' . $stop_time_midnightFix . '&nbsp;';
 									}
-									else
-									{
-										$times = $start_time . '&nbsp;';
-									}
 								}
-								else if ($row->alldayevent())
-								{
-									$times = "";
-								}
-								else
-								{
-									$times = $start_time . '&nbsp;-&nbsp;' . $stop_time_midnightFix . '&nbsp;';
-								}
+								$search[] = "{{REPEATSUMMARY}}";
+								$replace[] = $times;
+								$blank[] = "";
 							}
-							$search[] = "{{REPEATSUMMARY}}";
-							$replace[] = $times;
-							$blank[] = "";
 						}
-					}
-					$search[] = "{{DURATION}}";
-					$timedelta = $row->noendtime() ? "" : $row->getUnixEndTime() - $row->getUnixStartTime();
-					if ($row->alldayevent())
-					{
-						$timedelta = $row->getUnixEndDate() - $row->getUnixStartDate() + 60 * 60 * 24;
-					}
-					$fieldval = JText::_("JEV_DURATION_FORMAT");
-					$shownsign = false;
-					// whole days!
-					if (stripos($fieldval, "%wd") !== false)
-					{
-						$days = intval($timedelta / (60 * 60 * 24));
-						$timedelta -= $days * 60 * 60 * 24;
 
-						if ($timedelta > 3610)
+						$search[] = "{{COUNTDOWN}}";
+						$timedelta = $row->getUnixStartTime() - JevDate::mktime();
+						$eventPassed = !($timedelta >= 0);
+						$fieldval = JText::_("JEV_COUNTDOWN_FORMAT");
+						$shownsign = false;
+						if (stripos($fieldval, "%nopast") !== false)
 						{
-							//if more than 1 hour and 10 seconds over a day then round up the day output
-							$days +=1;
+							if (!$eventPassed)
+							{
+								$fieldval = str_ireplace("%nopast", "", $fieldval);
+							}
+							else
+							{
+								$fieldval = JText::_('JEV_EVENT_ALREADY_STARTED');
+							}
+						}
+						if (stripos($fieldval, "%d") !== false)
+						{
+							$days = intval($timedelta / (60 * 60 * 24));
+							$timedelta -= $days * 60 * 60 * 24;
+							$fieldval = str_ireplace("%d", $days, $fieldval);
+							$shownsign = true;
+						}
+						if (stripos($fieldval, "%h") !== false)
+						{
+							$hours = intval($timedelta / (60 * 60));
+							$timedelta -= $hours * 60 * 60;
+							if ($shownsign)
+								$hours = abs($hours);
+							$hours = sprintf("%02d", $hours);
+							$fieldval = str_ireplace("%h", $hours, $fieldval);
+							$shownsign = true;
+						}
+						if (stripos($fieldval, "%m") !== false)
+						{
+							$mins = intval($timedelta / 60);
+							$timedelta -= $hours * 60;
+							if ($mins)
+								$mins = abs($mins);
+							$mins = sprintf("%02d", $mins);
+							$fieldval = str_ireplace("%m", $mins, $fieldval);
+						}
+						$replace[] = $fieldval;
+						$blank[] = "";
+
+						$search[] = "{{DURATION}}";
+						$timedelta = $row->noendtime() ? "" : $row->getUnixEndTime() - $row->getUnixStartTime();
+						if ($row->alldayevent())
+						{
+							$timedelta = $row->getUnixEndDate() - $row->getUnixStartDate() + 60 * 60 * 24;
+						}
+						$fieldval = JText::_("JEV_DURATION_FORMAT");
+						$shownsign = false;
+						// whole days!
+						if (stripos($fieldval, "%wd") !== false)
+						{
+							$days = intval($timedelta / (60 * 60 * 24));
+							$timedelta -= $days * 60 * 60 * 24;
+
+							if ($timedelta > 3610)
+							{
+								//if more than 1 hour and 10 seconds over a day then round up the day output
+								$days +=1;
+							}
+
+							$fieldval = str_ireplace("%d", $days, $fieldval);
+							$shownsign = true;
+						}
+						if (stripos($fieldval, "%d") !== false)
+						{
+							$days = intval($timedelta / (60 * 60 * 24));
+							$timedelta -= $days * 60 * 60 * 24;
+							/*
+							  if ($timedelta>3610){
+							  //if more than 1 hour and 10 seconds over a day then round up the day output
+							  $days +=1;
+							  }
+							 */
+							$fieldval = str_ireplace("%d", $days, $fieldval);
+							$shownsign = true;
+						}
+						if (stripos($fieldval, "%h") !== false)
+						{
+							$hours = intval($timedelta / (60 * 60));
+							$timedelta -= $hours * 60 * 60;
+							if ($shownsign)
+								$hours = abs($hours);
+							$hours = sprintf("%02d", $hours);
+							$fieldval = str_ireplace("%h", $hours, $fieldval);
+							$shownsign = true;
+						}
+						if (stripos($fieldval, "%k") !== false)
+						{
+							$hours = intval($timedelta / (60 * 60));
+							$timedelta -= $hours * 60 * 60;
+							if ($shownsign)
+								$hours = abs($hours);
+							$fieldval = str_ireplace("%k", $hours, $fieldval);
+							$shownsign = true;
+						}
+						if (stripos($fieldval, "%m") !== false)
+						{
+							$mins = intval($timedelta / 60);
+							$timedelta -= $hours * 60;
+							if ($mins)
+								$mins = abs($mins);
+							$mins = sprintf("%02d", $mins);
+							$fieldval = str_ireplace("%m", $mins, $fieldval);
 						}
 
-						$fieldval = str_ireplace("%d", $days, $fieldval);
-						$shownsign = true;
+						$replace[] = $fieldval;
+						$blank[] = "";
 					}
-					if (stripos($fieldval, "%d") !== false)
-					{
-						$days = intval($timedelta / (60 * 60 * 24));
-						$timedelta -= $days * 60 * 60 * 24;
-						/*
-						  if ($timedelta>3610){
-						  //if more than 1 hour and 10 seconds over a day then round up the day output
-						  $days +=1;
-						  }
-						 */
-						$fieldval = str_ireplace("%d", $days, $fieldval);
-						$shownsign = true;
-					}
-					if (stripos($fieldval, "%h") !== false)
-					{
-						$hours = intval($timedelta / (60 * 60));
-						$timedelta -= $hours * 60 * 60;
-						if ($shownsign)
-							$hours = abs($hours);
-						$hours = sprintf("%02d", $hours);
-						$fieldval = str_ireplace("%h", $hours, $fieldval);
-						$shownsign = true;
-					}
-					if (stripos($fieldval, "%m") !== false)
-					{
-						$mins = intval($timedelta / 60);
-						$timedelta -= $hours * 60;
-						if ($mins)
-							$mins = abs($mins);
-						$mins = sprintf("%02d", $mins);
-						$fieldval = str_ireplace("%m", $mins, $fieldval);
-					}
-
-					$replace[] = $fieldval;
-					$blank[] = "";
 					break;
-
 
 				case "{{PREVIOUSNEXT}}":
 					static $doprevnext;
 					if (!isset($doprevnext))
 					{
-						$doprevnext = (strpos($template_value, "{{PREVIOUSNEXT}}") !== false);
+						$doprevnext = (JString::strpos($template_value, "{{PREVIOUSNEXT}}") !== false);
 					}
 					if ($doprevnext)
 					{
@@ -882,7 +1086,7 @@ function DefaultLoadedFromTemplate($view, $template_name, $event, $mask, $templa
 					static $doprevnextevent;
 					if (!isset($doprevnextevent))
 					{
-						$doprevnextevent = (strpos($template_value, "{{PREVIOUSNEXTEVENT}}") !== false);
+						$doprevnextevent = (JString::strpos($template_value, "{{PREVIOUSNEXTEVENT}}") !== false);
 					}
 					if ($doprevnextevent)
 					{
@@ -894,156 +1098,216 @@ function DefaultLoadedFromTemplate($view, $template_name, $event, $mask, $templa
 
                                         case "{{FIRSTREPEAT}}":
                                         case "{{FIRSTREPEATSTART}}":
-					static $dofirstrepeat;
-					if (!isset($dofirstrepeat))
-					{
-						$dofirstrepeat = (strpos($template_value, "{{FIRSTREPEAT}}") !== false || strpos($template_value, "{{FIRSTREPEATSTART}}") !== false);
-					}
-					if ($dofirstrepeat)
-					{
-						$search[] = "{{FIRSTREPEAT}}";
-						$firstrepeat = $event->getFirstRepeat();
-						if ($firstrepeat->rp_id() == $event->rp_id())
-						{
-							$replace[] = "";
-						}
-						else
-						{
-							$replace[] = "<a class='ev_firstrepeat' href='" . $firstrepeat->viewDetailLink($firstrepeat->yup(), $firstrepeat->mup(), $firstrepeat->dup(), true) . "' title='" . JText::_('JEV_FIRSTREPEAT') . "' >" . JText::_('JEV_FIRSTREPEAT') . "</a>";
-						}
-						$blank[] = "";
+                                        case "{{JEVAGE}}":
+					// no need to repeat this for each of the matching 'case's
+					if (!in_array( "{{FIRSTREPEAT}}", $search)) {
 
-						$search[] = "{{FIRSTREPEATSTART}}";
-						if ($firstrepeat->rp_id() == $event->rp_id())
+						static $dofirstrepeat;
+						if (!isset($dofirstrepeat))
 						{
-							$replace[] = "";
+							$dofirstrepeat = (JString::strpos($template_value, "{{FIRSTREPEAT") !== false
+									|| JString::strpos($template_value, "{{FIRSTREPEATSTART") !== false
+									 || JString::strpos($template_value, "{{JEVAGE") !== false);
 						}
-						else
+						if ($dofirstrepeat)
 						{
-							$replace[] = JEventsHTML::getDateFormat($firstrepeat->yup(), $firstrepeat->mup(), $firstrepeat->dup(), 0);
-							$rawreplace[] = $firstrepeat->yup() . "-" . $firstrepeat->mup() . "-" . $firstrepeat->dup() . " " . $firstrepeat->hup() . ":" . $firstrepeat->minup() . ":" . $firstrepeat->sup();
+							$search[] = "{{FIRSTREPEAT}}";
+							$firstrepeat = $event->getFirstRepeat();
+							if ($firstrepeat->rp_id() == $event->rp_id())
+							{
+								$replace[] = "";
+							}
+							else
+							{
+								$replace[] = "<a class='ev_firstrepeat' href='" . $firstrepeat->viewDetailLink($firstrepeat->yup(), $firstrepeat->mup(), $firstrepeat->dup(), true) . "' title='" . JText::_('JEV_FIRSTREPEAT') . "' >" . JText::_('JEV_FIRSTREPEAT') . "</a>";
+							}
+							$blank[] = "";
+
+							$search[] = "{{FIRSTREPEATSTART}}";
+							if ($firstrepeat->rp_id() == $event->rp_id())
+							{
+								$replace[] = "";
+							}
+							else
+							{
+								$replace[] = JEventsHTML::getDateFormat($firstrepeat->yup(), $firstrepeat->mup(), $firstrepeat->dup(), 0);
+								$rawreplace["{{FIRSTREPEATSTART}}"] = $firstrepeat->yup() . "-" . $firstrepeat->mup() . "-" . $firstrepeat->dup() . " " . $firstrepeat->hup() . ":" . $firstrepeat->minup() . ":" . $firstrepeat->sup();
+							}
+							$blank[] = "";
+
+							$search[] = "{{JEVAGE}}";
+							if ($firstrepeat->rp_id() == $event->rp_id())
+							{
+								$replace[] = "";
+							}
+							else
+							{
+								$replace[] = ($event->yup()>$firstrepeat->yup() && $event->mup()==$firstrepeat->mup()  && $event->dup()==$firstrepeat->dup() )   ?  $event->yup()-$firstrepeat->yup() : "";
+							}
+							$blank[] = "";
+
 						}
-						$blank[] = "";
 					}
 					break;
 				case "{{LASTREPEAT}}":
 				case "{{LASTREPEATEND}}":
-					static $dolastrepeat;
-					if (!isset($dolastrepeat))
-					{
-						$dolastrepeat = (strpos($template_value, "{{LASTREPEAT}}") !== false || strpos($template_value, "{{LASTREPEATEND}}") !== false);
-					}
-					if ($dolastrepeat)
-					{
-						$search[] = "{{LASTREPEAT}}";
-						$lastrepeat = $event->getLastRepeat();
-						if ($lastrepeat->rp_id() == $event->rp_id())
-						{
-							$replace[] = "";
-						}
-						else
-						{
-							$replace[] = "<a class='ev_lastrepeat' href='" . $lastrepeat->viewDetailLink($lastrepeat->yup(), $lastrepeat->mup(), $lastrepeat->dup(), true) . "' title='" . JText::_('JEV_LASTREPEAT') . "' >" . JText::_('JEV_LASTREPEAT') . "</a>";
-						}
-						$blank[] = "";
+					// no need to repeat this for each of the matching 'case's
+					if (!in_array( "{{LASTREPEAT}}", $search)) {
 
-						$search[] = "{{LASTREPEATEND}}";
-						if ($lastrepeat->rp_id() != $event->rp_id())
+						static $dolastrepeat;
+						if (!isset($dolastrepeat))
 						{
-							$replace[] = JEventsHTML::getDateFormat($lastrepeat->ydn(), $lastrepeat->mdn(), $lastrepeat->ddn(), 0);
-							$rawreplace[] =  $lastrepeat->ydn()."-".$lastrepeat->mdn()."-".$lastrepeat->ddn()." ".$lastrepeat->hdn().":".$lastrepeat->mindn().":".$lastrepeat->sdn();
+							$dolastrepeat = (JString::strpos($template_value, "{{LASTREPEAT}}") !== false || JString::strpos($template_value, "{{LASTREPEATEND}}") !== false);
 						}
-						else {
-							$replace[] = "";
+						if ($dolastrepeat)
+						{
+							$search[] = "{{LASTREPEAT}}";
+							$lastrepeat = $event->getLastRepeat();
+							if ($lastrepeat->rp_id() == $event->rp_id())
+							{
+								$replace[] = "";
+							}
+							else
+							{
+								$replace[] = "<a class='ev_lastrepeat' href='" . $lastrepeat->viewDetailLink($lastrepeat->yup(), $lastrepeat->mup(), $lastrepeat->dup(), true) . "' title='" . JText::_('JEV_LASTREPEAT') . "' >" . JText::_('JEV_LASTREPEAT') . "</a>";
+							}
+							$blank[] = "";
+
+							$search[] = "{{LASTREPEATEND}}";
+							if ($lastrepeat->rp_id() != $event->rp_id())
+							{
+								$replace[] = JEventsHTML::getDateFormat($lastrepeat->ydn(), $lastrepeat->mdn(), $lastrepeat->ddn(), 0);
+								$rawreplace["{{LASTREPEATEND}}"] =  $lastrepeat->ydn()."-".$lastrepeat->mdn()."-".$lastrepeat->ddn()." ".$lastrepeat->hdn().":".$lastrepeat->mindn().":".$lastrepeat->sdn();
+							}
+							else {
+								$replace[] = "";
+							}
+							$blank[] = "";
 						}
-						$blank[] = "";
 					}
 					break;
 
 				case "{{CREATOR_LABEL}}":
 					$search[] = "{{CREATOR_LABEL}}";
-					$replace[] = JText::_('JEV_BY');
+					if ($jevparams->get("com_byview",1)) {
+						$replace[] = JText::_('JEV_BY');
+					}
+					else {
+						$replace[] = "";
+					}
 					$blank[] = "";
 					break;
 
 				case "{{CREATOR}}":
 					$search[] = "{{CREATOR}}";
-					$replace[] = $event->contactlink();
+					if ($jevparams->get("com_byview",1)) {
+						$replace[] = $event->contactlink();
+					}
+					else {
+						$replace[] = "";
+					}
 					$blank[] = "";
 					break;
 
 				case "{{HITS}}":
 					$search[] = "{{HITS}}";
-					$replace[] = "<span class='hitslabel'>" . JText::_('JEV_EVENT_HITS') . '</span> : ' . $event->hits();
+					if ($jevparams->get("com_hitsview",1) || $template_name!="icalevent.detail_body") {
+						$replace[] = "<span class='hitslabel'>" . JText::_('JEV_EVENT_HITS') . '</span> : ' . $event->hits();
+					}
+					else {
+						$replace[] = "";
+					}
 					$blank[] = "";
 					break;
 
 				case "{{LOCATION_LABEL}}":
 				case "{{LOCATION}}":
-					if ($event->hasLocation())
-					{
-						$search[] = "{{LOCATION_LABEL}}";
-						$replace[] = JText::_('JEV_EVENT_ADRESSE') . "&nbsp;";
-						$blank[] = "";
-						$search[] = "{{LOCATION}}";
-						$replace[] = $event->location();
-						$blank[] = "";
-					}
-					else
-					{
-						$search[] = "{{LOCATION_LABEL}}";
-						$replace[] = "";
-						$blank[] = "";
-						$search[] = "{{LOCATION}}";
-						$replace[] = "";
-						$blank[] = "";
+					// no need to repeat this for each of the matching 'case's
+					if (!in_array( "{{LOCATION}}", $search)) {
+
+						if ($event->hasLocation())
+						{
+							$search[] = "{{LOCATION_LABEL}}";
+							$replace[] = JText::_('JEV_EVENT_ADRESSE') . "&nbsp;";
+							$blank[] = "";
+							$search[] = "{{LOCATION}}";
+							$replace[] = $event->location();
+							$blank[] = "";
+						}
+						else
+						{
+							$search[] = "{{LOCATION_LABEL}}";
+							$replace[] = "";
+							$blank[] = "";
+							$search[] = "{{LOCATION}}";
+							$replace[] = "";
+							$blank[] = "";
+						}
 					}
 					break;
 
 				case "{{CONTACT_LABEL}}":
 				case "{{CONTACT}}":
-					if ($event->hasContactInfo())
-					{
-						if (strpos($event->contact_info(), '<script') === false)
-						{
-							$dispatcher = JDispatcher::getInstance();
-							JPluginHelper::importPlugin('content');
+					// no need to repeat this for each of the matching 'case's
+					if (!in_array( "{{CONTACT}}", $search)) {
 
-							//Contact
-							$pattern = '[a-zA-Z0-9&?_.,=%\-\/]';
-							if (strpos($event->contact_info(), '<a href=') === false && $event->contact_info() != "")
+						if ($event->hasContactInfo())
+						{
+							if (JString::strpos($event->contact_info(), '<script') === false)
 							{
-								$event->contact_info(preg_replace('@(https?://)(' . $pattern . '*)@i', '<a href="\\1\\2">\\1\\2</a>', $event->contact_info()));
+								$dispatcher = JEventDispatcher::getInstance();
+								JPluginHelper::importPlugin('content');
+
+								//Contact
+								$pattern = '[a-zA-Z0-9&?_.,=%\-\/]';
+								if (JString::strpos($event->contact_info(), '<a href=') === false && $event->contact_info() != "")
+								{
+									$event->contact_info(preg_replace('@(https?://)(' . $pattern . '*)@i', '<a href="\\1\\2">\\1\\2</a>', $event->contact_info()));
+								}
+								// Need to call conContentPrepare even thought its called on the template value below here
+                                                                // because is the field appears twice it won't do the replacement on the second item
+                                                                $params = new JRegistry(null);
+                                                                $tmprow = new stdClass();
+                                                                $tmprow->text = $event->contact_info();
+                                                                $tmprow->event = $event;
+                                                                $dispatcher = JEventDispatcher::getInstance();
+                                                                JPluginHelper::importPlugin('content');
+                                                                $dispatcher->trigger('onContentPrepare', array('com_jevents', &$tmprow, &$params, 0));
+                                                                // Make sure each instance is replaced properly
+                                                                // New Joomla code for mail cloak only works once on a page !!!
+                                                                // Random number
+                                                                $rand = rand(1, 100000);                                                                
+                                                                $tmprow->text = preg_replace("/cloak[0-9]*/i", "cloak".$rand, $tmprow->text);
+                                                                $event->contact_info($tmprow->text);
 							}
-							// NO need to call conContentPrepate since its called on the template value below here
+							$search[] = "{{CONTACT_LABEL}}";
+							$replace[] = JText::_('JEV_EVENT_CONTACT') . "&nbsp;";
+							$blank[] = "";
+							$search[] = "{{CONTACT}}";
+							$replace[] = $event->contact_info();
+							$blank[] = "";
 						}
-						$search[] = "{{CONTACT_LABEL}}";
-						$replace[] = JText::_('JEV_EVENT_CONTACT') . "&nbsp;";
-						$blank[] = "";
-						$search[] = "{{CONTACT}}";
-						$replace[] = $event->contact_info();
-						$blank[] = "";
-					}
-					else
-					{
-						$search[] = "{{CONTACT_LABEL}}";
-						$replace[] = "";
-						$blank[] = "";
-						$search[] = "{{CONTACT}}";
-						$replace[] = "";
-						$blank[] = "";
+						else
+						{
+							$search[] = "{{CONTACT_LABEL}}";
+							$replace[] = "";
+							$blank[] = "";
+							$search[] = "{{CONTACT}}";
+							$replace[] = "";
+							$blank[] = "";
+						}
 					}
 					break;
 
 				case "{{EXTRAINFO}}":
 					//Extra
-					if (strpos($event->extra_info(), '<script') === false && $event->extra_info() != "")
+					if (JString::strpos($event->extra_info(), '<script') === false && $event->extra_info() != "")
 					{
-						$dispatcher = JDispatcher::getInstance();
+						$dispatcher = JEventDispatcher::getInstance();
 						JPluginHelper::importPlugin('content');
 
 						$pattern = '[a-zA-Z0-9&?_.,=%\-\/#]';
-						if (strpos($event->extra_info(), '<a href=') === false)
+						if (JString::strpos($event->extra_info(), '<a href=') === false)
 						{
 							$event->extra_info(preg_replace('@(https?://)(' . $pattern . '*)@i', '<a href="\\1\\2">\\1\\2</a>', $event->extra_info()));
 						}
@@ -1061,7 +1325,22 @@ function DefaultLoadedFromTemplate($view, $template_name, $event, $mask, $templa
 					$replace[] = $event->rp_id();
 					$blank[] = "";
 					break;
-
+				case "{{EVID}}":
+					$search[] = "{{EVID}}";
+					$replace[] = $event->ev_id();
+					$blank[] = "";
+					break;
+                case "{{SITEROOT}}":
+                    $search[]   = "{{SITEROOT}}";
+                    $replace[]  = JUri::root();
+                    $blank[]    = "";
+                    break;
+                case "{{SITEBASE}}":
+                    $search[]   = "{{SITEBASE}}";
+                    $replace[]  = JUri::base();
+                    $blank[]    = "";
+                    break;
+			
 				default:
 					$strippedmatch = str_replace(array("{", "}"), "", $strippedmatch);
 					if (is_callable(array($event, $strippedmatch)))
@@ -1108,29 +1387,51 @@ function DefaultLoadedFromTemplate($view, $template_name, $event, $mask, $templa
 					{
 						foreach ($fieldNameArray[$classname][$layout]["values"] as $fieldname)
 						{
-							if (!strpos($template_value, $fieldname) !== false)
-							{
-								continue;
-							}
-							$search[] = "{{" . $fieldname . "}}";
-							// is the event detail hidden - if so then hide any custom fields too!
-							if (!isset($event->_privateevent) || $event->_privateevent != 3)
-							{
-								$replace[] = call_user_func(array($classname, "substitutefield"), $event, $fieldname);
-								if (is_callable(array($classname, "blankfield")))
-								{
-									$blank[] = call_user_func(array($classname, "blankfield"), $event, $fieldname);
-								}
-								else
-								{
-									$blank[] = "";
-								}
-							}
-							else
-							{
-								$blank[] = "";
-								$replace[] = "";
-							}
+                                                        $fieldnames = array();
+                                                        // Special case where $fieldname has option value in it e.g. sizedimages 
+                                                        if (strpos($fieldname, ";")>0){
+                                                            $temp = explode(";", $fieldname);
+                                                            $fn = $temp[0];
+                                                            // What is the list of them 
+                                                            $temp = array();
+                                                            preg_match_all('@\{{'.$fn.';(.*?)[#|}}]@', $template_value, $temp);
+                                                            if (count($temp)==2 && count($temp[1])){
+                                                                $fieldnames = array();
+                                                                foreach ($temp[1] as $tmp){
+                                                                    $fieldnames[] = $fn.";".$tmp;
+                                                                }
+                                                            }
+                                                        }
+                                                        else {
+                                                            $fieldnames = array($fieldname);
+                                                        }
+
+                                                        foreach ($fieldnames as $fn){
+                                                            if (empty($fn) ||  !JString::strpos($template_value, $fn) !== false)
+                                                            {
+                                                                    continue;
+                                                            }
+                                                            
+                                                            $search[] = "{{" . $fn . "}}";
+                                                            // is the event detail hidden - if so then hide any custom fields too!
+                                                            if (!isset($event->_privateevent) || $event->_privateevent != 3)
+                                                            {
+                                                                    $replace[] = call_user_func(array($classname, "substitutefield"), $event, $fn);
+                                                                    if (is_callable(array($classname, "blankfield")))
+                                                                    {
+                                                                            $blank[] = call_user_func(array($classname, "blankfield"), $event, $fn);
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                            $blank[] = "";
+                                                                    }
+                                                            }
+                                                            else
+                                                            {
+                                                                    $blank[] = "";
+                                                                    $replace[] = "";
+                                                            }
+                                                        }
 						}
 					}
 				}
@@ -1140,7 +1441,7 @@ function DefaultLoadedFromTemplate($view, $template_name, $event, $mask, $templa
 		// word counts etc.
 		for ($s = 0; $s < count($search); $s++)
 		{
-			if (strpos($search[$s], "TRUNCATED_DESC:") > 0)
+			if (JString::strpos($search[$s], "TRUNCATED_DESC:") > 0 || JString::strpos($search[$s], "TRUNCATED_TITLE:") > 0)
 			{
 				global $tempreplace, $tempevent, $tempsearch;
 				$tempreplace = $replace[$s];
@@ -1153,18 +1454,19 @@ function DefaultLoadedFromTemplate($view, $template_name, $event, $mask, $templa
 		// Date/time formats etc.
 		for ($s = 0; $s < count($search); $s++)
 		{
-			if (strpos($search[$s], "STARTDATE") > 0 || strpos($search[$s], "STARTTIME") > 0 || strpos($search[$s], "ENDDATE") > 0 || strpos($search[$s], "ENDTIME") > 0
-				|| strpos($search[$s], "ENDTZ") > 0 || strpos($search[$s], "STARTTZ") > 0 || strpos($search[$s], "MULTIENDDATE") > 0
-				|| strpos($search[$s], "FIRSTREPEATSTART") > 0 || strpos($search[$s], "LASTREPEATEND") > 0)
+			if (JString::strpos($search[$s], "STARTDATE") > 0 || JString::strpos($search[$s], "STARTTIME") > 0 || JString::strpos($search[$s], "ENDDATE") > 0 || JString::strpos($search[$s], "ENDTIME") > 0
+				|| JString::strpos($search[$s], "ENDTZ") > 0 || JString::strpos($search[$s], "STARTTZ") > 0 || JString::strpos($search[$s], "MULTIENDDATE") > 0
+				|| JString::strpos($search[$s], "FIRSTREPEATSTART") > 0 || JString::strpos($search[$s], "LASTREPEATEND") > 0)
 			{
 				if (!isset($rawreplace[$search[$s]]) || !$rawreplace[$search[$s]]){
 					continue;
 				}
-				global $tempreplace, $tempevent, $tempsearch;
+				global $tempreplace, $tempevent, $tempsearch, $tempblank;
 				$tempreplace = $rawreplace[$search[$s]];
+				$tempblank = $blank[$s];
 				$tempsearch = str_replace("}}",";.*?}}",$search[$s]);
 				$tempevent = $event;
-				$template_value = preg_replace_callback("|$tempsearch|", 'jevSpecialDateFormatting', $template_value);
+				$template_value = preg_replace_callback("~$tempsearch~", 'jevSpecialDateFormatting', $template_value);
 			}
 		}
 
@@ -1178,6 +1480,7 @@ function DefaultLoadedFromTemplate($view, $template_name, $event, $mask, $templa
 			$template_value = preg_replace_callback("|$tempsearch(.+?)}}|", 'jevSpecialHandling2', $template_value);
 		}
 
+		// The universal search and replace to finish
 		$template_value = str_replace($search, $replace, $template_value);
 
 		if ($specialmodules)
@@ -1189,12 +1492,12 @@ function DefaultLoadedFromTemplate($view, $template_name, $event, $mask, $templa
 			foreach ($parts as $part)
 			{
 				$currentdynamicmodules = $reg->get("dynamicmodules", false);
-				if (strpos($part, "{{MODULEEND}}") === false)
+				if (JString::strpos($part, "{{MODULEEND}}") === false)
 				{
 					// strip out BAD HTML tags left by WYSIWYG editors
-					if (substr($part, strlen($part) - 3) == "<p>")
+					if (JString::substr($part, JString::strlen($part) - 3) == "<p>")
 					{
-						$template_value = substr($part, 0, strlen($part) - 3);
+						$template_value = JString::substr($part, 0, JString::strlen($part) - 3);
 					}
 					else
 					{
@@ -1203,15 +1506,15 @@ function DefaultLoadedFromTemplate($view, $template_name, $event, $mask, $templa
 					continue;
 				}
 				// start with module name
-				$modname = substr($part, 0, strpos($part, "}}"));
-				$modulecontent = substr($part, strpos($part, "}}") + 2);
-				$modulecontent = substr($modulecontent, 0, strpos($modulecontent, "{{MODULEEND}}"));
+				$modname = JString::substr($part, 0, JString::strpos($part, "}}"));
+				$modulecontent = JString::substr($part, JString::strpos($part, "}}") + 2);
+				$modulecontent = JString::substr($modulecontent, 0, JString::strpos($modulecontent, "{{MODULEEND}}"));
 				// strip out BAD HTML tags left by WYSIWYG editors
-				if (strpos($modulecontent, "</p>") === 0)
+				if (JString::strpos($modulecontent, "</p>") === 0)
 				{
 					$modulecontent = "<p>x@#" . $modulecontent;
 				}
-				if (substr($modulecontent, strlen($modulecontent) - 3) == "<p>")
+				if (JString::substr($modulecontent, JString::strlen($modulecontent) - 3) == "<p>")
 				{
 					$modulecontent .= "x@#</p>";
 				}
@@ -1238,7 +1541,7 @@ function DefaultLoadedFromTemplate($view, $template_name, $event, $mask, $templa
 		if ($template_name!="month.calendar_cell" && $template_name!="month.calendar_tip"){
 			$template_value = str_replace(array("[[","]]"), array("{","}"), $template_value);
 		}
-		
+
 		//We add new line characters again to avoid being marked as SPAM when using tempalte in emails
 		// do this before calling content plugins in case these add javascript etc. to layout
 		$template_value = preg_replace("@(<\s*(br)*\s*\/\s*(p|td|tr|table|div|ul|li|ol|dd|dl|dt)*\s*>)+?@i","$1\n",$template_value);
@@ -1249,14 +1552,14 @@ function DefaultLoadedFromTemplate($view, $template_name, $event, $mask, $templa
 		$tmprow = new stdClass();
 		$tmprow->text = $template_value;
 		$tmprow->event = $event;
-		$dispatcher = JDispatcher::getInstance();
+		$dispatcher = JEventDispatcher::getInstance();
 		JPluginHelper::importPlugin('content');
 		$dispatcher->trigger('onContentPrepare', array('com_jevents', &$tmprow, &$params, 0));
 		$template_value = $tmprow->text;
 		$template_value = str_replace("@£@", "@", $template_value);
 
 		echo $template_value;
-		return true;
+		return !$loadedFromFile;
 
 	}
 
@@ -1267,7 +1570,7 @@ function DefaultLoadedFromTemplate($view, $template_name, $event, $mask, $templa
 			$parts = explode(":", $matches[0]);
 			if (count($parts) > 0)
 			{
-				if (strpos($matches[0], "://") > 0)
+				if (JString::strpos($matches[0], "://") > 0)
 				{
 					return "{{" . $parts[count($parts) - 1];
 				}
@@ -1292,7 +1595,7 @@ function DefaultLoadedFromTemplate($view, $template_name, $event, $mask, $templa
 
 	function jevSpecialHandling($matches)
 	{
-		if (count($matches) == 1 && strpos($matches[0], ":") > 0)
+		if (count($matches) == 1 && JString::strpos($matches[0], ":") > 0)
 		{
 			global $tempreplace, $tempevent, $tempsearch;
 			$parts = explode(":", $matches[0]);
@@ -1300,7 +1603,7 @@ function DefaultLoadedFromTemplate($view, $template_name, $event, $mask, $templa
 			{
 				$wordcount = str_replace("}}", "", $parts[1]);
 				$charcount = 0;
-				if (strpos($wordcount, "chars") > 0)
+				if (JString::strpos($wordcount, "chars") > 0)
 				{
 					$charcount = intval(str_replace("chars", "", $wordcount));
 					$wordcount = 0;
@@ -1319,9 +1622,9 @@ function DefaultLoadedFromTemplate($view, $template_name, $event, $mask, $templa
 					$words[] = " ...";
 					return implode(" ", $words);
 				}
-				if ($charcount > 0 && strlen($value) > $charcount)
+				if ($charcount > 0 && JString::strlen($value) > $charcount)
 				{
-					return substr($value, 0, $charcount) . " ...";
+					return JString::substr($value, 0, $charcount) . " ...";
 				}
 				return implode(" ", $words);
 			}
@@ -1336,21 +1639,40 @@ function DefaultLoadedFromTemplate($view, $template_name, $event, $mask, $templa
 	}
 
 	function jevSpecialDateFormatting($matches){
-		if (count($matches) == 1 && strpos($matches[0], ";") > 0)
+		if (count($matches) == 1 && JString::strpos($matches[0], ";") > 0)
 		{
-			global $tempreplace, $tempevent, $tempsearch;
+			global $tempreplace, $tempevent, $tempsearch,$tempblank;
 			$parts = explode(";", $matches[0]);
 			if (count($parts) == 2)
 			{
-				$fmt = str_replace("}}", "", $parts[1]);
+				$fmt = str_replace(array("}}","}"), "", $parts[1]);
+				if (strpos($fmt, "#")!==false){
+					$fmtparts = explode("#", $fmt);
+					if ($tempreplace == $tempblank)
+					{
+						if (count($fmtparts) == 3)
+						{
+							$fmt = $fmtparts[2];
+						}
+						else
+							return  "";
+					}
+					else if (count($fmtparts) >= 2)
+					{
+						$fmt = sprintf($fmtparts[1], $fmtparts[0]);
+					}
+				}
 				//return strftime($fmt, strtotime(strip_tags($tempreplace)));
+				if (!is_int($tempreplace)){
+					$tempreplace =strtotime(strip_tags($tempreplace));
+				}
 				return JEV_CommonFunctions::jev_strftime($fmt, $tempreplace);
 			}
 			// TZ specified
 			else if (count($parts) == 3)
 			{
 				$fmt = $parts[1];
-				
+
 				// Must get this each time otherwise modules can't set their own timezone
 				$compparams = JComponentHelper::getParams(JEV_COM_COMPONENT);
 				$jtz = $compparams->get("icaltimezonelive", "");
@@ -1360,25 +1682,47 @@ function DefaultLoadedFromTemplate($view, $template_name, $event, $mask, $templa
 				}
 				else
 				{
-					$jtz = new DateTimeZone(@date_default_timezone_get());					
+					$jtz = new DateTimeZone(@date_default_timezone_get());
 				}
-				$outputtz = str_replace("}}","",$parts[2]);
-				
+				$outputtz = str_replace(array("}}","}"),"",$parts[2]);
+
+				if (strpos($outputtz, "#")!==false){
+					$outputtzparts = explode("#", $outputtz);
+					$outputtz = $outputtzparts[0];
+					if ($tempreplace == $tempblank)
+					{
+						if (count($outputtzparts) == 3)
+						{
+							$fmt = $outputtzparts[2];
+						}
+						else
+							return  "";
+					}
+					else if (count($outputtzparts) >= 2)
+					{
+						$fmt = sprintf($outputtzparts[1], $fmt);
+					}
+				}
+
+
 				if (strtolower($outputtz) == "user" || strtolower($outputtz) == "usertz"){
 					$user = JFactory::getUser();
 					$outputtz = $user->getParam("timezone", $compparams->get("icaltimezonelive", @date_default_timezone_get()));
 				}
 				$outputtz = new DateTimeZone($outputtz);
 
+				if (is_integer($tempreplace)){
+					$tempreplace = JEV_CommonFunctions::jev_strftime("%Y-%m-%d %H:%M:%S", $tempreplace);
+				}
 				$indate = new DateTime($tempreplace, $jtz);
 				$offset1 = $indate->getOffset();
 
 				// set the new timezone
-				$indate->setTimezone($outputtz);				
+				$indate->setTimezone($outputtz);
 				$offset2 = $indate->getOffset();;
 
 				$indate = $indate->getTimestamp()+$offset2-$offset1;
-				return JEV_CommonFunctions::jev_strftime($fmt, $indate);
+				return JEV_CommonFunctions::jev_strftime($fmt, intval($indate));
 			}
 			else
 			{
@@ -1391,7 +1735,7 @@ function DefaultLoadedFromTemplate($view, $template_name, $event, $mask, $templa
 
 	function jevSpecialHandling2($matches)
 	{
-		if (count($matches) == 2 && strpos($matches[0], "#") > 0)
+		if (count($matches) == 2 && JString::strpos($matches[0], "#") > 0)
 		{
 			global $tempreplace, $tempevent, $tempsearch, $tempblank;
 			$parts = explode("#", $matches[1]);

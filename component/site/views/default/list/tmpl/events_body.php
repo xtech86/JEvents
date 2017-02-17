@@ -40,7 +40,7 @@ foreach ($infields as $infield)
 }
 ?>
 
-<form action="<?php echo JRoute::_("index.php?option=com_jevlocations&task=locations.locations&layout=locations&Itemid=$Itemid"); ?>" method="post" name="adminForm" id="adminForm" >
+<form action="<?php echo JRoute::_("index.php?option=com_jevents&task=list.events&layout=events&Itemid=$Itemid"); ?>" method="post" name="adminForm" id="adminForm" >
 
 	<div id="eventlist">
 		<table class="eventlist table table-bordered" data-resizable-columns-id="demo-table">
@@ -78,7 +78,7 @@ foreach ($infields as $infield)
 					for ($r = 0; $r < $num_events; $r++)
 					{
 						$row = $data['rows'][$r];
-						$this->loadedFromTemplate('icalevent.list_event', $row, 0, $template);
+						$this->loadedFromTemplate('icalevent.list_row', $row, 0, $template);
 						//($view, $template_name, $event, $mask, $template_value = false)
 					}
 				}

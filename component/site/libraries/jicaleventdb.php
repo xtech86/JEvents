@@ -1,15 +1,17 @@
 <?php
 /**
- * JEvents Component for Joomla 1.5.x
+ * JEvents Component for Joomla! 3.x
  *
  * @version     $Id: jicaleventdb.php 3549 2012-04-20 09:26:21Z geraintedwards $
  * @package     JEvents
- * @copyright   Copyright (C) 2008-2015 GWE Systems Ltd, 2006-2008 JEvents Project Group
+ * @copyright   Copyright (C) 2008-2017 GWE Systems Ltd, 2006-2008 JEvents Project Group
  * @license     GNU/GPLv2, see http://www.gnu.org/licenses/gpl-2.0.html
  * @link        http://www.jevents.net
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
+
+use Joomla\String\StringHelper;
 
 class jIcalEventDB extends jEventCal {
 	//var $vevent;
@@ -17,7 +19,7 @@ class jIcalEventDB extends jEventCal {
 	// array of jIcalEventRepeat
 	var $_repeats=null;
 
-	function jIcalEventDB($vevent) {
+	function __construct($vevent) {
 		// get default value for multiday from params
 		$cfg = JEVConfig::getInstance();
 		if ($this->_multiday==-1){
@@ -49,6 +51,15 @@ class jIcalEventDB extends jEventCal {
 			$this->_publish_up = JevDate::strftime( '%Y-%m-%d %H:%M:%S',@$this->dtstart());
 		}
 
+		if (isset($vevent->irregulardates) &&  is_string($vevent->irregulardates) && $vevent->irregulardates!=""){
+			$this->_irregulardates = @json_decode($vevent->irregulardates);
+		}
+		else {
+			$this->_irregulardates = array();
+		}
+		if (!is_array($this->_irregulardates)){
+			$this->_irregulardates = array();
+		}
 		$this->_reccurtype = 0;
 		$this->_reccurday = "";
 		$this->_reccurweekdays = "";
@@ -142,7 +153,7 @@ class jIcalEventDB extends jEventCal {
 
 
 	function dtstart($val=""){
-		if (strlen($val)==0) {
+		if (JString::strlen($val)==0) {
 			if (!isset($this->_dtstart)){
 				return null;
 			}
@@ -155,7 +166,7 @@ class jIcalEventDB extends jEventCal {
 	}
 
 	function dtend($val=""){
-		if (strlen($val)==0) {
+		if (JString::strlen($val)==0) {
 			if (!isset($this->_dtend)){
 				return null;
 			}
@@ -168,7 +179,7 @@ class jIcalEventDB extends jEventCal {
 	}
 
 	function interval($val="") {
-		if (strlen($val)==0) {
+		if (JString::strlen($val)==0) {
 			if (!isset($this->_interval) || $this->_interval=="" || $this->_interval==0) return 1;
 			else return $this->_interval;
 		}
@@ -178,7 +189,7 @@ class jIcalEventDB extends jEventCal {
 	}
 
 	function count($val="") {
-		if (strlen($val)==0) {
+		if (JString::strlen($val)==0) {
 			if (!isset($this->_count) || $this->_count=="" || $this->_count==0) return 1;
 			else return $this->_count;
 		}
@@ -193,7 +204,7 @@ class jIcalEventDB extends jEventCal {
 	}
 
 	function until($val="") {
-		if (strlen($val)==0) {
+		if (JString::strlen($val)==0) {
 			if (!isset($this->_until) || $this->_until=="" || $this->_until==0) return $this->dtstart();
 			return $this->_until;
 		}
@@ -220,7 +231,7 @@ class jIcalEventDB extends jEventCal {
 	}
 
 	function starttime($val=""){
-		if (strlen($val)==0) {
+		if (JString::strlen($val)==0) {
 			$cfg	 = JEVConfig::getInstance();
 			// com_calUseStdTime = 12h clock
 			return JEVHelper::getTime($this->dtstart());
@@ -242,7 +253,7 @@ class jIcalEventDB extends jEventCal {
 
 
 	function endtime($val=""){
-		if (strlen($val)==0) {
+		if (JString::strlen($val)==0) {
 			$cfg	 = JEVConfig::getInstance();
 			// com_calUseStdTime = 12h clock
 			return JEVHelper::getTime($this->dtend());
@@ -740,7 +751,7 @@ class jIcalEventDB extends jEventCal {
 		$extratables = "";  // must have comma prefix
 		$extrawhere =array();
 		$extrajoin =array();
-		$dispatcher	= JDispatcher::getInstance();
+		$dispatcher	= JEventDispatcher::getInstance();
 		$dispatcher->trigger('onListEventsById', array (& $extrafields, & $extratables, & $extrawhere, & $extrajoin));
 
 		$params = JComponentHelper::getParams("com_jevents");
@@ -767,6 +778,8 @@ class jIcalEventDB extends jEventCal {
 		. $extrajoin
 		. "\n WHERE ev.ev_id = '".$this->ev_id()."' "
 		. $extrawhere
+                // Should not need Group By but group_concat fields from location addon seems to cause a group by implicitly!!!
+                . "\n GROUP BY rpt.rp_id"        
 		. "\n ORDER BY rpt.startrepeat asc LIMIT 1" ;
 
 		$db->setQuery( $query );
@@ -776,7 +789,7 @@ class jIcalEventDB extends jEventCal {
 		// iCal agid uses GUID or UUID as identifier
 		if( $rows ){
 			$row = new jIcalEventRepeat($rows[0]);
-			$dispatcher = JDispatcher::getInstance();
+			$dispatcher = JEventDispatcher::getInstance();
 			$dispatcher->trigger( 'onDisplayCustomFields', array( &$row ));
 		}
 		return $row;
@@ -800,7 +813,7 @@ class jIcalEventDB extends jEventCal {
 		// Should this happen here?
 		$query = "UPDATE #__jevents_vevdetail SET hits=(hits+1) WHERE evdet_id='".$this->evdet_id()."'"	;
 		$db->setQuery( $query );
-		if( !$db->query() ) {
+		if( !$db->execute() ) {
 			echo "<script> alert('".$db->getErrorMsg()."'); window.history.go(-1); </script>\n";
 			exit();
 		}
@@ -808,12 +821,24 @@ class jIcalEventDB extends jEventCal {
 
 	}
 
-	function creatorName(){
+	function creatorName($show = "both"){
 		if (!isset($this->_creatorname)){
-			$user = JEVHelper::getUser($this->_created_by);
-			if ($user->id>0) $this->_creatorname = $user->username. "(".$user->name.")";
-			else if (isset($this->_anonname)) $this->_creatorname = $this->_anonname. "<br/>(".$this->_anonemail.")";
-			else  $this->_creatorname = "";
+			if ($show == "both") {
+				$user = JEVHelper::getUser($this->_created_by);
+				if ($user->id > 0) $this->_creatorname = $user->username . "(" . $user->name . ")";
+				else if (isset($this->_anonname)) $this->_creatorname = $this->_anonname . "<br/>(" . $this->_anonemail . ")";
+				else  $this->_creatorname = "";
+			} else if ($show == "name") {
+				$user = JEVHelper::getUser($this->_created_by);
+				if ($user->id > 0) $this->_creatorname = $user->name ;
+				else if (isset($this->_anonname)) $this->_creatorname = $this->_anonname . "<br/>(" . $this->_anonemail . ")";
+				else  $this->_creatorname = "";
+			} else if ($show == "username") {
+				$user = JEVHelper::getUser($this->_created_by);
+				if ($user->id > 0) $this->_creatorname = " . $user->username . ";
+				else if (isset($this->_anonname)) $this->_creatorname = $this->_anonname . "<br/>(" . $this->_anonemail . ")";
+				else  $this->_creatorname = "";
+			}
 		}
 		return $this->_creatorname;
 	}
@@ -834,6 +859,8 @@ class jIcalEventDB extends jEventCal {
 			$repeat = $this->getFirstRepeat();
 			$this->dtstart($repeat->getUnixStartTime());
 			$this->dtend( $repeat->getUnixEndTime());
+			list($this->_yup, $this->_mup, $this->_dup, $this->_hup, $this->_minup, $this->_sup) = explode(":", str_replace(array("-"," "),":", $repeat->publish_up()));
+			list($this->_ydn, $this->_mdn, $this->_ddn, $this->_hdn, $this->_mindn, $this->_sup) = explode(":", str_replace(array("-"," "),":", $repeat->publish_down()));
 		}
 		else {
 			$repeat = $this->getFirstRepeat();
@@ -843,6 +870,8 @@ class jIcalEventDB extends jEventCal {
 			if (!$exception){
 				$this->dtstart($repeat->getUnixStartTime());
 				$this->dtend( $repeat->getUnixEndTime());
+				list($this->_yup, $this->_mup, $this->_dup, $this->_hup, $this->_minup, $this->_sup) = explode(":", str_replace(array("-"," "),":", $repeat->publish_up()));
+				list($this->_ydn, $this->_mdn, $this->_ddn, $this->_hdn, $this->_mindn, $this->_sup) = explode(":", str_replace(array("-"," "),":", $repeat->publish_down()));
 			}
 			else {
 				// This is the scenario where the first repeat is an exception so check to see if we need to be worried

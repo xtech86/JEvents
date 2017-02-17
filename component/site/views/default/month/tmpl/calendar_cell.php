@@ -1,15 +1,17 @@
 <?php
 /**
- * JEvents Component for Joomla 1.5.x
+ * JEvents Component for Joomla! 3.x
  *
  * @version     $Id: calendar_cell.php 2679 2011-10-03 08:52:57Z geraintedwards $
  * @package     JEvents
- * @copyright   Copyright (C) 2008-2015 GWE Systems Ltd, 2006-2008 JEvents Project Group
+ * @copyright   Copyright (C) 2008-2017 GWE Systems Ltd, 2006-2008 JEvents Project Group
  * @license     GNU/GPLv2, see http://www.gnu.org/licenses/gpl-2.0.html
  * @link        http://www.jevents.net
  */
 
 defined( '_JEXEC' ) or die( 'Restricted access' );
+
+use Joomla\String\StringHelper;
 
 class EventCalendarCell_default  extends JEventsDefaultView {
 	protected $_datamodel = null;
@@ -41,8 +43,7 @@ class EventCalendarCell_default  extends JEventsDefaultView {
 			$this->stop_date_midnightFix = JEventsHTML::getDateFormat(  $this->event->ydn(), $this->event->mdn(), $this->event->ddn()+1, 0 );
 		}
 		
-		// we only need the one helper so stick to default layout here!
-		$this->jevlayout="default";	
+		$this->jevlayout=isset($view->jevlayout) ? $view->jevlayout : "default";
 		
 		$this->addHelperPath(JEV_VIEWS."/default/helpers");
 		$this->addHelperPath( JPATH_BASE.'/'.'templates'.'/'.JFactory::getApplication()->getTemplate().'/'.'html'.'/'.JEV_COM_COMPONENT.'/'."helpers");
@@ -215,8 +216,8 @@ class EventCalendarCell_default  extends JEventsDefaultView {
 		$link = $this->event->viewDetailLink($this->event->yup(),$this->event->mup(),$this->event->dup(),false);
 		$link = JRoute::_($link.$this->_datamodel->getCatidsOutLink());
 
-		$cellString .= '<hr />'
-		. '<small><a href="'.$link.'" title="'. JText::_('JEV_CLICK_TO_OPEN_EVENT', true).'" >' . JText::_('JEV_CLICK_TO_OPEN_EVENT') . '</a></small>'
+		$cellString .= '<hr   class="jev-click-to-open"/>'
+		. '<small class="jev-click-to-open"><a href="'.$link.'"   title="'. JText::_('JEV_CLICK_TO_OPEN_EVENT', true).'" >' . JText::_('JEV_CLICK_TO_OPEN_EVENT') . '</a></small>'
 		// Watch out for mambots !!
 		. '</td></tr></table>';
 
@@ -319,8 +320,8 @@ class EventCalendarCell_default  extends JEventsDefaultView {
 		$link = $this->event->viewDetailLink($this->event->yup(),$this->event->mup(),$this->event->dup(),false);
 		$link = JRoute::_($link.$this->_datamodel->getCatidsOutLink());
 
-		$cellString .= '<hr />'
-		. '<small><a href="'.$link.'" title="'. JText::_('JEV_CLICK_TO_OPEN_EVENT', true).'" >' . JText::_('JEV_CLICK_TO_OPEN_EVENT') . '</a></small>';
+		$cellString .= '<hr   class="jev-click-to-open"/>'
+		. '<small   class="jev-click-to-open"><a href="'.$link.'" title="'. JText::_('JEV_CLICK_TO_OPEN_EVENT', true).'" >' . JText::_('JEV_CLICK_TO_OPEN_EVENT') . '</a></small>';
 		return $cellString;
 
 		// harden the string for the tooltip
@@ -421,7 +422,7 @@ class EventCalendarCell_default  extends JEventsDefaultView {
 			}
 			else {
 
-				JevHtmlBootstrap::popover('.hasjevtip' , array("trigger"=>"hover focus", "placement"=>"top", "container"=>"#jevents_body", "delay"=> array( "hide"=> 150 )));
+				JevHtmlBootstrap::popover('.hasjevtip' , array("trigger"=>"hover focus", "placement"=>"top", "container"=>"#jevents_body", "delay"=> array( "show"=> 150, "hide"=> 150 )));
 				//$toolTipArray = array('className' => 'jevtip');
 				//JHTML::_('behavior.tooltip', '.hasjevtip', $toolTipArray);
 
@@ -433,8 +434,31 @@ class EventCalendarCell_default  extends JEventsDefaultView {
 				$tooltip = $this->correctTooltipLanguage($tooltip);
 
 				if (strpos($tooltip,"templated")===0 ) {
-					$title = substr($tooltip,9);
-					$cellString = "";
+					$cellString = JString::substr($tooltip,9);
+					$dom = new DOMDocument();
+                                        // see http://php.net/manual/en/domdocument.savehtml.php cathexis dot de ¶
+                                        $dom->loadHTML('<html><head><meta content="text/html; charset=utf-8" http-equiv="Content-Type"></head><body>'.$cellString.'</body>');
+
+					$classname = 'jevtt_title';
+					$finder = new DomXPath($dom);
+					$nodes = $finder->query("//*[contains(concat(' ', normalize-space(@class), ' '), ' $classname ')]");
+
+					if ($nodes->length){
+						foreach ($nodes as $node){
+							$title = $dom->saveHTML($node);
+							$node->parentNode->removeChild($node);
+						}
+						$body = $dom->getElementsByTagName('body')->item(0);
+						$cellString= '';
+						$children = $body->childNodes;
+						foreach ($children as $child) {
+							$cellString .= $child->ownerDocument->saveXML( $child );
+						}
+					}
+					else {
+						$title = $cellString;
+						$cellString = "";
+					}
 				}
 				else {
 					// TT background

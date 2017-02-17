@@ -1,10 +1,10 @@
 <?php
 /**
- * JEvents Component for Joomla 1.5.x
+ * JEvents Component for Joomla! 3.x
  *
  * @version     $Id: abstract.php 3229 2012-01-30 12:06:34Z geraintedwards $
  * @package     JEvents
- * @copyright   Copyright (C)  2008-2015 GWE Systems Ltd
+ * @copyright   Copyright (C)  2008-2017 GWE Systems Ltd
  * @license     GNU/GPLv2, see http://www.gnu.org/licenses/gpl-2.0.html
  * @link        http://www.jevents.net
  */
@@ -12,6 +12,8 @@
 defined('_JEXEC') or die();
 
 jimport('joomla.application.component.view');
+
+use Joomla\String\StringHelper;
 
 class JEventsAbstractView extends JViewLegacy
 {
@@ -21,47 +23,40 @@ class JEventsAbstractView extends JViewLegacy
 		parent::__construct($config);
 		jimport('joomla.filesystem.file');
 
-		if (JevJoomlaVersion::isCompatible("3.0"))
-		{
-			JEVHelper::stylesheet('eventsadmin.css', 'components/' . JEV_COM_COMPONENT . '/assets/css/');
-		}
-		else {
-			JEVHelper::stylesheet('eventsadminjq.css', 'components/' . JEV_COM_COMPONENT . '/assets/css/');
-		}
+		JEVHelper::stylesheet('eventsadmin.css', 'components/' . JEV_COM_COMPONENT . '/assets/css/');
 
 		$this->_addPath('template', $this->_basePath . '/' . 'views' . '/' . 'abstract' . '/' . 'tmpl');
 		// note that the name config variable is ignored in the parent construct!
-		if (JevJoomlaVersion::isCompatible("2.5"))
-		{
-			// Ok getTemplate doesn't seem to get the active menu item's template, so lets do it ourselves if it exists
 
-			$app = JFactory::getApplication();
-			// Get current template style ID
-			$page_template_id = $app->isAdmin() ? "0" : @$app->getMenu()->getActive()->template_style_id;
+		// Ok getTemplate doesn't seem to get the active menu item's template, so lets do it ourselves if it exists
 
-			// Check it's a valid style with simple check
-			if (!($page_template_id == "" || $page_template_id == "0")) {
-				// Load the valid style:
-				$db = JFactory::getDbo();
-				$query = $db->getQuery(true)
-					->select('template')
-					->from('#__template_styles')
-					->where('id =' . $db->quote($page_template_id) . '');
-				$db->setQuery($query);
-				$template = $db->loadResult();
+		$app = JFactory::getApplication();
+		// Get current template style ID
+		$page_template_id = $app->isAdmin() ? "0" : @$app->getMenu()->getActive()->template_style_id;
 
-			} else {
-				$template = JFactory::getApplication()->getTemplate();
-			}
+		// Check it's a valid style with simple check
+		if (!($page_template_id == "" || $page_template_id == "0")) {
+			// Load the valid style:
+			$db = JFactory::getDbo();
+			$query = $db->getQuery(true)
+				->select('template')
+				->from('#__template_styles')
+				->where('id =' . $db->quote($page_template_id) . '');
+			$db->setQuery($query);
+			$template = $db->loadResult();
 
-			$theme = JEV_CommonFunctions::getJEventsViewName();
-			$name = $this->getName();
-			$name = str_replace($theme."/", "", $name);
-			$this->addTemplatePath(JPATH_BASE . '/' . 'templates' . '/' . $template . '/' . 'html' . '/' . JEV_COM_COMPONENT . '/' . $theme . '/' . $name);
-
-			// or could have used 
-			//$this->addTemplatePath( JPATH_BASE.'/'.'templates'.'/'.JFactory::getApplication()->getTemplate().'/'.'html'.'/'.JEV_COM_COMPONENT.'/'.$config['name'] );
+		} else {
+			$template = JFactory::getApplication()->getTemplate();
 		}
+
+		$theme = JEV_CommonFunctions::getJEventsViewName();
+		$name = $this->getName();
+		$name = str_replace($theme."/", "", $name);
+		$this->addTemplatePath(JPATH_BASE . '/' . 'templates' . '/' . $template . '/' . 'html' . '/' . JEV_COM_COMPONENT . '/' . $theme . '/' . $name);
+
+		// or could have used
+		//$this->addTemplatePath( JPATH_BASE.'/'.'templates'.'/'.JFactory::getApplication()->getTemplate().'/'.'html'.'/'.JEV_COM_COMPONENT.'/'.$config['name'] );
+		
 
 	}
 
@@ -111,11 +106,7 @@ class JEventsAbstractView extends JViewLegacy
 	function _hideSubmenu()
 	{
 		// WHY THE HELL DO THEY BREAK PUBLIC FUNCTIONS !!!
-		if (!JevJoomlaVersion::isCompatible("3.0"))
-			JHTML::stylesheet('administrator/components/' . JEV_COM_COMPONENT . '/assets/css/hidesubmenu16.css');
-		else
-			JHTML::stylesheet('hidesubmenu.css', 'administrator/components/' . JEV_COM_COMPONENT . '/assets/css/');
-
+		JHTML::stylesheet('hidesubmenu.css', 'administrator/components/' . JEV_COM_COMPONENT . '/assets/css/');
 	}
 
 	/**
@@ -148,7 +139,7 @@ class JEventsAbstractView extends JViewLegacy
 					//echo JHTML::_('image.administrator', $image, $path, NULL, NULL, $text ); 
 					if (strpos($path, '/') === 0)
 					{
-						$path = substr($path, 1);
+						$path = JString::substr($path, 1);
 					}
 					echo JHTML::_('image', $path . $image, $alttext, array('title' => $alttext), false);
 					//JHtml::_('image', 'mod_languages/'.$menuType->image.'.gif', $alt, array('title'=>$menuType->title_native), true)
@@ -183,7 +174,7 @@ class JEventsAbstractView extends JViewLegacy
 					//echo JHTML::_('image.administrator', $image, $path, NULL, NULL, $text );
 					if (strpos($path, '/') === 0)
 					{
-						$path = substr($path, 1);
+						$path = JString::substr($path, 1);
 					}
 					$atributes = array('title' => $alttext, 'onmouseover' => 'this.src=\'../' . $path . $image_hover . '\'', 'onmouseout' => 'this.src=\'../' . $path . $image . '\'' );
 
@@ -324,7 +315,7 @@ class JEventsAbstractView extends JViewLegacy
 			if (strpos($strippedmatch, "{{_") === 0 && strpos($strippedmatch, " ") === false)
 			{
 				$search[] = $strippedmatch;
-				$strippedmatch = substr($strippedmatch, 3, strlen($strippedmatch) - 5);
+				$strippedmatch = JString::substr($strippedmatch, 3, JString::strlen($strippedmatch) - 5);
 				$replace[] = JText::_($strippedmatch);
 				$blank[] = "";
 				continue;
@@ -351,93 +342,54 @@ class JEventsAbstractView extends JViewLegacy
 			 */
 		}
 
-
 		// Close all the tabs in Joomla > 3.0
-		if (JevJoomlaVersion::isCompatible("3.0"))
+		$tabstartarray = array();
+		preg_match_all('|{{TABSTART#(.*?)}}|', $template_value, $tabstartarray);
+		if ($tabstartarray && count($tabstartarray) == 2)
 		{
-			$tabstartarray = array();
-			preg_match_all('|{{TABSTART#(.*?)}}|', $template_value, $tabstartarray);
-			if ($tabstartarray && count($tabstartarray) == 2)
+			$tabstartarray0Count = count($tabstartarray[0]);
+			if ($tabstartarray0Count > 0)
 			{
-				$tabstartarray0Count = count($tabstartarray[0]);
-				if ($tabstartarray0Count > 0)
-				{
-					//We get and add all the tabs
-					$tabreplace = '<ul class="nav nav-tabs" id="myEditTabs">';
-					for ($tab = 0; $tab < $tabstartarray0Count; $tab++)
-					{
-						$paneid = str_replace(" ", "_", htmlspecialchars($tabstartarray[1][$tab]));
-						$tablabel = ($paneid == JText::_($paneid)) ? $tabstartarray[1][$tab] : JText::_($paneid);
-						if ($tab == 0)
-						{
-							$tabreplace .= '<li class="active"><a data-toggle="tab" href="#' . $paneid . '">' . $tablabel . '</a></li>';
-						}
-						else
-						{
-							$tabreplace .= '<li ><a data-toggle="tab" href="#' . $paneid . '">' . $tablabel . '</a></li>';
-						}
-					}
-					$tabreplace.= "</ul>\n";
-					$tabreplace = $tabreplace . $tabstartarray[0][0];
-					$template_value = str_replace($tabstartarray[0][0], $tabreplace, $template_value);
-				}
-			}
-			// Create the tabs content
-			if (isset($tabstartarray[0]) && $tabstartarray0Count > 0)
-			{
+				//We get and add all the tabs
+				$tabreplace = '<ul class="nav nav-tabs" id="myEditTabs">';
 				for ($tab = 0; $tab < $tabstartarray0Count; $tab++)
 				{
 					$paneid = str_replace(" ", "_", htmlspecialchars($tabstartarray[1][$tab]));
+					$tablabel = ($paneid == JText::_($paneid)) ? $tabstartarray[1][$tab] : JText::_($paneid);
 					if ($tab == 0)
 					{
-						$tabcode = JHtml::_('bootstrap.startPane', 'myEditTabs', array('active' => $paneid)) . JHtml::_('bootstrap.addPanel', "myEditTabs", $paneid);
+						$tabreplace .= '<li class="active" id="tab'.$paneid.'" ><a data-toggle="tab" href="#' . $paneid . '">' . $tablabel . '</a></li>';
 					}
 					else
 					{
-						$tabcode = JHtml::_('bootstrap.endPanel') . JHtml::_('bootstrap.addPanel', "myEditTabs", $paneid);
+						$tabreplace .= '<li  id="tab'.$paneid.'"><a data-toggle="tab" href="#' . $paneid . '">' . $tablabel . '</a></li>';
 					}
-					$template_value = str_replace($tabstartarray[0][$tab], $tabcode, $template_value);
 				}
-				// Manually close the tabs
-				$template_value = str_replace("{{TABSEND}}",JHtml::_('bootstrap.endPanel') . JHtml::_('bootstrap.endPane'), $template_value);
+				$tabreplace.= "</ul>\n";
+				$tabreplace = $tabreplace . $tabstartarray[0][0];
+				$template_value = str_replace($tabstartarray[0][0], $tabreplace, $template_value);
 			}
 		}
-		else
+		// Create the tabs content
+		if (isset($tabstartarray[0]) && $tabstartarray0Count > 0)
 		{
-			// TABLINKS are not relevant before Joomla 3.0
-			// non greedy replacement - because of the ?
-			$template_value = preg_replace_callback('|{{TABLINK.*?}}|', array($this, 'cleanUnpublished'), $template_value);
-
-			$tabstartarray = array();
-			preg_match_all('|{{TABSTART#.*?}}|', $template_value, $tabstartarray);
-			if (isset($tabstartarray[0]))
+			for ($tab = 0; $tab < $tabstartarray0Count; $tab++)
 			{
-				$tabstartarray0Count = count($tabstartarray[0]);
-				if ($tabstartarray0Count > 0)
+				$paneid = str_replace(" ", "_", htmlspecialchars($tabstartarray[1][$tab]));
+				if ($tab == 0)
 				{
-					for ($tab = 0; $tab < $tabstartarray0Count; $tab++)
-					{
-						$title = str_replace(array("{{TABSTART#", "}}"), "", $tabstartarray[0][$tab]);
-						$paneid = str_replace("=", "", base64_encode($title));
-						$tabContent = '<dt class="tabs" id="' . $paneid . '"><span><h3><a href="javascript:void(0);">' . JText::_($title) . '</a></h3></span></dt><dd class="tabs ' . $paneid . '">' . "\n";
-						$tabContent .= "<div class='jevextrablock'>" . "\n";
-						if ($tab == 0)
-						{
-							$tabcode = JHtml::_('tabs.start', 'tabs') . $tabContent;
-						}
-						else
-						{
-							$tabcode = "</div></dd>" . "\n" . $tabContent;
-						}
-
-						$template_value = str_replace($tabstartarray[0][$tab], $tabcode, $template_value);
-					}
-					// Manually close the tabs
-					$template_value = str_replace("{{TABSEND}}", "</div></dd></dl>", $template_value);
-					//$template_value .= "</div></dd></dl>" . "\n";
+					$tabcode = JHtml::_('bootstrap.startPane', 'myEditTabs', array('active' => $paneid)) . JHtml::_('bootstrap.addPanel', "myEditTabs", $paneid);
 				}
+				else
+				{
+					$tabcode = JHtml::_('bootstrap.endPanel') . JHtml::_('bootstrap.addPanel', "myEditTabs", $paneid);
+				}
+				$template_value = str_replace($tabstartarray[0][$tab], $tabcode, $template_value);
 			}
+			// Manually close the tabs
+			$template_value = str_replace("{{TABSEND}}",JHtml::_('bootstrap.endPanel') . JHtml::_('bootstrap.endPane'), $template_value);
 		}
+	
 
 		// Now do the plugins
 		// get list of enabled plugins
@@ -634,7 +586,7 @@ class JEventsAbstractView extends JViewLegacy
 		{
 			if (strpos($k, "_") === 0)
 			{
-				$newk = substr($k, 1);
+				$newk = JString::substr($k, 1);
 				//$this->row->$newk = $v;
 			}
 			else
@@ -647,6 +599,9 @@ class JEventsAbstractView extends JViewLegacy
 		$rowdata["allDayEvent"] = $rowdata["alldayevent"];
 		$rowdata["contact_info"] = $rowdata["contact"];
 
+		// set creator based on created_by input
+		$rowdata["creator"] = $rowdata["created_by"];
+
 		$this->form->bind($rowdata);
 
 		$this->form->setValue("view12Hour", null,$params->get('com_calUseStdTime', 0) ? 1 : 0);
@@ -656,6 +611,9 @@ class JEventsAbstractView extends JViewLegacy
 		{
 			$this->catid = $this->defaultCat;
 		}
+		$this->primarycatid = $this->catid;
+		$this->form->setValue("primarycatid", null, $this->primarycatid);
+
 		if ($this->row->catids)
 		{
 			$this->catid = $this->row->catids;
@@ -714,6 +672,8 @@ class JEventsAbstractView extends JViewLegacy
 			$this->form->jevdata["catid"]["excats"] = $this->excats;
 		}
 		$this->form->setValue("catid", null, $this->catid);
+
+		$this->form->jevdata["primarycatid"] = $this->primarycatid;
 
 		$this->form->jevdata["creator"]["users"] = false;
 		if ((JRequest::getCmd("task") == "icalevent.edit" || JRequest::getCmd("task") == "icalevent.editcopy"
@@ -783,11 +743,15 @@ class JEventsAbstractView extends JViewLegacy
 		// Plugins CAN BE LAYERED IN HERE - In Joomla 3.0 we need to call it earlier to get the tab titles
 		// append array to extratabs keys content, title, paneid
 		$this->extraTabs = array();
-		$dispatcher = JDispatcher::getInstance();
+		$dispatcher = JEventDispatcher::getInstance();
 		$dispatcher->trigger('onEventEdit', array(&$this->extraTabs, &$this->row, &$params), true);
 
 		foreach ($this->extraTabs as $extraTab)
 		{
+			if (trim($extraTab['content'])=="") {
+				continue;
+			}
+
 			$extraTab['title'] = str_replace(" ", "_", strtoupper($extraTab['title']));
 			$this->searchtags[] = "{{" . $extraTab['title'] . "}}";
 			$this->replacetags[] = $extraTab['content'];
@@ -834,6 +798,9 @@ class JEventsAbstractView extends JViewLegacy
 			$this->searchtags[] = '{{' . $key . '_lbl}}';
 			$this->replacetags[] = $this->customfields[$key]["label"];
 			$this->blanktags[] = "";
+			$this->searchtags[] = '{{' . $key . '_showon}}';
+			$this->replacetags[] = isset($this->customfields[$key]["showon"]) ? $this->customfields[$key]["showon"] : "";
+			$this->blanktags[] = "";
 
 			if (in_array($key, $requiredFields))
 			{
@@ -841,7 +808,7 @@ class JEventsAbstractView extends JViewLegacy
 				{
 					$requiredTags['default_value'] = $this->customfields[$key]["default_value"];
 					$requiredTags['id'] = $this->customfields[$key]["id_to_check"];
-					$requiredTags['alert_message'] = JText::_('JEV_ADD_REQUIRED_FIELD',true)." ".$requiredTags['id'];
+					$requiredTags['alert_message'] = JText::_('JEV_ADD_REQUIRED_FIELD',true)." ".JText::_($requiredTags['id']);
 				}
 /*				else
 				{
@@ -863,34 +830,14 @@ class JEventsAbstractView extends JViewLegacy
 				$requiredTags['label'] = $this->customfields[$key]["label"];
 				$this->requiredtags[] = $requiredTags;
 			}
-			if (JevJoomlaVersion::isCompatible("3.0"))
-			{
-				?>
-				<div class="control-group jevplugin_<?php echo $key; ?>">
-					<label class="control-label "><?php echo $this->customfields[$key]["label"]; ?></label>
-					<div class="controls" >
-						<?php echo $this->customfields[$key]["input"]; ?>
-					</div>
-				</div>
-				<?php
-			}
-			else
-			{
-				?>
-				<tr class="jevplugin_<?php echo $key; ?>">
-					<td valign="top"  width="130" align="left">
-						<?php
-						echo $this->customfields[$key]["label"];
-						?>
-					</td>
-					<td colspan="3">
-						<?php
-						echo $this->customfields[$key]["input"];
-						?>
-					</td>
-				</tr>
-				<?php
-			}
+                        ?>
+                        <div class="control-group jevplugin_<?php echo $key; ?>" <?php echo isset($this->customfields[$key]["showon"])?$this->customfields[$key]["showon"]:""; ?>>
+                                <label class="control-label "><?php echo $this->customfields[$key]["label"]; ?></label>
+                                <div class="controls" >
+                                        <?php echo $this->customfields[$key]["input"]; ?>
+                                </div>
+                        </div>
+                        <?php
 		}
 		$this->searchtags[] = "{{CUSTOMFIELDS}}";
 		$output = ob_get_clean();

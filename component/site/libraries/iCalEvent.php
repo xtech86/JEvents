@@ -1,10 +1,10 @@
 <?php
 /**
- * JEvents Component for Joomla 1.5.x
+ * JEvents Component for Joomla! 3.x
  *
  * @version     $Id: iCalEvent.php 3549 2012-04-20 09:26:21Z geraintedwards $
  * @package     JEvents
- * @copyright   Copyright (C) 2008-2015 GWE Systems Ltd, 2006-2008 JEvents Project Group
+ * @copyright   Copyright (C) 2008-2017 GWE Systems Ltd, 2006-2008 JEvents Project Group
  * @license     GNU/GPLv2, see http://www.gnu.org/licenses/gpl-2.0.html
  * @link        http://www.jevents.net
  */
@@ -12,7 +12,7 @@
 // no direct access
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
-
+use Joomla\String\StringHelper;
 
 class iCalEvent extends JTable  {
 
@@ -50,7 +50,7 @@ class iCalEvent extends JTable  {
 	/**
 	 * Null Constructor
 	 */
-	function iCalEvent( &$db ) {
+	function __construct( &$db ) {
 		parent::__construct( '#__jevents_vevent', 'ev_id', $db );
 		$this->access = JEVHelper::getBaseAccess();
 	}
@@ -64,6 +64,13 @@ class iCalEvent extends JTable  {
 	function store($updateNulls=false , $overwriteCreator = false) {
 		$user = JFactory::getUser();
 
+		$jinput = JFactory::getApplication()->input;
+		$curr_task = $jinput->getCmd('task');
+		$ical_access = $jinput->getInt('access');
+
+		if ($curr_task == "icals.save") {
+			$this->access = $ical_access;
+		}
 		if ($this->ev_id==0){
 			$date = JevDate::getDate("+0 seconds");
 			$this->created = $date->toMySQL();
@@ -73,6 +80,8 @@ class iCalEvent extends JTable  {
 			$this->created_by		= $user->id;
 		}
 		$this->modified_by		= $user->id;
+
+
 		if (!isset($this->created_by_alias) || is_null($this->created_by_alias) || $this->created_by_alias==""){
 			$this->created_by_alias		= "";
 		}
@@ -108,8 +117,12 @@ class iCalEvent extends JTable  {
 				
 		$db = JFactory::getDBO();
 		$detailid = $this->_detail->store($updateNulls);
+
 		if (!$detailid){
-			JError::raiseError( 104, JText::_( 'PROBLEMS_STORING_EVENT_DETAIL' ));
+
+			JFactory::getApplication()->enqueueMessage(JText::_("PROBLEMS_STORING_EVENT_DETAIL"), 'error');
+
+			//TODO Setup a exception catch
 			echo $db->getErrorMsg()."<br/>";
 			return false;
 		}
@@ -121,7 +134,9 @@ class iCalEvent extends JTable  {
 			$this->catid =$this->catid[0];
 		}
 		if (!parent::store($updateNulls)){
-			JError::raiseError( 105, JText::_( 'PROBLEMS_STORING_EVENT' ) );
+			JFactory::getApplication()->enqueueMessage(JText::_("PROBLEMS_STORING_EVENT"), 'error');
+
+			//TODO Setup a exception catch
 			echo $db->getErrorMsg()."<br/>";
 			return false;
 		}
@@ -139,16 +154,16 @@ class iCalEvent extends JTable  {
 			}
 			$db->setQuery("DELETE FROM #__jevents_catmap where evid = ".$this->ev_id." AND catid NOT IN (".implode(",",$catids).")");
 			$sql =$db->getQuery();
-			$success = $db->query();
+			$success = $db->execute();
 			if (count($pairs)>0){
 				$db->setQuery("Replace into #__jevents_catmap (evid, catid, ordering) VALUES ".implode(",", $pairs));
 				$sql =$db->getQuery();
-				$success = $db->query();
+				$success = $db->execute();
 			}
 		}
 		
 		// I also need to store custom data - when we need the event itself and not just the detail
-		$dispatcher	= JDispatcher::getInstance();
+		$dispatcher	= JEventDispatcher::getInstance();
 		// just incase we don't have jevents plugins registered yet
 		JPluginHelper::importPlugin("jevents");
 		$res = $dispatcher->trigger( 'onStoreCustomEvent' , array(&$this));
@@ -165,7 +180,8 @@ class iCalEvent extends JTable  {
 	}
 
 	function isDuplicate(){
-		$sql = "SELECT ev_id from #__jevents_vevent as vev WHERE vev.uid = '".$this->uid."'";
+		$uid = str_replace("'", '', $this->uid);
+		$sql = "SELECT ev_id from #__jevents_vevent as vev WHERE vev.uid = '".$uid."'";
 		$this->_db->setQuery($sql);
 		$matches = $this->_db->loadObjectList();
 		if (count($matches)>0 && isset($matches[0]->ev_id)) {
@@ -179,8 +195,9 @@ class iCalEvent extends JTable  {
 		if (isset($this->_matched)){ 
 			return;
 		}
+		$uid = str_replace("'", "", $this->uid);
 		$sql = "SELECT *  from #__jevents_vevent as vev,#__jevents_vevdetail as det"
-		."\n WHERE vev.uid = '".$this->uid."'"
+		."\n WHERE vev.uid = '".$uid . "'"
 		."\n AND vev.detail_id = det.evdet_id";
 		$this->_db->setQuery($sql);
 		$matches = $this->_db->loadObjectList();
@@ -348,14 +365,31 @@ else $this->_detail = false;
 			$db	= JFactory::getDBO();
 			$repeat = new iCalRepetition($db);
 			$repeat->eventid = $this->ev_id;
-			$repeat->startrepeat = JevDate::strftime('%Y-%m-%d %H:%M:%S',$this->_detail->dtstart);
-			$repeat->endrepeat = JevDate::strftime('%Y-%m-%d %H:%M:%S',$this->_detail->dtend);
-			$repeat->duplicatecheck = md5($repeat->eventid . $this->_detail->dtstart);
+                        // is it in a non-default timezone
+                        $repeat->startrepeat = JevDate::strftime('%Y-%m-%d %H:%M:%S',$this->_detail->dtstart, $this->tzid);
+                        $repeat->endrepeat = JevDate::strftime('%Y-%m-%d %H:%M:%S',$this->_detail->dtend, $this->tzid);
+                        
+                        $repeat->duplicatecheck = md5($repeat->eventid . $this->_detail->dtstart);
 			$this->_repetitions[] = $repeat;
 			return $this->_repetitions;
 		}
 		else {
 			$this->_repetitions = $this->rrule->getRepetitions($this->_detail->dtstart,$this->_detail->dtend,$this->_detail->duration, $recreate,$this->_exdate);
+                        
+                        // is it in a non-default timezone
+                        if ($this->tzid) {
+                            foreach ($this->_repetitions as &$repeat){
+                                $testdate = DateTime::createFromFormat('Y-m-d H:i:s', $repeat->startrepeat, new DateTimeZone($this->tzid));
+                                $testdate->setTimezone(new DateTimeZone(@date_default_timezone_get()));
+                                $repeat->startrepeat = $testdate->format('Y-m-d H:i:s');
+
+                                $testdate = DateTime::createFromFormat('Y-m-d H:i:s', $repeat->endrepeat, new DateTimeZone($this->tzid));
+                                $testdate->setTimezone(new DateTimeZone(@date_default_timezone_get()));
+                                $repeat->endrepeat = $testdate->format('Y-m-d H:i:s');
+                                unset($repeat);
+                            }
+                        }
+                        
 			return $this->_repetitions;
 		}
 	}
@@ -377,7 +411,7 @@ else $this->_detail = false;
 		$db	= JFactory::getDBO();
 		$sql = "DELETE FROM #__jevents_repetition WHERE duplicatecheck='".$duplicatecheck."'";
 		$db->setQuery($sql);
-		return $db->query();
+		return $db->execute();
 	}
 
 	/**
@@ -441,7 +475,7 @@ else $this->_detail = false;
 		.", duplicatecheck='".$duplicatecheck."'"
 		." WHERE rp_id=".$matchingRepetition->rp_id;
 		$db->setQuery($sql);
-		return $db->query();
+		return $db->execute();
 
 	}
 
@@ -462,10 +496,10 @@ else $this->_detail = false;
 			$idlist = implode(",",$ids);
 			$sql = "DELETE FROM #__jevents_vevdetail  WHERE evdet_id IN(".$idlist.")";
 			$db->setQuery($sql);
-			$db->query();
+			$db->execute();
 
 			// I also need to clean out associated custom data
-			$dispatcher	= JDispatcher::getInstance();
+			$dispatcher	= JEventDispatcher::getInstance();
 			// just incase we don't have jevents plugins registered yet
 			JPluginHelper::importPlugin("jevents");
 			$res = $dispatcher->trigger( 'onDeleteEventDetails' , array($idlist));
@@ -479,7 +513,7 @@ else $this->_detail = false;
 		$oldrepeatcount = count($oldrepeats);
 		foreach ($oldrepeats as &$oldrepeat) {
 			// find matching day
-			$oldrepeat->startday = substr($oldrepeat->startrepeat,0,10);
+			$oldrepeat->startday = JString::substr($oldrepeat->startrepeat,0,10);
 			// free the reference
 			unset($oldrepeat);
 		}
@@ -489,19 +523,20 @@ else $this->_detail = false;
 			// since the repeat may have been= adjusted
 			$sql = "DELETE FROM #__jevents_repetition  WHERE eventid=".$this->ev_id;
 			$db->setQuery($sql);
-			$db->query();
+			$db->execute();
 		 }
 
 		// Now attempt to replace repetitions using the old repeat ids
 		for ($r = 0;$r<count($this->_repetitions);$r++){
 			$repeat =& $this->_repetitions[$r];
 			// find matching day and only one!!
-			$repeat->startday = substr($repeat->startrepeat,0,10);
+			$repeat->startday = JString::substr($repeat->startrepeat,0,10);
 			$matched = false;
-			foreach ($oldrepeats as $oldrepeat) {
-				if ($oldrepeat->startday == $repeat->startday){
+			foreach ($oldrepeats as & $oldrepeat) {
+				if ($oldrepeat->startday == $repeat->startday && !isset($repeat->old_rpid) && !isset($oldrepeat->matched) ){
 					$matched = true;
 					$repeat->old_rpid = $oldrepeat->rp_id;
+                                        $oldrepeat->matched = true;
 					if (is_null($repeat->rp_id)){
 						$repeat->rp_id = $repeat->old_rpid;
 					}
@@ -510,6 +545,7 @@ else $this->_detail = false;
 				if ($oldrepeat->startday > $repeat->startday){
 					break;
 				}
+                                unset($oldrepeat);
 			}
 			if (!$matched) $repeat->old_rpid = 0;
 			// free the reference
@@ -535,7 +571,7 @@ else $this->_detail = false;
 			if ($r+1 < count($this->_repetitions)) $sql .= ",";
 		}
 		$db->setQuery($sql);
-		return $db->query();
+		return $db->execute();
 	}
 
 	function eventOnDate($testDate){

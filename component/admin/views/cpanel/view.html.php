@@ -947,37 +947,9 @@ class AdminCpanelViewCpanel extends JEventsAbstractView
 
 	}
 
-	public function custom_css()
-	{
-		jimport('joomla.html.pane');
-
-		$document = JFactory::getDocument();
-		$document->setTitle(JText::_('JEVENTS') . ' :: ' . JText::_('JEVENTS'));
-		$bar =  JToolBar::getInstance('newtoolbar');
-
-		$this->toolbartitle(JText::_('JEVENTS') . ': ' . JText::_('JEV_CUSTOM_CSS'), 'jevents');
-
-        $this->toolbarApply('cpanel.custom_css');
-        $this->toolbarCancel('cpanel.cpanel');
-
-     //   jimport('joomla.form.form');
-
-
-        JEventsHelper::addSubmenu();
-
-		$params = JComponentHelper::getParams(JEV_COM_COMPONENT);
-
-		if (JevJoomlaVersion::isCompatible("3.0"))
-		{
-			$this->sidebar = JHtmlSidebar::render();
-		}
-
-	}
-
-	protected  function setUpdateUrls()
+	function setUpdateUrls()
 	{
 		$params = JComponentHelper::getParams(JEV_COM_COMPONENT);
-
 
 		$updates = array(
 			array("element"=>"pkg_jevents","name"=>"com_jevents", "type"=>"package"),

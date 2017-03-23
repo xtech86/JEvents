@@ -84,9 +84,16 @@ $toolbar = $bar->getItems() ? $bar->render() : "";
 					// Don't show warning for new events
 					if ($this->ev_id > 0)
 					{
-						echo '<h1>' . JText::_('YOU_ARE_EDITING_AN_ICAL_EVENT');
-						echo '<small>' . JText::_("JEV_CREATE_AN_EVENT_STRAPLINE") . '</small></h1>';
-						echo '<p>' . JText::_('YOU_ARE_EDITING_AN_ICAL_EVENT_DESC') . '</p>';
+					    if ($this->row->_freq === "none")
+					    {
+						    echo '<h1>' . JText::_('YOU_ARE_EDITING_AN_ICAL_EVENT_WITH_NO_REPEATS');
+						    echo '<small>' . JText::_("JEV_CREATE_AN_EVENT_STRAPLINE") . '</small></h1>';
+						    echo '<p>' . JText::_('YOU_ARE_EDITING_AN_ICAL_EVENT_WITH_NO_REPEATS_DESC') . '</p>';
+					    } else {
+						    echo '<h1>' . JText::_('YOU_ARE_EDITING_AN_ICAL_EVENT');
+						    echo '<small>' . JText::_("JEV_CREATE_AN_EVENT_STRAPLINE") . '</small></h1>';
+						    echo '<p>' . JText::_('YOU_ARE_EDITING_AN_ICAL_EVENT_DESC') . '</p>';
+                        }
 
 					}
 				}

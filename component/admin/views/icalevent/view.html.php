@@ -165,9 +165,11 @@ class AdminIcaleventViewIcalevent extends JEventsAbstractView
 		else
 		{
 			if (JEVHelper::isEventEditor())
-				$this->toolbarApply('icalevent.apply', "JEV_SAVE");
-			    $this->toolbarSave('icalevent.save');
-			    $this->toolbarSave2new('icalevent.savenew', "JEV_SAVE_NEW");
+			{
+				JToolBarHelper::apply('icalevent.apply', "JEV_SAVE");
+				JToolBarHelper::save('icalevent.save');
+				JToolBarHelper::save2new('icalevent.savenew', "JEV_SAVE_NEW");
+			}
 		}
 
 		JEventsHelper::addSubmenu();

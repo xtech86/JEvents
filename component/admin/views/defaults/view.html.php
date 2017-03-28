@@ -109,18 +109,16 @@ class AdminDefaultsViewDefaults extends JEventsAbstractView
 		// Set toolbar items for the page
 		JToolBarHelper::title(JText::_('JEV_LAYOUT_DEFAULT_EDIT'), 'jevents');
 
-		JToolBarHelper::apply("defaults.apply");
-		JToolBarHelper::save("defaults.save");
-		JToolBarHelper::cancel("defaults.cancel");
+		$this->toolbarApply("defaults.apply");
+		$this->toolbarSave("defaults.save");
+		$this->toolbarCancel("defaults.cancel");
 
 		JEventsHelper::addSubmenu();
 
 		JHTML::_('behavior.tooltip');
 
-
-
 		$db = JFactory::getDbo();
-		$uri =  JFactory::getURI();
+		$uri =  JUri::current();
 
 		// Get data from the model
 		$model =  $this->getModel();

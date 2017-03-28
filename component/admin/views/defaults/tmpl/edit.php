@@ -48,6 +48,8 @@ if ($this->item->name == 'icalevent.list_block2' && $this->item->value == "" && 
 echo $this->sidebar;
 
 $this->replaceLabels($this->item->value);
+$bar     = JToolBar::getInstance('newtoolbar');
+$toolbar = $bar->getItems() ? $bar->render() : "";
 ?>
 <div id="jev_adminui" class="jev_adminui skin-blue sidebar-mini">
     <header class="main-header">
@@ -80,11 +82,6 @@ $this->replaceLabels($this->item->value);
             <!-- Default box -->
             <div class="box">
                 <div class="box-body custom_layouts">
-					<input type="hidden" name="name" value="<?php echo $this->item->name; ?>">
-					<input type="hidden" name="id" value="<?php echo $this->item->id; ?>">
-					<input type="hidden" name="language" value="<?php echo $this->item->language; ?>">
-					<input type="hidden" name="catid" value="<?php echo $this->item->catid; ?>">
-
 					<script type="text/javascript" >
 						<!--//
 						Joomla.submitbutton = function(pressbutton) {
@@ -97,6 +94,7 @@ echo $editor->save('value');
 						}
 //-->
 					</script>
+                    <form action="index.php" method="post" name="adminForm" id="adminForm">
 					<div class="adminform row-fluid" align="left">
                         <div class="form-group span3">
                             <label for="title"><?php echo JText::_('TITLE'); ?>:</label>
@@ -203,6 +201,10 @@ echo $editor->save('value');
                     <input type="hidden" name="task" value="defaults.edit" />
                     <input type="hidden" name="act" value="" />
                     <input type="hidden" name="option" value="<?php echo JEV_COM_COMPONENT; ?>" />
+                    <input type="hidden" name="name" value="<?php echo $this->item->name; ?>">
+                    <input type="hidden" name="id" value="<?php echo $this->item->id; ?>">
+                    <input type="hidden" name="language" value="<?php echo $this->item->language; ?>">
+                    <input type="hidden" name="catid" value="<?php echo $this->item->catid; ?>">
                     </form>
 				</div><!-- /.box-body -->
                 <div class="box-footer">

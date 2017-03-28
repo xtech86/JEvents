@@ -12,6 +12,7 @@
 defined( 'JPATH_BASE' ) or die( 'Direct Access to this location is not allowed.' );
 
 jimport('joomla.application.component.controllerform');
+jimport( 'joomla.application.input' );
 
 class AdminDefaultsController extends JControllerForm {
 	/**
@@ -236,12 +237,11 @@ class AdminDefaultsController extends JControllerForm {
 
 	/**
 	* Saves the Session Record
-	*/
+	**/
 	function save($key = NULL, $urlVar = NULL) {
-
 		$jinput = JFactory::getApplication()->input;
+		$id = $jinput->getInt("id", 0);
 
-		$id = $jinput->getInt("id",0);
 		if ($id >0 ){
 
 			// Get/Create the model
@@ -252,7 +252,7 @@ class AdminDefaultsController extends JControllerForm {
 						$this->setRedirect("index.php?option=".JEV_COM_COMPONENT."&task=defaults.edit&id=$id",JText::_("JEV_TEMPLATE_SAVED"));
 						$this->redirect();
 						return;
-					}					
+					}
 					$this->setRedirect("index.php?option=".JEV_COM_COMPONENT."&task=defaults.overview",JText::_("JEV_TEMPLATE_SAVED"));
 					$this->redirect();
 					return;
@@ -262,6 +262,10 @@ class AdminDefaultsController extends JControllerForm {
 					exit();
 				}
 			}
+		} else {
+			$this->setRedirect("index.php?option=".JEV_COM_COMPONENT."&task=defaults.overview",JText::_("JEV_TEMPLATE_ERROR_SAVING"));
+			$this->redirect;
+			return;
 		}
 
 

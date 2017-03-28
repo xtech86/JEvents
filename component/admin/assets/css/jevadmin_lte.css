@@ -228,6 +228,10 @@ body.com_jevents #jev_adminui .adminlist .row_info > span {
   margin-right: 10px;
   font-size: 11px;
 }
+body.com_jevents #jev_adminui #filter-bar {
+  height: auto;
+  min-height: 29px;
+}
 body.com_jevents #jev_adminui #system-message-container.j-toggle-main {
   float: none;
   width: 100%;

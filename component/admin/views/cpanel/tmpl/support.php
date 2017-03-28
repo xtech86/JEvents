@@ -9,68 +9,63 @@
  * @link        http://www.jevents.net
  */
 defined('_JEXEC') or die('Restricted access');
-$mainspan = 10;
- $fullspan = 12;
+
+$bar     = JToolBar::getInstance('newtoolbar');
+$toolbar = $bar->getItems() ? $bar->render() : "";
 ?>
-<?php if (!empty($this->sidebar)) : ?>
-<div id="j-sidebar-container" class="span2">
+<div id="jev_adminui" class="jev_adminui skin-blue sidebar-mini">
+    <header class="main-header">
+		<?php echo JEventsHelper::addAdminHeader($items = array(), $toolbar); ?>
+    </header>
+    <!-- =============================================== -->
+    <!-- Left side column. contains the sidebar -->
+    <!-- sidebar: style can be found in sidebar.less -->
 	<?php echo $this->sidebar; ?>
-</div>
- <?php endif; ?>
-<div id="jevents">
-	<form action="index.php" method="post" name="adminForm" id="adminForm">
-		<div id="j-main-container" class="span<?php echo (!empty($this->sidebar)) ? $mainspan : $fullspan; ?>  ">
-				<table border="0" cellpadding="2" cellspacing="2" class="adminform">
+    <!-- /.sidebar -->
+    <!-- =============================================== -->
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper" style="min-height: 1096px;">
+        <!-- Content Header (Page header) -->
+        <section class="content-header">
+            <h1>
+				<?php echo JText::_('ICALS'); ?>
+                <small><?php echo JText::_('JEV_ICALS_DESC'); ?></small>
+            </h1>
+        </section>
 
-					<tr>
-						<td width="50%" valign="top">
-							<div id="cpanel">
-								<?php
-								$clubnews = $this->renderVersionsForClipboard();
-								$label = JText::_("JEV_VERSION_INFORMATION_FOR_SUPPORT");
-								//echo JHtml::_('sliders.panel', $label, 'cpanelstatustextarea');
-								?>
-								<div style="width: 100%;padding:0px;">
-									<strong><?php echo JText::_("JEV_VERSION_INFORMATION_FOR_SUPPORT_DESCRIPTION"); ?></strong>
-									<br/>
-<?php echo $clubnews; ?>
-								</div>
-							</div>                                    
-						</td>
-						<td width="50%" valign="top">  
+        <!-- Main content -->
+        <section class="content ov_info">
 
-							<?php
-							// Lets check if SH404 is enabled.
-							//$db = JFactory::getDbo();
-							//$query = $db->getQuery(true);
-							//$query->select('enabled');
-							//$query->from('#__extensions');
-							//$query->where('name = \'sh404sef\'');
-							//$db->setQuery($query);
-							//$enabled = $db->loadresult();
-							//if ($enabled == '0') {
-							?>				
-							<!--<h3> Your SH404 configuration may cause problems with JEvents.</h3> -->
+            <!-- Default box -->
+            <div class="box">
+                <div class="box-body">
+                    <div id="jevents">
+                        <form action="index.php" method="post" name="adminForm" id="adminForm">
+                            <?php
+                            $clubnews = $this->renderVersionsForClipboard();
+                            $label    = JText::_("JEV_VERSION_INFORMATION_FOR_SUPPORT");
+                            //echo JHtml::_('sliders.panel', $label, 'cpanelstatustextarea');
+                            ?>
+                            <p>
+                                <strong><?php echo JText::_("JEV_VERSION_INFORMATION_FOR_SUPPORT_DESCRIPTION"); ?></strong>
+                            </p>
 
-							<?php
-							//} else { 
-							//echo "<p><strong style='color:green;'>No issues detected</strong></p>";
-							//}
-							?>
-						</td>
-					</tr>
-				</table>             
-				<p align="center">
-					<a href="<?php $version = JEventsVersion::getInstance();
-							echo $version->getUrl();
-							?>" target="_blank" style="font-size:xx-small;" title="Events Website"><?php echo $version->getLongVersion(); ?></a>
-					&nbsp;
-					<span style="color:#999999; font-size:9px;"><?php echo $version->getShortCopyright(); ?></span>
-				</p>
+                                <?php echo $clubnews; ?>
 
-				<input type="hidden" name="task" value="cpanel" />
-				<input type="hidden" name="act" value="" />
-				<input type="hidden" name="option" value="<?php echo JEV_COM_COMPONENT; ?>" />
-			</div>
-	</form>
+                                <input type="hidden" name="task" value="cpanel"/>
+                                <input type="hidden" name="act" value=""/>
+                                <input type="hidden" name="option" value="<?php echo JEV_COM_COMPONENT; ?>"/>
+                        </form>
+                    </div><!-- /.box-body -->
+                </div><!-- /.box -->
+            </div>
+        </section><!-- /.content -->
+
+    </div>
+    <!-- /.content-wrapper -->
+    <?php echo JEventsHelper::addAdminFooter(); ?>
+    <!-- /.control-sidebar -->
+    <!-- Add the sidebar's background. This div must be placed
+           immediately after the control sidebar -->
+    <div class="control-sidebar-bg" style="position: fixed; height: auto;"></div>
 </div>

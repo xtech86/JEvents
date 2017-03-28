@@ -28,8 +28,6 @@ class AdminIcaleventViewIcalevent extends JEventsAbstractView
 		$document = JFactory::getDocument();
 		$document->setTitle(JText::_('ICAL_EVENTS'));
 
-		$bar =  JToolBar::getInstance('newtoolbar');
-
 		// Set toolbar items for the page
 		$this->toolbartitle(JText::_('ICAL_EVENTS'), 'jevents');
 

@@ -20,7 +20,6 @@ $toolbar = $bar->getItems() ? $bar->render() : "";
 	</header>
 	<!-- =============================================== -->
 	<!-- Left side column. contains the sidebar -->
-	<aside class="main-sidebar">
 		<!-- sidebar: style can be found in sidebar.less -->
 		<?php
 		echo $this->sidebar;
@@ -45,68 +44,64 @@ $toolbar = $bar->getItems() ? $bar->render() : "";
 			<!-- Default box -->
 			<div class="box">
 				<div class="box-body no-padding">
-
 					<form action="index.php" method="post" name="adminForm" id="adminForm">
 						<div class="row">
-							<div id="filter-bar">
-								<fieldset id="filter-bar">
-									<div class="span12 filter-select fltrt form-group">
-
-										<?php if ($this->catids)
-										{ ?>
-											<div class="span3"></div>
-											<div class="span3">
-												<div class="form-group">
-													<select name="filter_catid"
-													        class="form-control select2"
-													        style="width: 100%;"
-													        onchange="this.form.submit()">
-														<option
-															value=""><?php echo JText::_('JOPTION_SELECT_CATEGORY'); ?></option>
-														<?php echo $this->catids; ?>
-													</select>
-												</div><!-- /.form-group -->
-											</div> <!-- /.span2 -->
-										<?php }
-										else
-										{ ?>
-											<div class="span6"></div>
-										<?php } ?>
-										<div class="span3">
-											<div class="form-group">
-												<select name="filter_layout_type"
-												        class="form-control select2"
-												        style="width: 100%;"
-												        onchange="this.form.submit()">
-													<?php echo $this->addonoptions; ?>
-												</select>
-											</div><!-- /.form-group -->
-										</div> <!-- ./span2 -->
-										<div class="span3">
-											<div class="form-group">
-												<select name="filter_published"
-												        class="form-control select2"
-												        style="width: 100%;"
-												        onchange="this.form.submit()">
-													<option
-														value=""><?php echo JText::_('JOPTION_SELECT_PUBLISHED'); ?></option>
-													<?php echo JHtml::_('select.options', JHtml::_('jgrid.publishedOptions', array("trash" => 0, "archived" => 0, "all" => 0)), 'value', 'text', $this->filter_published, true); ?>
-												</select>
-											</div><!-- /.form-group -->
-										</div>
-									</div>
-								</fieldset>
-							</div>
+                            <fieldset id="filter-bar">
+                                <div class="span12 filter-select fltrt form-group">
+                                    <?php if ($this->catids)
+                                    { ?>
+                                        <div class="span3 fltlh"></div>
+                                        <div class="span3 fltrt">
+                                            <div class="form-group">
+                                                <select name="filter_catid"
+                                                        class="form-control select2"
+                                                        style="width: 100%;"
+                                                        onchange="this.form.submit()">
+                                                    <option
+                                                        value=""><?php echo JText::_('JOPTION_SELECT_CATEGORY'); ?></option>
+                                                    <?php echo $this->catids; ?>
+                                                </select>
+                                            </div><!-- /.form-group -->
+                                        </div> <!-- /.span2 -->
+                                    <?php }
+                                    else
+                                    { ?>
+                                        <div class="span6 "></div>
+                                    <?php } ?>
+                                    <div class="span3 fltrt">
+                                        <div class="form-group">
+                                            <select name="filter_layout_type"
+                                                    class="form-control select2"
+                                                    style="width: 100%;"
+                                                    onchange="this.form.submit()">
+                                                <?php echo $this->addonoptions; ?>
+                                            </select>
+                                        </div><!-- /.form-group -->
+                                    </div> <!-- ./span2 -->
+                                    <div class="span3 fltrt">
+                                        <div class="form-group">
+                                            <select name="filter_published"
+                                                    class="form-control select2"
+                                                    style="width: 100%;"
+                                                    onchange="this.form.submit()">
+                                                <option
+                                                    value=""><?php echo JText::_('JOPTION_SELECT_PUBLISHED'); ?></option>
+                                                <?php echo JHtml::_('select.options', JHtml::_('jgrid.publishedOptions', array("trash" => 0, "archived" => 0, "all" => 0)), 'value', 'text', $this->filter_published, true); ?>
+                                            </select>
+                                        </div><!-- /.form-group -->
+                                    </div>
+                                </div>
+                            </fieldset>
 						</div>
 						<div>
-							<div id="editcell">
-								<table class="adminlist  table table-striped">
-									<thead>
-									<tr>
+							<div id="editcell" class="box-body table-responsive no-padding">
+								<table class="adminlist table table-hover table-striped">
+                                    <tbody>
+                                    <tr>
 										<th width="20" nowrap="nowrap">
 											<?php echo JHtml::_('grid.checkall'); ?>
 										</th>
-										<th width="5">
+										<th width="5" style="display:none;">
 											<?php echo JText::_('NUM'); ?>
 										</th>
 										<th class="title">
@@ -131,8 +126,6 @@ $toolbar = $bar->getItems() ? $bar->render() : "";
 										<?php } ?>
 										<th width="10%" nowrap="nowrap"><?php echo JText::_('JEV_PUBLISHED'); ?></th>
 									</tr>
-									</thead>
-									<tbody>
 									<?php
 									$k = 0;
 									for ($i = 0, $n = count($this->items); $i < $n; $i++)
@@ -151,7 +144,7 @@ $toolbar = $bar->getItems() ? $bar->render() : "";
 											<td width="20">
 												<?php echo JHtml::_('grid.id', $i, $row->id); ?>
 											</td>
-											<td>
+											<td style="display:none;">
 												<?php echo $i + 1; ?>
 											</td>
 											<td>
@@ -194,9 +187,10 @@ $toolbar = $bar->getItems() ? $bar->render() : "";
 											<td align="center">
 												<?php
 												$img = $row->state ? JHTML::_('image', 'admin/tick.png', '', array('title' => ''), true) : JHTML::_('image', 'admin/publish_x.png', '', array('title' => ''), true);
+												$state = $row->state ? '<span class="label label-success">' .  JText::_("JEV_PUBLISHED") . '</span>' : '<span class="label label-danger">' .  JText::_("JEV_UNPUBLISHED") . '</span>';
 												?>
 												<a href="javascript: void(0);"
-												   onclick="return listItemTask('cb<?php echo $i; ?>','<?php echo $row->state ? 'defaults.unpublish' : 'defaults.publish'; ?>')"><?php echo $img; ?></a>
+												   onclick="return listItemTask('cb<?php echo $i; ?>','<?php echo $row->state ? 'defaults.unpublish' : 'defaults.publish'; ?>')"><?php echo $state; ?></a>
 											</td>
 										</tr>
 										<?php
@@ -224,9 +218,7 @@ $toolbar = $bar->getItems() ? $bar->render() : "";
 		</section><!-- /.content -->
 	</div>
 	<!-- /.content-wrapper -->
-	<footer class="main-footer">
-		<?php echo JEventsHelper::addAdminFooter(); ?>
-	</footer>
+    <?php echo JEventsHelper::addAdminFooter(); ?>
 	<!-- /.control-sidebar -->
 	<!-- Add the sidebar's background. This div must be placed
 		   immediately after the control sidebar -->

@@ -20,7 +20,7 @@ defined('_JEXEC') or die();
 
 use Joomla\String\StringHelper;
 
-class CustomcssViewCustomcss extends JViewLegacy {
+class CustomcssViewCustomcss extends JEventsAbstractView {
 
 	function display($cachable = false)
 	{
@@ -29,15 +29,13 @@ class CustomcssViewCustomcss extends JViewLegacy {
 		$document = JFactory::getDocument();
 		$document->setTitle(JText::_('COM_JEVENTS') . ': ' . JText::_('JEV_CUSTOM_CSS'));
 
-		$bar = JToolbar::getInstance('toolbar');
+		$bar = JToolbar::getInstance('newtoolbar');
 
 		JToolBarHelper::title(JText::_('COM_JEVENTS') . ': ' . JText::_('JEV_CUSTOM_CSS'), 'jevents');
 
-		JToolBarHelper::apply('customcss.apply');
-		JToolBarHelper::save('customcss.save');
-		JToolBarHelper::cancel('customcss.cancel');
-		JToolbarHelper::divider();
-
+		$this->toolbarApply('customcss.apply');
+		$this->toolbarSave('customcss.save');
+		$this->toolbarCancel('customcss.cancel');
 
 		//Check if the Customcss file already exists, if not load the .new version
 		$filepath = JPATH_ROOT . '/components/com_jevents/assets/css/jevcustom.css';
@@ -55,6 +53,8 @@ class CustomcssViewCustomcss extends JViewLegacy {
 		$this->type     = 'file';
 
 		JEventsHelper::addSubmenu();
+
+		$this->sidebar = JHtmlSidebar::render();
 
 		$params = JComponentHelper::getParams(JEV_COM_COMPONENT);
 

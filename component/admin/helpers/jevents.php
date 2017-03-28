@@ -7,7 +7,6 @@ JLoader::register('JevJoomlaVersion', JPATH_ADMINISTRATOR . "/components/com_jev
 //No need to globally define sidebar, and we need it here for com_categories.
 JLoader::register('JevAdminJHtmlSidebar',JEV_ADMINPATH."helpers/jevsidebar.php");
 
-
 /**
  * JEvents component helper.
  *
@@ -207,7 +206,7 @@ class JEventsHelper
 			//Support Info
 			JevAdminJHtmlSidebar::addEntry(JText::_('SUPPORT_INFO'), 'index.php?option=com_jevents&task=cpanel.support', $vName === 'cpanel.support', 'jevents', 'fa-support', 0, 7, 0);
 			//Custom CSS
-			JevAdminJHtmlSidebar::addEntry(JText::_('JEV_CUSTOM_CSS'), 'index.php?option=com_jevents&task=cpanel.custom_css', $vName === 'cpanel.custom_css', 'jevents', 'fa-css3', 0, 8, 0);
+			JevAdminJHtmlSidebar::addEntry(JText::_('JEV_CUSTOM_CSS'), 'index.php?option=com_jevents&view=customcss', $vName === 'customcss', 'jevents', 'fa-css3', 0, 8, 0);
 
 			// Lets do a single query and get an array of the addons! Wheyyy // Also make sure they are enabled!
 			$jevaddons = array('com_jevlocations', 'com_rsvppro', 'jevcustomfields', 'com_jevpeople');
@@ -503,11 +502,9 @@ class JEventsHelper
 	{
 		$version = JEventsVersion::getInstance();
 
-		$footer_html = '		<div class="pull-right hidden-xs">
-			<b>Version: </b>
-			' . JString::substr($version->getShortVersion(), 1) . '
-		</div>
-		<strong>Copyright © 2015 <a href="http://www.jevents.net">JEvents - GWE Systems Ltd</a>.</strong> All rights reserved.';
+		$footer_html = '<footer class="main-footer">';
+		$footer_html .= '<div class="pull-right hidden-xs"><b>Version: </b>' . JString::substr($version->getShortVersion(), 1) . '</div><strong>Copyright © 2015 <a href="http://www.jevents.net">JEvents - GWE Systems Ltd</a>.</strong> All rights reserved.';
+		$footer_html .= '</footer>';
 
 		return $footer_html;
 	}

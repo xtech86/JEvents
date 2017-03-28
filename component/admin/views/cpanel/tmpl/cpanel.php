@@ -30,15 +30,10 @@ $limit = 4;
 		<?php echo JEventsHelper::addAdminHeader($items = array(), $toolbar); ?>
 	</header>
 	<!-- =============================================== -->
-	<!-- Left side column. contains the sidebar -->
-	<aside class="main-sidebar">
-		<!-- sidebar: style can be found in sidebar.less -->
-		<?php
-        echo $this->sidebar;
-
-		?>
-		<!-- /.sidebar -->
-	</aside>
+    <!-- Left side column. contains the sidebar -->
+    <!-- sidebar: style can be found in sidebar.less -->
+    <?php echo $this->sidebar; ?>
+    <!-- /.sidebar -->
 	<!-- =============================================== -->
 	<!-- Content Wrapper. Contains page content -->
 	<div class="content-wrapper" style="min-height: 1096px;">
@@ -332,9 +327,7 @@ $limit = 4;
 		</section><!-- /.content -->
 	</div>
 	<!-- /.content-wrapper -->
-	<footer class="main-footer">
-		<?php echo JEventsHelper::addAdminFooter(); ?>
-	</footer>
+    <?php echo JEventsHelper::addAdminFooter(); ?>
 	<!-- /.control-sidebar -->
 	<!-- Add the sidebar's background. This div must be placed
            immediately after the control sidebar -->

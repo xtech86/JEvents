@@ -59,13 +59,9 @@ $toolbar = $bar->getItems() ? $bar->render() : "";
 	</header>
 	<!-- =============================================== -->
 	<!-- Left side column. contains the sidebar -->
-	<aside class="main-sidebar">
-		<!-- sidebar: style can be found in sidebar.less -->
-		<?php
-    		echo $this->sidebar;
-        ?>
-		<!-- /.sidebar -->
-	</aside>
+    <!-- sidebar: style can be found in sidebar.less -->
+    <?php echo $this->sidebar; ?>
+    <!-- /.sidebar -->
 	<!-- =============================================== -->
 	<!-- Content Wrapper. Contains page content -->
 	<div class="content-wrapper" style="min-height: 1096px;">

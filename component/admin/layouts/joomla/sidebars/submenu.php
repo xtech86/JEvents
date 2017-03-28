@@ -44,63 +44,67 @@ foreach ($displayData->list as $key => $item) {
 }
 
 //New sidebar
-foreach ($sections as $section) {
-   // echo '<pre>';print_R($section);echo '</pre>';
-    ?>
-<section class="sidebar" style="height: auto;">
-    <ul class="sidebar-menu">
+?>
+<aside class="main-sidebar">
     <?php
-    foreach ($section as $items) {
-      //  echo '<pre>';print_r($items);echo '</pre>';
-        foreach ($items as $item)
-        {
-	        //First sub_link section calculation
-	        $sub_links = isset($item['sub_links']) ? $item['sub_links'] : array();
-	        $total_slinks = count($sub_links);
+    foreach ($sections as $section) {
+       // echo '<pre>';print_R($section);echo '</pre>';
+        ?>
+    <section class="sidebar" style="height: auto;">
+        <ul class="sidebar-menu">
+        <?php
+        foreach ($section as $items) {
+          //  echo '<pre>';print_r($items);echo '</pre>';
+            foreach ($items as $item)
+            {
+                //First sub_link section calculation
+                $sub_links = isset($item['sub_links']) ? $item['sub_links'] : array();
+                $total_slinks = count($sub_links);
 
-            if (isset($item[5]) && $item[5] == 1)
-	        {
-		        echo '<li class="header">' . $item[0] . '</li>';
-		        continue;
-	        }
-
-
-	        //Define if active / LI Class element
-	        $class = '';
-
-            if (isset ($item[2]) && $item[2] == 1)  {
-	            $class = 'active ' . $item[8];
-            } else {
-	            $class = $item[8];
-            }
-            $pull_icon = (strpos($item[8], 'treeview') !== false) ? '<i class="fa fa-angle-left pull-right"></i>' : '';
-
-	        echo '<li class="' . $class . '">';
-            echo '<a href="' . $item[1] . '"><i class="fa ' . $item[4] . '"></i><span>' . $item[0] . '</span>' . $pull_icon . '</a>';
-
-            // Generate sublinks if there are any
-            if ($total_slinks> 0) {
-
-                $ul_class = ($item[9] != '') ? $item[9] : "";
-                echo '<ul class="treeview-menu ' . $ul_class . '">';
-
-                foreach ($sub_links as $sub_link) {
-                    //Check if it's a theme OR Config option since we handle these differently.
-                    if ($sub_link[8] > '' && preg_match('/config_edit/', $sub_link[8])) {
-	                    echo '<li class="' . $sub_link[8] . '"><a ' . $sub_link[1] . '"><i class="fa ' . $sub_link[4] . '"></i><span>' . $sub_link[0] . '</span></a></li>';
-                    } else {
-                    echo '<li class="' . $sub_link[8] . '"><a href="' . $sub_link[1] . '"><i class="fa ' . $sub_link[4] . '"></i><span>' . $sub_link[0] . '</span></a></li>';
-                    }
+                if (isset($item[5]) && $item[5] == 1)
+                {
+                    echo '<li class="header">' . $item[0] . '</li>';
+                    continue;
                 }
-                echo '</ul>';
 
+
+                //Define if active / LI Class element
+                $class = '';
+
+                if (isset ($item[2]) && $item[2] == 1)  {
+                    $class = 'active ' . $item[8];
+                } else {
+                    $class = $item[8];
+                }
+                $pull_icon = (strpos($item[8], 'treeview') !== false) ? '<i class="fa fa-angle-left pull-right"></i>' : '';
+
+                echo '<li class="' . $class . '">';
+                echo '<a href="' . $item[1] . '"><i class="fa ' . $item[4] . '"></i><span>' . $item[0] . '</span>' . $pull_icon . '</a>';
+
+                // Generate sublinks if there are any
+                if ($total_slinks> 0) {
+
+                    $ul_class = ($item[9] != '') ? $item[9] : "";
+                    echo '<ul class="treeview-menu ' . $ul_class . '">';
+
+                    foreach ($sub_links as $sub_link) {
+                        //Check if it's a theme OR Config option since we handle these differently.
+                        if ($sub_link[8] > '' && preg_match('/config_edit/', $sub_link[8])) {
+                            echo '<li class="' . $sub_link[8] . '"><a ' . $sub_link[1] . '"><i class="fa ' . $sub_link[4] . '"></i><span>' . $sub_link[0] . '</span></a></li>';
+                        } else {
+                        echo '<li class="' . $sub_link[8] . '"><a href="' . $sub_link[1] . '"><i class="fa ' . $sub_link[4] . '"></i><span>' . $sub_link[0] . '</span></a></li>';
+                        }
+                    }
+                    echo '</ul>';
+
+                }
+                echo "</li>";
             }
-	        echo "</li>";
         }
+        ?>
+        </ul>
+    </section>
+        <?php
     }
-    ?>
-    </ul>
-</section>
-    <?php
-}
-
+        ?>
+</aside>

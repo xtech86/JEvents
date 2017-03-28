@@ -53,11 +53,9 @@ $toolbar = $bar->getItems() ? $bar->render() : "";
 	</header>
 	<!-- =============================================== -->
 	<!-- Left side column. contains the sidebar -->
-	<aside class="main-sidebar">
-		<!-- sidebar: style can be found in sidebar.less -->
-		<?php echo $this->sidebar; ?>
-		<!-- /.sidebar -->
-	</aside>
+    <!-- sidebar: style can be found in sidebar.less -->
+    <?php echo $this->sidebar; ?>
+    <!-- /.sidebar -->
 	<!-- =============================================== -->
 	<!-- Content Wrapper. Contains page content -->
 	<div class="content-wrapper" style="min-height: 1096px;">
@@ -292,9 +290,7 @@ $toolbar = $bar->getItems() ? $bar->render() : "";
 		</section><!-- /.content -->
 	</div>
 	<!-- /.content-wrapper -->
-	<footer class="main-footer">
-		<?php echo JEventsHelper::addAdminFooter(); ?>
-	</footer>
+    <?php echo JEventsHelper::addAdminFooter(); ?>
 	<!-- /.control-sidebar -->
 	<!-- Add the sidebar's background. This div must be placed
 		   immediately after the control sidebar -->

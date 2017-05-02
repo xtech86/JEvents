@@ -52,9 +52,8 @@ class AdminIcalrepeatController extends JControllerLegacy
 
 		$db = JFactory::getDbo();
 		$publishedOnly = false;
-		$cid = $jinput->get('cid', array(0), 'array');
-		
-		ArrayHelper::toInteger($cid);
+		$cid = $jinput->get('cid', array(0),"array");
+		$cid = ArrayHelper::toInteger($cid);
 
 		if (is_array($cid) && count($cid) > 0)
 			$id = $cid[0];
@@ -67,7 +66,7 @@ class AdminIcalrepeatController extends JControllerLegacy
 		{
 			$id = $evid;
 		}
-		
+
 		$limit = intval(JFactory::getApplication()->getUserStateFromRequest("viewlistlimit", 'limit', JFactory::getApplication()->getCfg('list_limit',10)));
 		$limitstart = intval(JFactory::getApplication()->getUserStateFromRequest("view{" . JEV_COM_COMPONENT . "}limitstart", 'limitstart', 0));
 
@@ -149,7 +148,7 @@ class AdminIcalrepeatController extends JControllerLegacy
 
 		$db = JFactory::getDbo();
 		$cid = JRequest::getVar('cid', array(0));
-		ArrayHelper::toInteger($cid);
+		$cid = ArrayHelper::toInteger($cid);
 		if (is_array($cid) && count($cid) > 0)
 			$id = $cid[0];
 		else
@@ -761,7 +760,7 @@ class AdminIcalrepeatController extends JControllerLegacy
 		$cid = JRequest::getVar('cid', array(0));
 		if (!is_array($cid))
 			$cid = array(intval($cid));
-			ArrayHelper::toInteger($cid);
+			$cid = ArrayHelper::toInteger($cid);
 
 		$db = JFactory::getDbo();
 		foreach ($cid as $id)
@@ -875,7 +874,7 @@ class AdminIcalrepeatController extends JControllerLegacy
 		$cid = JRequest::getVar('cid', array(0));
 		if (!is_array($cid))
 			$cid = array(intval($cid));
-		ArrayHelper::toInteger($cid);
+		$cid = ArrayHelper::toInteger($cid);
 
 		$db = JFactory::getDbo();
 		foreach ($cid as $id)

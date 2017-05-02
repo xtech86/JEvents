@@ -476,29 +476,39 @@ $toolbar = $bar->getItems() ? $bar->render() : "";
 												<?php
 											}
 
-											if ($this->form->getLabel("access"))
-											{
+											if ($this->repeatId === 0 && $this->form->getLabel("access") ){
 												?>
-                                                <div class="row jevaccess form-group">
+                                                <div class="row  jevaccess">
 													<?php
 													if ($this->form->getLabel("access"))
 													{
-														echo $this->form->getLabel("access");
-														echo $this->form->getInput("access");
+														?>
+                                                        <div class="span2">
+															<?php
+															echo $this->form->getLabel("access");
+															?>
+                                                        </div>
+                                                        <div class="span10 accesslevel ">
+															<?php echo $this->form->getInput("access"); ?>
+                                                        </div>
+														<?php
 													}
 													?>
                                                 </div>
 												<?php
 											}
 
-											if ($this->form->getLabel("state"))
-											{
+											if ($this->repeatId !== 0){
+												//Do Nothing, repeats do not yet have states
+											} else if ($this->form->getLabel("state")) {
 												?>
-                                                <div class="row jevpublished form-group">
-													<?php
-													echo $this->form->getLabel("state");
-													echo $this->form->getInput("state");
-													?>
+                                                <div class="row jevpublished">
+                                                    <div class="span2">
+														<?php echo $this->form->getLabel("state"); ?>
+                                                    </div>
+                                                    <div class="span10">
+														<?php echo $this->form->getInput("state"); ?>
+                                                    </div>
                                                 </div>
 												<?php
 											}

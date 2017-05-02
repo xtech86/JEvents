@@ -2,10 +2,12 @@
 
 // No direct access
 defined('_JEXEC') or die;
+include_once(JPATH_ADMINISTRATOR . '/components/com_jevents/jevents.defines.php');
 
 JLoader::register('JevJoomlaVersion', JPATH_ADMINISTRATOR . "/components/com_jevents/libraries/version.php");
 //No need to globally define sidebar, and we need it here for com_categories.
 JLoader::register('JevAdminJHtmlSidebar',JEV_ADMINPATH."helpers/jevsidebar.php");
+//Include the defines, needed for com_categories
 
 /**
  * JEvents component helper.
@@ -137,7 +139,7 @@ class JEventsHelper
 			JevAdminJHtmlSidebar::addEntry(JText::_('JEV_TAB_COMPONENT'), $config_tabs . 'JEV_TAB_COMPONENT', $vName ==='params.edit', 'jevents', 'fa-circle-o', 0, 0, 4, 'config_edit');
 			JevAdminJHtmlSidebar::addEntry(JText::_('JEV_PERMISSIONS'), $config_tabs . 'JEV_PERMISSIONS', $vName === 'params.edit', 'jevents', 'fa-circle-o', 0, 0, 4, 'config_edit');
 			JevAdminJHtmlSidebar::addEntry(JText::_('JEV_EVENT_EDITING'), $config_tabs . 'JEV_EVENT_EDITING', $vName === 'params.edit', 'jevents', 'fa-circle-o', 0, 0, 4, 'difficulty1 config_edit');
-			JevAdminJHtmlSidebar::addEntry(JText::_('JEV_EVENT_DETAIL_VIEW'), $config_tabs . 'EV_EVENT_DETAIL_VIEW', $vName === 'params.edit', 'jevents', 'fa-circle-o', 0, 0, 4, 'difficulty1 config_edit');
+			JevAdminJHtmlSidebar::addEntry(JText::_('JEV_EVENT_DETAIL_VIEW'), $config_tabs . 'JEV_EVENT_DETAIL_VIEW', $vName === 'params.edit', 'jevents', 'fa-circle-o', 0, 0, 4, 'difficulty1 config_edit');
 			JevAdminJHtmlSidebar::addEntry(JText::_('JEV_ADMIN_MONTHLY_CALENDAR_VIEW'), $config_tabs . 'JEV_MAIN_MONTHLY_CALENDAR', $vName === 'params.edit', 'jevents', 'fa-circle-o', 0, 0, 4, 'difficulty1 config_edit');
 			JevAdminJHtmlSidebar::addEntry(JText::_('YEARCATEGORY_VIEW'), $config_tabs . 'JEV_YEAR_CATEGORY_VIEW', $vName === 'params.edit', 'jevents', 'fa-circle-o', 0, 0, 4, 'difficulty1 config_edit');
 

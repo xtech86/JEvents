@@ -55,12 +55,12 @@
     </media>
     <administration>
         <menu>COM_JEVENTS_MENU</menu>
-
         <files folder="admin">
             <folder>assets</folder>
             <folder>controllers</folder>
             <folder>fields</folder>
             <folder>helpers</folder>
+            <folder>layouts</folder>
             <folder>libraries</folder>
             <folder>models</folder>
             <folder>tables</folder>

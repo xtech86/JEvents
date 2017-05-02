@@ -16,6 +16,7 @@ defined('_JEXEC') or die();
  *
  * @static
  */
+
 class AdminIcaleventViewIcalevent extends JEventsAbstractView
 {
 
@@ -134,17 +135,16 @@ class AdminIcaleventViewIcalevent extends JEventsAbstractView
 			$document->setTitle(JText::_('CREATE_ICAL_EVENT'));
 
 			// Set toolbar items for the page
-			JToolBarHelper::title(JText::_('CREATE_ICAL_EVENT'), 'jevents');
+			$this->toolbartitle(JText::_('CREATE_ICAL_EVENT'), 'jevents');
 		}
 		else
 		{
 			$document->setTitle(JText::_('EDIT_ICAL_EVENT'));
 
 			// Set toolbar items for the page
-			JToolBarHelper::title(JText::_('EDIT_ICAL_EVENT'), 'jevents');
+			$this->toolbartitle(JText::_('EDIT_ICAL_EVENT'), 'jevents');
 		}
 
-		$bar =  JToolBar::getInstance('newtoolbar');
 		if ($this->id > 0)
 		{
 			if ($this->editCopy)
@@ -162,11 +162,11 @@ class AdminIcaleventViewIcalevent extends JEventsAbstractView
 		}
 		else
 		{
-			if (JEVHelper::isEventEditor())
+			if (JEVHelper::isEventEditor() )
 			{
-				JToolBarHelper::apply('icalevent.apply', "JEV_SAVE");
-				JToolBarHelper::save('icalevent.save');
-				JToolBarHelper::save2new('icalevent.savenew', "JEV_SAVE_NEW");
+				$this->toolbarApply('icalevent.apply', "JEV_SAVE");
+				$this->toolbarSave('icalevent.save');
+				$this->toolbarSave2new('icalevent.savenew', "JEV_SAVE_NEW");
 			}
 		}
 

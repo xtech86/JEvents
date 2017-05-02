@@ -302,13 +302,13 @@ $toolbar = $bar->getItems() ? $bar->render() : "";
 										}
 										if ($hasconfig)
 										{
-											echo JHtml::_('bootstrap.addPanel', 'myLayoutTabs', $viewfile);
-											//echo JHtml::_('bootstrap.addPanel', 'myParamsTabs', $viewfile);
+											//echo JHtml::_('bootstrap.addPanel', 'myLayoutTabs', $viewfile);
+											echo JHtml::_('bootstrap.addPanel', 'myParamsTabs', $viewfile);
 
 											echo implode("\n", $html);
 
-											echo JHtml::_('bootstrap.endPanel');
 											//echo JHtml::_('bootstrap.endPanel');
+											echo JHtml::_('bootstrap.endPanel');
 										}
 									}
 								}

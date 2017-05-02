@@ -306,6 +306,45 @@ body.com_jevents #jev_adminui.sidebar-collapse ul.sidebar-menu ul.treeview-menu 
 body.com_jevents #jev_adminui.sidebar-collapse ul.sidebar-menu ul.treeview-menu {
   width: 200px !important;
 }
+body.com_jevents #jev_adminui .form-group.row {
+  margin-bottom: 10px;
+}
+body.com_jevents #jev_adminui .form-group label {
+  font-weight: 600;
+}
+body.com_jevents #jev_adminui .form-group div.chzn-container {
+  padding-left: 0;
+}
+body.com_jevents #jev_adminui select,
+body.com_jevents #jev_adminui input[type="text"],
+body.com_jevents #jev_adminui input[type="password"],
+body.com_jevents #jev_adminui input[type="datetime"],
+body.com_jevents #jev_adminui input[type="datetime-local"],
+body.com_jevents #jev_adminui input[type="date"],
+body.com_jevents #jev_adminui input[type="month"],
+body.com_jevents #jev_adminui input[type="time"],
+body.com_jevents #jev_adminui input[type="week"],
+body.com_jevents #jev_adminui input[type="number"],
+body.com_jevents #jev_adminui input[type="email"],
+body.com_jevents #jev_adminui input[type="url"],
+body.com_jevents #jev_adminui input[type="search"],
+body.com_jevents #jev_adminui input[type="tel"],
+body.com_jevents #jev_adminui input[type="color"],
+body.com_jevents #jev_adminui .uneditable-input {
+  min-height: 18px;
+}
+body.com_jevents #jev_adminui input.inputbox {
+  width: 100%;
+}
+body.com_jevents #jev_adminui textarea {
+  min-height: 150px;
+  width: 100%;
+  box-sizing: border-box;
+}
+body.com_jevents #jev_adminui .wf-editor-container {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
 body.com_jevents li {
   line-height: 20px;
 }

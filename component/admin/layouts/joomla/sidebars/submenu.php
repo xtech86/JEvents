@@ -7,6 +7,7 @@
  * @license     GNU General Public License version 2 or later; see LICENSE.txt
  */
 
+
 defined('JPATH_BASE') or die;
 
 JHtml::_('jquery.framework');
@@ -31,6 +32,7 @@ JFactory::getDocument()->addScriptDeclaration('
 $task = JFactory::getApplication()->input;
 $sections = array();
 $prev_key = 0;
+
 foreach ($displayData->list as $key => $item) {
 	// echo '<pre>';print_r($item);echo '</pre>';
 
@@ -48,6 +50,7 @@ foreach ($displayData->list as $key => $item) {
 <aside class="main-sidebar">
     <?php
     foreach ($sections as $section) {
+
        // echo '<pre>';print_R($section);echo '</pre>';
         ?>
     <section class="sidebar" style="height: auto;">

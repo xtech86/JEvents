@@ -111,7 +111,7 @@ class AdminIcalsViewIcals extends JEventsAbstractView
 		}
 		if (count($userOptions) > 0)
 		{
-			$userlist = JHTML::_('select.genericlist', $userOptions, 'created_by', 'class="inputbox" size="1" ', 'value', 'text', $created_by);
+			$userlist = JHTML::_('select.genericlist', $userOptions, 'created_by', 'class="inputbox select2" size="1" ', 'value', 'text', $created_by);
 		}
 		else
 		{

@@ -37,9 +37,8 @@ class AdminIcalrepeatViewIcalrepeat extends JEventsAbstractView
 
 		JHTML::_('behavior.tooltip');
 
-		if (JevJoomlaVersion::isCompatible("3.0")){
-			$this->sidebar = JHtmlSidebar::render();					
-		}
+        $this->sidebar = JHtmlSidebar::render();
+
 	}
 
 	function edit($tpl = null)
@@ -60,13 +59,13 @@ class AdminIcalrepeatViewIcalrepeat extends JEventsAbstractView
 		// Set toolbar items for the page
 		JToolBarHelper::title(JText::_('EDIT_ICAL_REPEAT'), 'jevents');
 
-		JToolBarHelper::apply('icalrepeat.apply', "JEV_SAVE");
-		JToolBarHelper::apply('icalrepeat.save', "JEV_SAVE_CLOSE");
+		$this->toolbarApply('icalrepeat.apply', "JEV_SAVE");
+		$this->toolbarSave('icalrepeat.save', "JEV_SAVE_CLOSE");
 
 		// We will need this when we offer to change one or more repeats on save!
 		//$this->addSaveToolBarButton();
 
-		JToolBarHelper::cancel('icalrepeat.list');
+		$this->toolbarCancel('icalrepeat.list');
 		//JToolBarHelper::help( 'screen.icalrepeat.edit', true);
 
 		$params = JComponentHelper::getParams(JEV_COM_COMPONENT);
@@ -76,6 +75,11 @@ class AdminIcalrepeatViewIcalrepeat extends JEventsAbstractView
 		
 		// load Joomla javascript classes
 		JHTML::_('behavior.core');
+
+		JEventsHelper::addSubmenu();
+
+		$this->sidebar = JHtmlSidebar::render();
+
 		$this->setLayout("edit");
 
 		$this->setupEditForm();

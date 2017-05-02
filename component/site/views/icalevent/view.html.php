@@ -166,7 +166,7 @@ class ICalEventViewIcalevent extends AdminIcaleventViewIcalevent
 		$this->datamodel = new JEventsDataModel();
 		$dispatcher->trigger('onJEventsHeader', array($this));
 		?>
-		<div style="clear:both"  
+		<div style="clear:both"
 		<?php
 		$mainframe = JFactory::getApplication();
 		$params = JComponentHelper::getParams(JEV_COM_COMPONENT);
@@ -331,4 +331,3 @@ class ICalEventViewIcalevent extends AdminIcaleventViewIcalevent
 	    }
 
     }
-    

@@ -110,6 +110,9 @@ class AdminParamsController extends JControllerAdmin
 	 */
 	function save($key = NULL, $urlVar = NULL)
 	{
+		$jinput = JFactory::getApplication()->input;
+		$session = JFactory::getSession();
+
 		// Check for request forgeries
 		JRequest::checkToken() or jexit('Invalid Token');
 		//echo $this->getTask();
@@ -126,6 +129,11 @@ class AdminParamsController extends JControllerAdmin
 		}
 
 		$post = JRequest::get('post');
+
+		if ($post['default_tab'] !== '') {
+			$session->set('default_tab', $post['default_tab']);
+		}
+
 		$post['params'] = JRequest::getVar('jform', array(), 'post', 'array');
                 $post['plugins'] = JRequest::getVar('jform_plugin', array(), 'post', 'array');
 		$post['option'] = $component;
@@ -256,6 +264,8 @@ class AdminParamsController extends JControllerAdmin
 				$this->redirect();
 				break;
 			default:
+				//Clear the tab
+				$session->set('default_tab', '');
 				$this->setRedirect('index.php?option=' . JEV_COM_COMPONENT . "&task=cpanel.cpanel", JText::_('CONFIG_SAVED'));
 				$this->redirect();
 				break;
@@ -271,6 +281,9 @@ class AdminParamsController extends JControllerAdmin
 	 */
 	function cancel($key=NULL)
 	{
+		$session = JFactory::getSession();
+		$session->set('default_tab', '');
+
 		$this->setRedirect('index.php');
 		$this->redirect();
 	}

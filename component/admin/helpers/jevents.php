@@ -98,7 +98,7 @@ class JEventsHelper
 			$customfields = '<li><a href="' . $link . '"><i class="fa fa-file-text-o"></i> <span>' . JText::_('JEV_CUSTOM_FIELDS') . '</span></a></li>';
 		}
 
-		$config_tabs = ($task === 'params.edit' ?  "data-toggle=\"tab\" href=\"index.php?option=com_jevents&task=params.edit#" : "href=\"index.php?option=com_jevents&task=params.edit&default_tab=");
+		$config_tabs = ($task === 'params.edit' ?  'onclick="storeTab(this);" data-toggle="tab" href="index.php?option=com_jevents&task=params.edit#' : "href=\"index.php?option=com_jevents&task=params.edit&default_tab=");
 
 		//Could be called from categories component
 		JLoader::register('JEVHelper', JPATH_SITE . '/components/com_jevents/libraries/helper.php');
@@ -115,7 +115,7 @@ class JEventsHelper
 		//Categories
 		JevAdminJHtmlSidebar::addEntry(JText::_('JEV_CATEGORIES'), '#', $vName === 'categories', 'jevents', 'fa-folder', 0, 2, 0, 'treeview');
 		//Categories Sub Items
-		JevAdminJHtmlSidebar::addEntry(JText::_('JEV_ADD_CAT'), 'index.php?option=com_categories&view=category&layout=edit&extension=com_content', $vName === 'categories', 'jevents', 'fa-plus-square', 0, 0, 2, '');
+		JevAdminJHtmlSidebar::addEntry(JText::_('JEV_ADD_CAT'), 'index.php?option=com_categories&view=category&layout=edit&extension=com_jevents', $vName === 'categories', 'jevents', 'fa-plus-square', 0, 0, 2, '');
 		JevAdminJHtmlSidebar::addEntry(JText::_('JEV_INSTALL_CATS'), 'index.php?option=com_categories&extension=com_jevents', $vName === 'categories', 'jevents', 'fa-folder', 0, 0, 2, '');
 
 		//JEvents Admin User Items:
@@ -136,19 +136,19 @@ class JEventsHelper
 			JevAdminJHtmlSidebar::addEntry(JText::_('JEV_INSTALL_CONFIG'), '#', $vName === 'params.edit', 'jevents', 'fa-cogs', 0, 4, 0, 'treeview ' . ($task === 'params.edit' ? 'active' : ''));
 
 			//Configuration Sub Items
-			JevAdminJHtmlSidebar::addEntry(JText::_('JEV_TAB_COMPONENT'), $config_tabs . 'JEV_TAB_COMPONENT', $vName ==='params.edit', 'jevents', 'fa-circle-o', 0, 0, 4, 'config_edit');
-			JevAdminJHtmlSidebar::addEntry(JText::_('JEV_PERMISSIONS'), $config_tabs . 'JEV_PERMISSIONS', $vName === 'params.edit', 'jevents', 'fa-circle-o', 0, 0, 4, 'config_edit');
-			JevAdminJHtmlSidebar::addEntry(JText::_('JEV_EVENT_EDITING'), $config_tabs . 'JEV_EVENT_EDITING', $vName === 'params.edit', 'jevents', 'fa-circle-o', 0, 0, 4, 'difficulty1 config_edit');
-			JevAdminJHtmlSidebar::addEntry(JText::_('JEV_EVENT_DETAIL_VIEW'), $config_tabs . 'JEV_EVENT_DETAIL_VIEW', $vName === 'params.edit', 'jevents', 'fa-circle-o', 0, 0, 4, 'difficulty1 config_edit');
-			JevAdminJHtmlSidebar::addEntry(JText::_('JEV_ADMIN_MONTHLY_CALENDAR_VIEW'), $config_tabs . 'JEV_MAIN_MONTHLY_CALENDAR', $vName === 'params.edit', 'jevents', 'fa-circle-o', 0, 0, 4, 'difficulty1 config_edit');
-			JevAdminJHtmlSidebar::addEntry(JText::_('YEARCATEGORY_VIEW'), $config_tabs . 'JEV_YEAR_CATEGORY_VIEW', $vName === 'params.edit', 'jevents', 'fa-circle-o', 0, 0, 4, 'difficulty1 config_edit');
+			JevAdminJHtmlSidebar::addEntry(JText::_('JEV_TAB_COMPONENT'), $config_tabs . 'JEV_TAB_COMPONENT" data-jev-tab="JEV_TAB_COMPONENT', $vName ==='params.edit', 'jevents', 'fa-circle-o', 0, 0, 4, 'config_edit');
+			JevAdminJHtmlSidebar::addEntry(JText::_('JEV_PERMISSIONS'), $config_tabs . 'JEV_PERMISSIONS" data-jev-tab="JEV_PERMISSIONS', $vName === 'params.edit', 'jevents', 'fa-circle-o', 0, 0, 4, 'config_edit');
+			JevAdminJHtmlSidebar::addEntry(JText::_('JEV_EVENT_EDITING'), $config_tabs . 'JEV_EVENT_EDITING" data-jev-tab="JEV_EVENT_EDITING', $vName === 'params.edit', 'jevents', 'fa-circle-o', 0, 0, 4, 'difficulty1 config_edit');
+			JevAdminJHtmlSidebar::addEntry(JText::_('JEV_EVENT_DETAIL_VIEW'), $config_tabs . 'JEV_EVENT_DETAIL_VIEW" data-jev-tab="JEV_EVENT_DETAIL_VIEW', $vName === 'params.edit', 'jevents', 'fa-circle-o', 0, 0, 4, 'difficulty1 config_edit');
+			JevAdminJHtmlSidebar::addEntry(JText::_('JEV_ADMIN_MONTHLY_CALENDAR_VIEW'), $config_tabs . 'JEV_MAIN_MONTHLY_CALENDAR" data-jev-tab="JEV_MAIN_MONTHLY_CALENDAR', $vName === 'params.edit', 'jevents', 'fa-circle-o', 0, 0, 4, 'difficulty1 config_edit');
+			JevAdminJHtmlSidebar::addEntry(JText::_('YEARCATEGORY_VIEW'), $config_tabs . 'JEV_YEAR_CATEGORY_VIEW" data-jev-tab="JEV_YEAR_CATEGORY_VIEW', $vName === 'params.edit', 'jevents', 'fa-circle-o', 0, 0, 4, 'difficulty1 config_edit');
 
-			JevAdminJHtmlSidebar::addEntry(JText::_('JEV_ICAL_CALENDAR'), $config_tabs . 'JEV_ICAL_CALENDAR', $vName === 'params.edit', 'jevents', 'fa-circle-o', 0, 0, 4, 'difficulty2 config_edit ' . $hiddenDiff2);
-			JevAdminJHtmlSidebar::addEntry(JText::_('JEV_TAB_RSS'), $config_tabs . 'JEV_TAB_RSS', $vName === 'params.edit', 'jevents', 'fa-circle-o', 0, 0, 4, 'difficulty2 config_edit ' . $hiddenDiff2);
+			JevAdminJHtmlSidebar::addEntry(JText::_('JEV_ICAL_CALENDAR'), $config_tabs . 'JEV_ICAL_CALENDAR" data-jev-tab="JEV_ICAL_CALENDAR', $vName === 'params.edit', 'jevents', 'fa-circle-o', 0, 0, 4, 'difficulty2 config_edit ' . $hiddenDiff2);
+			JevAdminJHtmlSidebar::addEntry(JText::_('JEV_TAB_RSS'), $config_tabs . 'JEV_TAB_RSS" data-jev-tab="JEV_TAB_RSS', $vName === 'params.edit', 'jevents', 'fa-circle-o', 0, 0, 4, 'difficulty2 config_edit ' . $hiddenDiff2);
 
-			JevAdminJHtmlSidebar::addEntry(JText::_('ROBOT_SEF_OPTIONS'), $config_tabs . 'ROBOT_SEF_OPTIONS', $vName === 'params.edit', 'jevents', 'fa-circle-o', 0, 0, 4, 'difficulty3 config_edit ' . $hiddenDiff3);
-			JevAdminJHtmlSidebar::addEntry(JText::_('JEV_MODULE_CONFIG'), $config_tabs . 'JEV_MODULE_CONFIG', $vName === 'params.edit', 'jevents', 'fa-circle-o', 0, 0, 4, 'difficulty3 config_edit ' . $hiddenDiff3);
-			JevAdminJHtmlSidebar::addEntry(JText::_('JEV_PLUGIN_OPTIONS'), $config_tabs . 'plugin_options', $vName === 'params.edit', 'jevents', 'fa-circle-o', 0, 0, 4, 'difficulty3 config_edit ' . $hiddenDiff3);
+			JevAdminJHtmlSidebar::addEntry(JText::_('ROBOT_SEF_OPTIONS'), $config_tabs . 'ROBOT_SEF_OPTIONS" data-jev-tab="ROBOT_SEF_OPTIONS', $vName === 'params.edit', 'jevents', 'fa-circle-o', 0, 0, 4, 'difficulty3 config_edit ' . $hiddenDiff3);
+			JevAdminJHtmlSidebar::addEntry(JText::_('JEV_MODULE_CONFIG'), $config_tabs . 'JEV_MODULE_CONFIG" data-jev-tab="JEV_MODULE_CONFIG', $vName === 'params.edit', 'jevents', 'fa-circle-o', 0, 0, 4, 'difficulty3 config_edit ' . $hiddenDiff3);
+			JevAdminJHtmlSidebar::addEntry(JText::_('JEV_PLUGIN_OPTIONS'), $config_tabs . 'plugin_options" data-jev-tab="plugin_options', $vName === 'params.edit', 'jevents', 'fa-circle-o', 0, 0, 4, 'difficulty3 config_edit ' . $hiddenDiff3);
 
 			//Custom Layouts
 			$flt = $jinput->get('filter_layout_type', '');
@@ -193,13 +193,13 @@ class JEventsHelper
 						$class      = ' class="active "';
 						$haslayouts = true;
 						//$themes .= '<li ' . $class . '><a ' . $config_tabs . '#' . $viewfile . '" class="themes_link"><i class="fa fa-circle-o"></i>' . $viewfile . '</a></li>';
-						JevAdminJHtmlSidebar::addEntry(JText::_($viewfile), $config_tabs . $viewfile, $vName === 'params.edit#' . $viewfile, 'jevents', 'fa-circle-o', 0, 0, 6, 'config_edit');
+						JevAdminJHtmlSidebar::addEntry(JText::_($viewfile), $config_tabs . $viewfile .'" data-jev-tab="' . $viewfile, $vName === 'params.edit#' . $viewfile, 'jevents', 'fa-circle-o', 0, 0, 6, 'config_edit');
 					}
 					elseif (file_exists($config))
 					{
 						$class      = '';
 						$haslayouts = true;
-						JevAdminJHtmlSidebar::addEntry(JText::_($viewfile), $config_tabs . $viewfile, $vName === 'params.edit#' . $viewfile, 'jevents', 'fa-circle-o', 0, 0, 6, 'config_edit');
+						JevAdminJHtmlSidebar::addEntry(JText::_($viewfile), $config_tabs . $viewfile .'" data-jev-tab="' . $viewfile, $vName === 'params.edit#' . $viewfile, 'jevents', 'fa-circle-o', 0, 0, 6, 'config_edit');
 					}
 				}
 
@@ -212,9 +212,18 @@ class JEventsHelper
 
 			// Lets do a single query and get an array of the addons! Wheyyy // Also make sure they are enabled!
 			$jevaddons = array('com_jevlocations', 'com_rsvppro', 'jevcustomfields', 'com_jevpeople');
+			$query = '';
+			foreach ($jevaddons as $key=> $addon) {
+				if ($key === 0) {
+					$query .=  ' \'%' . $addon . '%\' AND enabled = 1';
+				} else {
+					$query .= ' OR element LIKE \'%' . $addon . '%\' AND enabled = 1';
+				}
+			}
+
 			// Links to addons
 			$db = JFactory::getDbo();
-			$db->setQuery("SELECT element FROM #__extensions WHERE element LIKE '%" . implode('%\' OR element LIKE \'%', $jevaddons) . "%' AND enabled = 1");
+			$db->setQuery("SELECT element FROM #__extensions WHERE element LIKE " . $query);
 			$jevaddons_results = $db->loadColumn();
 
 

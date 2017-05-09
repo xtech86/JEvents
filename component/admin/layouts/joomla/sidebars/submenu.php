@@ -32,6 +32,9 @@ JFactory::getDocument()->addScriptDeclaration('
 $task = JFactory::getApplication()->input;
 $sections = array();
 $prev_key = 0;
+//var_dump($task);
+
+//die;
 
 foreach ($displayData->list as $key => $item) {
 	// echo '<pre>';print_r($item);echo '</pre>';
@@ -70,12 +73,13 @@ foreach ($displayData->list as $key => $item) {
                     continue;
                 }
 
-
                 //Define if active / LI Class element
                 $class = '';
 
                 if (isset ($item[2]) && $item[2] == 1)  {
                     $class = 'active ' . $item[8];
+
+
                 } else {
                     $class = $item[8];
                 }
@@ -91,6 +95,7 @@ foreach ($displayData->list as $key => $item) {
                     echo '<ul class="treeview-menu ' . $ul_class . '">';
 
                     foreach ($sub_links as $sub_link) {
+                        //var_dump($sub_link);
                         //Check if it's a theme OR Config option since we handle these differently.
                         if ($sub_link[8] > '' && preg_match('/config_edit/', $sub_link[8])) {
                             echo '<li class="' . $sub_link[8] . '"><a ' . $sub_link[1] . '"><i class="fa ' . $sub_link[4] . '"></i><span>' . $sub_link[0] . '</span></a></li>';

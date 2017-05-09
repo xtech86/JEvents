@@ -745,7 +745,7 @@ function _init() {
   };
 }(jQuery));
 
-//A little bit of JS to re-set the system messages in Joomla
+//A little bit of JS to re-set the system messages in Joomla!
 jQuery( document ).ready(function (jQuery) {
   if( jQuery('#system-message-container').html().length > 5) {
     jQuery("#system-message-container").detach().insertBefore('#jev_adminui section.content');
@@ -757,3 +757,13 @@ jQuery( document ).ready(function (jQuery) {
     }
   });
 });
+
+function storeTab(el) {
+  //alert(el.getAttribute('jev-tab'));
+    var jevtab = el.getAttribute('data-jev-tab');
+  if(jevtab != null) {
+      document.getElementById('default_tab').value = jevtab;
+  }
+}
+
+//Set the active tab to input with id default_tab

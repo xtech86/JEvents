@@ -23,16 +23,17 @@
         border: 0;
       }
     }
-
     .je-toolbar {
-      @media (max-width: @screen-phone) {
-        display: none !important;
+
+      .btn-toolbar {
+          margin: 0 10px 0 10px !important;
+          padding: 9px;
+          display: inline-block;
+
+        @media (max-width: @screen-phone) {
+          width: 80%;
+        }
       }
-    .btn-toolbar {
-        margin: 0px 10px 0px 10px !important;
-        padding: 9px;
-        display: inline-block;
-    }
     }
   }
   .jevconfig {
@@ -49,10 +50,15 @@
   }
 }
 .main-header {
-  position: absolute;
+  position: fixed;
   max-height: 100px;
   z-index: 1005;
   width:100%;
+
+    @media (max-width: @screen-phone) {
+      max-height: auto;
+
+    }
   //Navbar
   > .navbar {
     .transition(margin-left @transition-speed @transition-fn);

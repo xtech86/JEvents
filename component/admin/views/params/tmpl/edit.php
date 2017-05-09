@@ -19,6 +19,7 @@ use Joomla\String\StringHelper;
 $version = JEventsVersion::getInstance();
 
 $jinput = JFactory::getApplication()->input;
+$session = JFactory::getSession();
 
 $haslayouts = false;
 foreach (JEV_CommonFunctions::getJEventsViewList() as $viewfile)
@@ -30,16 +31,16 @@ foreach (JEV_CommonFunctions::getJEventsViewList() as $viewfile)
 	}
 }
 $hasPlugins = false;
-$db    = JFactory::getDbo();
-$query = $db->getQuery(true)
-        ->select('folder AS type, element AS name, params, enabled, manifest_cache ')
-        ->from('#__extensions')
-        // include unpublished plugins
-        //->where('enabled = 1')
-        ->where('type =' . $db->quote('plugin'))
-        ->where('state IN (0,1)')
-        ->where('(folder="jevents" OR element="gwejson" OR element="jevent_embed")')
-        ->order('enabled desc, ordering asc');
+$db         = JFactory::getDbo();
+$query      = $db->getQuery(true)
+	->select('folder AS type, element AS name, params, enabled, manifest_cache ')
+	->from('#__extensions')
+	// include unpublished plugins
+	//->where('enabled = 1')
+	->where('type =' . $db->quote('plugin'))
+	->where('state IN (0,1)')
+	->where('(folder="jevents" OR element="gwejson" OR element="jevent_embed")')
+	->order('enabled desc, ordering asc');
 
 $jevplugins = $db->setQuery($query)->loadObjectList();
 
@@ -48,31 +49,31 @@ if (count($jevplugins))
 	$hasPlugins = true;
 }
 
-$bar = JToolBar::getInstance('newtoolbar');
+$bar     = JToolBar::getInstance('newtoolbar');
 $toolbar = $bar->getItems() ? $bar->render() : "";
 
 ?>
 <!-- Set Difficulty : -->
 <div id="jev_adminui" class="jev_adminui skin-blue sidebar-mini">
-	<header class="main-header">
+    <header class="main-header">
 		<?php echo JEventsHelper::addAdminHeader($items = array(), $toolbar); ?>
-	</header>
-	<!-- =============================================== -->
-	<!-- Left side column. contains the sidebar -->
+    </header>
+    <!-- =============================================== -->
+    <!-- Left side column. contains the sidebar -->
     <!-- sidebar: style can be found in sidebar.less -->
-    <?php echo $this->sidebar; ?>
+	<?php echo $this->sidebar; ?>
     <!-- /.sidebar -->
-	<!-- =============================================== -->
-	<!-- Content Wrapper. Contains page content -->
-	<div class="content-wrapper" style="min-height: 1096px;">
-		<form action="index.php" method="post" name="adminForm" autocomplete="off" id="adminForm">
-			<fieldset class='jevconfig'>
-				<!-- Content Header (Page header) -->
-				<section class="content-header">
-					<h1>
+    <!-- =============================================== -->
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper" style="min-height: 1096px;">
+        <form action="index.php" method="post" name="adminForm" autocomplete="off" id="adminForm">
+            <fieldset class='jevconfig'>
+                <!-- Content Header (Page header) -->
+                <section class="content-header">
+                    <h1>
 						<?php echo JText::_('JEV_EVENTS_CONFIG'); ?>
-					</h1>
-					<small>
+                    </h1>
+                    <small>
 						<?php
 						// difficulty rating is outside the tabs!
 						$fieldSets = $this->form->getFieldsets();
@@ -83,30 +84,33 @@ $toolbar = $bar->getItems() ? $bar->render() : "";
 								if ($field->fieldname == "com_difficulty")
 								{
 									?>
-									<table class="settings_level">
-										<tr class=" difficulty1">
+                                    <table class="settings_level">
+                                        <tr class=" difficulty1">
 											<?php
 											echo '<td class="paramlist_value"><span class="editlinktip">' . $field->label . '</span>' . $field->input . '</td>';
 											?>
-										</tr>
-									</table>
+                                        </tr>
+                                    </table>
 									<?php
 								}
 							}
 						}
 						?>
-					</small>
-				</section>
-				<!-- Main content -->
-				<section class="content ov_info">
+                    </small>
+                </section>
+                <!-- Main content -->
+                <section class="content ov_info">
 
-					<!-- Default box -->
-					<div class="box">
-						<div class="box-body jev_config">
+                    <!-- Default box -->
+                    <div class="box">
+                        <div class="box-body jev_config">
 
 							<?php
 
-                            echo JHtml::_('bootstrap.startPane', 'myParamsTabs', array('active' => $jinput->get('default_tab', 'JEV_TAB_COMPONENT')));
+                            //Find the active tab! using JSession since it's config only, double check jinput if session is empty.
+                            $active_tab = $session->get('default_tab', '') === '' ? $jinput->get('default_tab', 'JEV_TAB_COMPONENT') : $session->get('default_tab');
+
+							echo JHtml::_('bootstrap.startPane', 'myParamsTabs', array('active' => $active_tab));
 							$fieldSets = $this->form->getFieldsets();
 
 							foreach ($fieldSets as $name => $fieldSet)
@@ -130,7 +134,7 @@ $toolbar = $bar->getItems() ? $bar->render() : "";
 
 								foreach ($this->form->getFieldset($name) as $field)
 								{
-									if (strpos($field->fieldname, 'spacer') !== FALSE)
+									if (strpos($field->fieldname, 'spacer') !== false)
 									{
 										$html[] = "<tr><td colspan='2'>" . $field->input . "<br/><br/></td></tr>";
 
@@ -444,14 +448,15 @@ SCRIPT;
 
 													$hasconfig = true;
 													$class     = isset($field->class) ? $field->class : "";
-                                                        if ($field->fieldname=="whitelist"){
-                                                            $x = 1;
-                                                        }
+													if ($field->fieldname == "whitelist")
+													{
+														$x = 1;
+													}
 
-                                                        $hasconfig = true;
-                                                        $html[] = $field->renderField();
+													$hasconfig = true;
+													$html[]    = $field->renderField();
 
-                                                        $class = $field->class;
+													$class = $field->class;
 
 													if (StringHelper::strlen($class) > 0)
 													{
@@ -478,15 +483,15 @@ SCRIPT;
 										else
 										{
 											?>
-											<div class="accordion-group">
-												<div class="accordion-heading">
-													<strong>
+                                            <div class="accordion-group">
+                                                <div class="accordion-heading">
+                                                    <strong>
                                                     <span class="accordion-toggle">
                                                     <?php echo $label; ?>
                                                     </span>
-													</strong>
-												</div>
-											</div>
+                                                    </strong>
+                                                </div>
+                                            </div>
 											<?php
 										}
 									}
@@ -502,18 +507,18 @@ SCRIPT;
 							echo JHtml::_('bootstrap.endPane', 'myLayoutTabs');
 							echo JHtml::_('bootstrap.endPanel');
 							?>    </div>
-					</div>
-				</section>
-	</div>
-	<input type="hidden" name="id" value="<?php echo $this->component->id; ?>"/>
-	<input type="hidden" name="component" value="<?php echo $this->component->option; ?>"/>
-
-	<input type="hidden" name="controller" value="component"/>
-	<input type="hidden" name="option" value="<?php echo JEV_COM_COMPONENT; ?>"/>
-	<input type="hidden" name="task" value=""/>
-	<?php echo JHTML::_('form.token'); ?>
-	</fieldset>
-	</form>
-</div>
+                    </div>
+                </section>
+                <input type="hidden" name="id" value="<?php echo $this->component->id; ?>"/>
+                <input type="hidden" name="component" value="<?php echo $this->component->option; ?>"/>
+                <input type="hidden" name="default_tab" id="default_tab"
+                       value="<?php echo $session->get('default_tab', 'JEV_TAB_COMPONENT'); ?>"/>
+                <input type="hidden" name="controller" value="component"/>
+                <input type="hidden" name="option" value="<?php echo JEV_COM_COMPONENT; ?>"/>
+                <input type="hidden" name="task" value=""/>
+				<?php echo JHTML::_('form.token'); ?>
+            </fieldset>
+        </form>
+    </div>
 
 

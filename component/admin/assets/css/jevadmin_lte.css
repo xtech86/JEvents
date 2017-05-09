@@ -604,15 +604,15 @@ a:focus {
   clip: rect(0, 0, 0, 0);
   border: 0;
 }
-@media (max-width: 480px) {
-  #jev_adminui .main-header .je-toolbar {
-    display: none !important;
-  }
-}
 #jev_adminui .main-header .je-toolbar .btn-toolbar {
-  margin: 0px 10px 0px 10px !important;
+  margin: 0 10px 0 10px !important;
   padding: 9px;
   display: inline-block;
+}
+@media (max-width: 480px) {
+  #jev_adminui .main-header .je-toolbar .btn-toolbar {
+    width: 80%;
+  }
 }
 @media (min-width: 768px) {
   #jev_adminui .jevconfig table.settings_level {
@@ -624,10 +624,15 @@ a:focus {
   }
 }
 .main-header {
-  position: absolute;
+  position: fixed;
   max-height: 100px;
   z-index: 1005;
   width: 100%;
+}
+@media (max-width: 480px) {
+  .main-header {
+    max-height: auto;
+  }
 }
 .main-header > .navbar {
   -webkit-transition: margin-left 0.3s ease-in-out;

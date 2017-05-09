@@ -32,6 +32,8 @@ class AdminCpanelViewCpanel extends JEventsAbstractView
 	{
 		jimport('joomla.html.pane');
 
+		$session = JFactory::getSession();
+		$session->set('default_tab', '');
 		$document = JFactory::getDocument();
 		$document->setTitle(JText::_('JEVENTS_CORE_CPANEL'));
 

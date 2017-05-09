@@ -113,16 +113,16 @@ class JEventsHelper
 		JevAdminJHtmlSidebar::addEntry(JText::_('JEV_INSTALL_MANAGE'), 'index.php?option=com_jevents&task=icalevent.list&state=3', $vName === 'icalevent.list', 'jevents', 'fa-calendar', 0, 0, 1, '');
 		JevAdminJHtmlSidebar::addEntry(JText::_('JEV_TRASHED_EVENTS'), 'index.php?option=com_jevents&task=icalevent.list&state=-1', $vName === 'icalevent.list', 'jevents', 'fa-calendar-plus-o', 0, 0, 1, '');
 		//Categories
-		JevAdminJHtmlSidebar::addEntry(JText::_('JEV_CATEGORIES'), '#', $vName === 'categories', 'jevents', 'fa-folder', 0, 2, 0, 'treeview');
+		JevAdminJHtmlSidebar::addEntry(JText::_('JEV_CATEGORIES'), '#', $vName === 'categories', 'jevents', 'fa-folder', 0, 20, 0, 'treeview');
 		//Categories Sub Items
-		JevAdminJHtmlSidebar::addEntry(JText::_('JEV_ADD_CAT'), 'index.php?option=com_categories&view=category&layout=edit&extension=com_jevents', $vName === 'categories', 'jevents', 'fa-plus-square', 0, 0, 2, '');
-		JevAdminJHtmlSidebar::addEntry(JText::_('JEV_INSTALL_CATS'), 'index.php?option=com_categories&extension=com_jevents', $vName === 'categories', 'jevents', 'fa-folder', 0, 0, 2, '');
+		JevAdminJHtmlSidebar::addEntry(JText::_('JEV_ADD_CAT'), 'index.php?option=com_categories&view=category&layout=edit&extension=com_jevents', $vName === 'categories', 'jevents', 'fa-plus-square', 0, 0, 20, '');
+		JevAdminJHtmlSidebar::addEntry(JText::_('JEV_INSTALL_CATS'), 'index.php?option=com_categories&extension=com_jevents', $vName === 'categories', 'jevents', 'fa-folder', 0, 0, 20, '');
 
 		//JEvents Admin User Items:
 		if (JEVHelper::isAdminUser())
 		{
 			// Calendars / Feeds
-			JevAdminJHtmlSidebar::addEntry(JText::_('JEV_ADMIN_CALENDAR_FEEDS'), 'index.php?option=com_jevents&task=icals.list', $vName === 'icals.list', 'jevents', 'fa-calendar', 0, 0, 0, '');
+			JevAdminJHtmlSidebar::addEntry(JText::_('JEV_ADMIN_CALENDAR_FEEDS'), 'index.php?option=com_jevents&task=icals.list', $vName === 'icals.list', 'jevents', 'fa-calendar', 0, 10, 0, '');
 
 			$params = JComponentHelper::getParams(JEV_COM_COMPONENT);
 			if ($params->get("authorisedonly", 0))
@@ -133,41 +133,41 @@ class JEventsHelper
 			$hiddenDiff2 = ($difficulty <= 1) ? 'hiddenDifficulty' : '';
 			$hiddenDiff3 = ($difficulty <= 2) ? 'hiddenDifficulty' : '';
  			//Configuration Parent
-			JevAdminJHtmlSidebar::addEntry(JText::_('JEV_INSTALL_CONFIG'), '#', $vName === 'params.edit', 'jevents', 'fa-cogs', 0, 4, 0, 'treeview ' . ($task === 'params.edit' ? 'active' : ''));
+			JevAdminJHtmlSidebar::addEntry(JText::_('JEV_INSTALL_CONFIG'), '#', $vName === 'params.edit', 'jevents', 'fa-cogs', 0, 40, 0, 'treeview ' . ($task === 'params.edit' ? 'active' : ''));
 
 			//Configuration Sub Items
-			JevAdminJHtmlSidebar::addEntry(JText::_('JEV_TAB_COMPONENT'), $config_tabs . 'JEV_TAB_COMPONENT" data-jev-tab="JEV_TAB_COMPONENT', $vName ==='params.edit', 'jevents', 'fa-circle-o', 0, 0, 4, 'config_edit');
-			JevAdminJHtmlSidebar::addEntry(JText::_('JEV_PERMISSIONS'), $config_tabs . 'JEV_PERMISSIONS" data-jev-tab="JEV_PERMISSIONS', $vName === 'params.edit', 'jevents', 'fa-circle-o', 0, 0, 4, 'config_edit');
-			JevAdminJHtmlSidebar::addEntry(JText::_('JEV_EVENT_EDITING'), $config_tabs . 'JEV_EVENT_EDITING" data-jev-tab="JEV_EVENT_EDITING', $vName === 'params.edit', 'jevents', 'fa-circle-o', 0, 0, 4, 'difficulty1 config_edit');
-			JevAdminJHtmlSidebar::addEntry(JText::_('JEV_EVENT_DETAIL_VIEW'), $config_tabs . 'JEV_EVENT_DETAIL_VIEW" data-jev-tab="JEV_EVENT_DETAIL_VIEW', $vName === 'params.edit', 'jevents', 'fa-circle-o', 0, 0, 4, 'difficulty1 config_edit');
-			JevAdminJHtmlSidebar::addEntry(JText::_('JEV_ADMIN_MONTHLY_CALENDAR_VIEW'), $config_tabs . 'JEV_MAIN_MONTHLY_CALENDAR" data-jev-tab="JEV_MAIN_MONTHLY_CALENDAR', $vName === 'params.edit', 'jevents', 'fa-circle-o', 0, 0, 4, 'difficulty1 config_edit');
-			JevAdminJHtmlSidebar::addEntry(JText::_('YEARCATEGORY_VIEW'), $config_tabs . 'JEV_YEAR_CATEGORY_VIEW" data-jev-tab="JEV_YEAR_CATEGORY_VIEW', $vName === 'params.edit', 'jevents', 'fa-circle-o', 0, 0, 4, 'difficulty1 config_edit');
+			JevAdminJHtmlSidebar::addEntry(JText::_('JEV_TAB_COMPONENT'), $config_tabs . 'JEV_TAB_COMPONENT" data-jev-tab="JEV_TAB_COMPONENT', $vName ==='params.edit', 'jevents', 'fa-circle-o', 0, 0, 40, 'config_edit');
+			JevAdminJHtmlSidebar::addEntry(JText::_('JEV_PERMISSIONS'), $config_tabs . 'JEV_PERMISSIONS" data-jev-tab="JEV_PERMISSIONS', $vName === 'params.edit', 'jevents', 'fa-circle-o', 0, 0, 40, 'config_edit');
+			JevAdminJHtmlSidebar::addEntry(JText::_('JEV_EVENT_EDITING'), $config_tabs . 'JEV_EVENT_EDITING" data-jev-tab="JEV_EVENT_EDITING', $vName === 'params.edit', 'jevents', 'fa-circle-o', 0, 0, 40, 'difficulty1 config_edit');
+			JevAdminJHtmlSidebar::addEntry(JText::_('JEV_EVENT_DETAIL_VIEW'), $config_tabs . 'JEV_EVENT_DETAIL_VIEW" data-jev-tab="JEV_EVENT_DETAIL_VIEW', $vName === 'params.edit', 'jevents', 'fa-circle-o', 0, 0, 40, 'difficulty1 config_edit');
+			JevAdminJHtmlSidebar::addEntry(JText::_('JEV_ADMIN_MONTHLY_CALENDAR_VIEW'), $config_tabs . 'JEV_MAIN_MONTHLY_CALENDAR" data-jev-tab="JEV_MAIN_MONTHLY_CALENDAR', $vName === 'params.edit', 'jevents', 'fa-circle-o', 0, 0, 40, 'difficulty1 config_edit');
+			JevAdminJHtmlSidebar::addEntry(JText::_('YEARCATEGORY_VIEW'), $config_tabs . 'JEV_YEAR_CATEGORY_VIEW" data-jev-tab="JEV_YEAR_CATEGORY_VIEW', $vName === 'params.edit', 'jevents', 'fa-circle-o', 0, 0, 40, 'difficulty1 config_edit');
 
-			JevAdminJHtmlSidebar::addEntry(JText::_('JEV_ICAL_CALENDAR'), $config_tabs . 'JEV_ICAL_CALENDAR" data-jev-tab="JEV_ICAL_CALENDAR', $vName === 'params.edit', 'jevents', 'fa-circle-o', 0, 0, 4, 'difficulty2 config_edit ' . $hiddenDiff2);
-			JevAdminJHtmlSidebar::addEntry(JText::_('JEV_TAB_RSS'), $config_tabs . 'JEV_TAB_RSS" data-jev-tab="JEV_TAB_RSS', $vName === 'params.edit', 'jevents', 'fa-circle-o', 0, 0, 4, 'difficulty2 config_edit ' . $hiddenDiff2);
+			JevAdminJHtmlSidebar::addEntry(JText::_('JEV_ICAL_CALENDAR'), $config_tabs . 'JEV_ICAL_CALENDAR" data-jev-tab="JEV_ICAL_CALENDAR', $vName === 'params.edit', 'jevents', 'fa-circle-o', 0, 0, 40, 'difficulty2 config_edit ' . $hiddenDiff2);
+			JevAdminJHtmlSidebar::addEntry(JText::_('JEV_TAB_RSS'), $config_tabs . 'JEV_TAB_RSS" data-jev-tab="JEV_TAB_RSS', $vName === 'params.edit', 'jevents', 'fa-circle-o', 0, 0, 40, 'difficulty2 config_edit ' . $hiddenDiff2);
 
-			JevAdminJHtmlSidebar::addEntry(JText::_('ROBOT_SEF_OPTIONS'), $config_tabs . 'ROBOT_SEF_OPTIONS" data-jev-tab="ROBOT_SEF_OPTIONS', $vName === 'params.edit', 'jevents', 'fa-circle-o', 0, 0, 4, 'difficulty3 config_edit ' . $hiddenDiff3);
-			JevAdminJHtmlSidebar::addEntry(JText::_('JEV_MODULE_CONFIG'), $config_tabs . 'JEV_MODULE_CONFIG" data-jev-tab="JEV_MODULE_CONFIG', $vName === 'params.edit', 'jevents', 'fa-circle-o', 0, 0, 4, 'difficulty3 config_edit ' . $hiddenDiff3);
-			JevAdminJHtmlSidebar::addEntry(JText::_('JEV_PLUGIN_OPTIONS'), $config_tabs . 'plugin_options" data-jev-tab="plugin_options', $vName === 'params.edit', 'jevents', 'fa-circle-o', 0, 0, 4, 'difficulty3 config_edit ' . $hiddenDiff3);
+			JevAdminJHtmlSidebar::addEntry(JText::_('ROBOT_SEF_OPTIONS'), $config_tabs . 'ROBOT_SEF_OPTIONS" data-jev-tab="ROBOT_SEF_OPTIONS', $vName === 'params.edit', 'jevents', 'fa-circle-o', 0, 0, 40, 'difficulty3 config_edit ' . $hiddenDiff3);
+			JevAdminJHtmlSidebar::addEntry(JText::_('JEV_MODULE_CONFIG'), $config_tabs . 'JEV_MODULE_CONFIG" data-jev-tab="JEV_MODULE_CONFIG', $vName === 'params.edit', 'jevents', 'fa-circle-o', 0, 0, 40, 'difficulty3 config_edit ' . $hiddenDiff3);
+			JevAdminJHtmlSidebar::addEntry(JText::_('JEV_PLUGIN_OPTIONS'), $config_tabs . 'plugin_options" data-jev-tab="plugin_options', $vName === 'params.edit', 'jevents', 'fa-circle-o', 0, 0, 40, 'difficulty3 config_edit ' . $hiddenDiff3);
 
 			//Custom Layouts
 			$flt = $jinput->get('filter_layout_type', '');
 			$vNameCLayouts = (in_array($vName, array('defaults.list', 'defaults.overview')) ? 'defaults.list' : '');
-			JevAdminJHtmlSidebar::addEntry(JText::_('JEV_LAYOUT_DEFAULTS'), '#', $vName === $vNameCLayouts, 'jevents', 'fa-files-o', 0, 5, 0, 'treeview');
+			JevAdminJHtmlSidebar::addEntry(JText::_('JEV_LAYOUT_DEFAULTS'), '#', $vName === $vNameCLayouts, 'jevents', 'fa-files-o', 0, 50, 0, 'treeview');
 
 			//JEvents Core
-			JevAdminJHtmlSidebar::addEntry(JText::_('JEV_ADMIN_JEVENTS_CORE'), 'index.php?option=com_jevents&task=defaults.list&filter_layout_type=jevents', $vName ===  $vNameCLayouts, 'jevents', 'fa-circle-o', 0, 0, 5, ($task === $vNameCLayouts && $flt === 'jevents' ? 'active' : ''));
+			JevAdminJHtmlSidebar::addEntry(JText::_('JEV_ADMIN_JEVENTS_CORE'), 'index.php?option=com_jevents&task=defaults.list&filter_layout_type=jevents', $vName ===  $vNameCLayouts, 'jevents', 'fa-circle-o', 0, 0, 50, ($task === $vNameCLayouts && $flt === 'jevents' ? 'active' : ''));
 
 			//Run through club add ons
 			if (in_array('com_jevpeople', $jevaddons_results))
 			{
 				//Managed People
-				JevAdminJHtmlSidebar::addEntry(JText::_('JEV_ADMIN_JEVENTS_MANAGED_PEOPLE'), 'index.php?option=com_jevents&task=defaults.list&filter_layout_type=jevpeople', $vName === $vNameCLayouts, 'jevents', 'fa-circle-o', 0, 0, 5, ($task === $vNameCLayouts && $flt === 'jevpeople' ? 'active' : ''));
+				JevAdminJHtmlSidebar::addEntry(JText::_('JEV_ADMIN_JEVENTS_MANAGED_PEOPLE'), 'index.php?option=com_jevents&task=defaults.list&filter_layout_type=jevpeople', $vName === $vNameCLayouts, 'jevents', 'fa-circle-o', 0, 0, 50, ($task === $vNameCLayouts && $flt === 'jevpeople' ? 'active' : ''));
 			}
 			if (in_array('com_jevlocations', $jevaddons_results))
 			{
 				//Managed Locations
-				JevAdminJHtmlSidebar::addEntry(JText::_('JEV_ADMIN_JEVENTS_MANAGED_LOCATIONS'), 'index.php?option=com_jevents&task=defaults.list&filter_layout_type=jevlocations', $vName ===  $vNameCLayouts, 'jevents', 'fa-circle-o', 0, 0, 5, ($task === $vNameCLayouts && $flt === 'jevlocations' ? 'active' : ''));
+				JevAdminJHtmlSidebar::addEntry(JText::_('JEV_ADMIN_JEVENTS_MANAGED_LOCATIONS'), 'index.php?option=com_jevents&task=defaults.list&filter_layout_type=jevlocations', $vName ===  $vNameCLayouts, 'jevents', 'fa-circle-o', 0, 0, 50, ($task === $vNameCLayouts && $flt === 'jevlocations' ? 'active' : ''));
 			}
 
 			//Lets checkout what club themes are installed
@@ -182,7 +182,7 @@ class JEventsHelper
 
 			if (count($themes) > 0) {
 
-				JevAdminJHtmlSidebar::addEntry(JText::_('JEV_ADMIN_CLUB_THEMES'), '#', $vName === 'params.edit#iconic', 'jevents', 'fa-laptop', 0, 6, 0, 'treeview');
+				JevAdminJHtmlSidebar::addEntry(JText::_('JEV_ADMIN_CLUB_THEMES'), '#', $vName === 'params.edit#iconic', 'jevents', 'fa-laptop', 0, 60, 0, 'treeview');
 
 				foreach ($themes as $viewfile)
 				{
@@ -193,22 +193,22 @@ class JEventsHelper
 						$class      = ' class="active "';
 						$haslayouts = true;
 						//$themes .= '<li ' . $class . '><a ' . $config_tabs . '#' . $viewfile . '" class="themes_link"><i class="fa fa-circle-o"></i>' . $viewfile . '</a></li>';
-						JevAdminJHtmlSidebar::addEntry(JText::_($viewfile), $config_tabs . $viewfile .'" data-jev-tab="' . $viewfile, $vName === 'params.edit#' . $viewfile, 'jevents', 'fa-circle-o', 0, 0, 6, 'config_edit');
+						JevAdminJHtmlSidebar::addEntry(JText::_($viewfile), $config_tabs . $viewfile .'" data-jev-tab="' . $viewfile, $vName === 'params.edit#' . $viewfile, 'jevents', 'fa-circle-o', 0, 0, 60, 'config_edit');
 					}
 					elseif (file_exists($config))
 					{
 						$class      = '';
 						$haslayouts = true;
-						JevAdminJHtmlSidebar::addEntry(JText::_($viewfile), $config_tabs . $viewfile .'" data-jev-tab="' . $viewfile, $vName === 'params.edit#' . $viewfile, 'jevents', 'fa-circle-o', 0, 0, 6, 'config_edit');
+						JevAdminJHtmlSidebar::addEntry(JText::_($viewfile), $config_tabs . $viewfile .'" data-jev-tab="' . $viewfile, $vName === 'params.edit#' . $viewfile, 'jevents', 'fa-circle-o', 0, 0, 60, 'config_edit');
 					}
 				}
 
 			}
 
 			//Support Info
-			JevAdminJHtmlSidebar::addEntry(JText::_('SUPPORT_INFO'), 'index.php?option=com_jevents&task=cpanel.support', $vName === 'cpanel.support', 'jevents', 'fa-support', 0, 7, 0);
+			JevAdminJHtmlSidebar::addEntry(JText::_('SUPPORT_INFO'), 'index.php?option=com_jevents&task=cpanel.support', $vName === 'cpanel.support', 'jevents', 'fa-support', 0, 70, 0);
 			//Custom CSS
-			JevAdminJHtmlSidebar::addEntry(JText::_('JEV_CUSTOM_CSS'), 'index.php?option=com_jevents&view=customcss', $vName === 'customcss', 'jevents', 'fa-css3', 0, 8, 0);
+			JevAdminJHtmlSidebar::addEntry(JText::_('JEV_CUSTOM_CSS'), 'index.php?option=com_jevents&view=customcss', $vName === 'customcss', 'jevents', 'fa-css3', 0, 80, 0);
 
 			// Lets do a single query and get an array of the addons! Wheyyy // Also make sure they are enabled!
 			$jevaddons = array('com_jevlocations', 'com_rsvppro', 'jevcustomfields', 'com_jevpeople');
@@ -230,36 +230,36 @@ class JEventsHelper
 			// Managed Locations
 			if (in_array('com_jevlocations', $jevaddons_results))
 			{
-				JevAdminJHtmlSidebar::addEntry(JText::_('JEV_ADMIN_MANAGED_LOCATIONS_HEADER_TITLE'), '#', $vName === 'cpanel.cpanel', 'jevlocations', 'fa-map-o', 0, 9, 0, 'treeview ' . ($task === '' ? 'active' : ''));
-				JevAdminJHtmlSidebar::addEntry(JText::_('JEV_ADMIN_LOCATIONS_OVERVIEW'), 'index.php?option=com_jevlocations&task=locations.overview', $vName === 'locations.overview', 'jevlocations', 'fa-map-marker', 0, 0, 9);
-				JevAdminJHtmlSidebar::addEntry(JText::_('JEV_ADMIN_LOCATIONS_ADD_LOCATION'), 'index.php?option=com_jevlocations&task=locations.edit', $vName === 'locations.edit', 'jevlocations', 'fa-edit', 0, 0, 9);
-				JevAdminJHtmlSidebar::addEntry(JText::_('JEV_CATEGORIES'), 'index.php?option=com_jevlocations', $vName === 'cpanel.cpanel', 'jevlocations', 'fa-folder', 0, 0, 9);
-				JevAdminJHtmlSidebar::addEntry(JText::_('JEV_INSTALL_CONFIG'), 'index.php?option=com_jevlocations&task=params.edit', $vName === 'params.edit', 'jevlocations', 'fa-cogs', 0, 0, 9);
+				JevAdminJHtmlSidebar::addEntry(JText::_('JEV_ADMIN_MANAGED_LOCATIONS_HEADER_TITLE'), '#', $vName === 'cpanel.cpanel', 'jevlocations', 'fa-map-o', 0, 90, 0, 'treeview ' . ($task === '' ? 'active' : ''));
+				JevAdminJHtmlSidebar::addEntry(JText::_('JEV_ADMIN_LOCATIONS_OVERVIEW'), 'index.php?option=com_jevlocations&task=locations.overview', $vName === 'locations.overview', 'jevlocations', 'fa-map-marker', 0, 0, 90);
+				JevAdminJHtmlSidebar::addEntry(JText::_('JEV_ADMIN_LOCATIONS_ADD_LOCATION'), 'index.php?option=com_jevlocations&task=locations.edit', $vName === 'locations.edit', 'jevlocations', 'fa-edit', 0, 0, 90);
+				JevAdminJHtmlSidebar::addEntry(JText::_('JEV_CATEGORIES'), 'index.php?option=com_jevlocations', $vName === 'cpanel.cpanel', 'jevlocations', 'fa-folder', 0, 0, 90);
+				JevAdminJHtmlSidebar::addEntry(JText::_('JEV_INSTALL_CONFIG'), 'index.php?option=com_jevlocations&task=params.edit', $vName === 'params.edit', 'jevlocations', 'fa-cogs', 0, 0, 90);
 			}
 
 			// Managed People
 			if (in_array('com_jevpeople', $jevaddons_results))
 			{
 				JFactory::getLanguage()->load("com_jevpeople", JPATH_ADMINISTRATOR);
-				JevAdminJHtmlSidebar::addEntry(JText::_('JEV_ADMIN_MANAGED_PEOPLE_HEADER_TITLE'), '#', $vName === 'cpanel.cpanel', 'jevpeople', 'fa-puzzle-piece', 0, 11, 0, 'treeview ' . ($task === '' ? 'active' : ''));
-				JevAdminJHtmlSidebar::addEntry(JText::_('JEV_PEOPLE'), 'index.php?option=com_jevpeople&task=people.overview', $vName === 'people.overview', 'jevpeople', 'fa-users', 0, 0, 11);
-				JevAdminJHtmlSidebar::addEntry(JText::_('PEOPLE_TYPES'), 'index.php?option=com_jevpeople&task=types.list', $vName === 'types.list', 'jevpeople', 'fa-random', 0, 0, 11);
-				JevAdminJHtmlSidebar::addEntry(JText::_('CATEGORIES'), 'index.php?option=com_categories&extension=com_jevpeople', $vName === '', 'jevpeople', 'fa-folder', 0, 0, 11);
+				JevAdminJHtmlSidebar::addEntry(JText::_('JEV_ADMIN_MANAGED_PEOPLE_HEADER_TITLE'), '#', $vName === 'cpanel.cpanel', 'jevpeople', 'fa-puzzle-piece', 0, 110, 0, 'treeview ' . ($task === '' ? 'active' : ''));
+				JevAdminJHtmlSidebar::addEntry(JText::_('JEV_PEOPLE'), 'index.php?option=com_jevpeople&task=people.overview', $vName === 'people.overview', 'jevpeople', 'fa-users', 0, 0, 110);
+				JevAdminJHtmlSidebar::addEntry(JText::_('PEOPLE_TYPES'), 'index.php?option=com_jevpeople&task=types.list', $vName === 'types.list', 'jevpeople', 'fa-random', 0, 0, 110);
+				JevAdminJHtmlSidebar::addEntry(JText::_('CATEGORIES'), 'index.php?option=com_categories&extension=com_jevpeople', $vName === '', 'jevpeople', 'fa-folder', 0, 0, 110);
 			}
 			// RSVP Pro
 			if (in_array('com_rsvppro', $jevaddons_results))
 			{
 				JFactory::getLanguage()->load("com_rsvppro", JPATH_ADMINISTRATOR);
-				JevAdminJHtmlSidebar::addEntry(JText::_('JEV_ADMIN_RSVP_PRO_HEADER_TITLE'), '#', $vName === 'cpanel.cpanel', 'jevrsvppro', 'fa-users', 0, 11, 0, 'treeview ' . ($task === '' ? 'active' : ''));
-				JevAdminJHtmlSidebar::addEntry(JText::_('RSVP_SESSIONS'), 'index.php?option=com_rsvppro&task=sessions.list', $vName === 'sessions.list', 'jevrsvppro', 'fa-users', 0, 0, 11);
-				JevAdminJHtmlSidebar::addEntry(JText::_('RSVP_TEMPLATES'), 'index.php?option=com_rsvppro&task=templates.list', $vName === 'template.list', 'jevrsvppro', 'fa-edit', 0, 0, 11);
-				JevAdminJHtmlSidebar::addEntry(JText::_('RSVP_PRO_PAYMENT_METHODS'), 'index.php?option=com_rsvppro&task=pmethods.overview', $vName === 'pmethods.overview', 'jevrsvppro', 'fa-dollar', 0, 0, 11);
-				JevAdminJHtmlSidebar::addEntry(JText::_('RSVP_CONFIGURATION'), 'index.php?option=com_rsvppro&task=params.edit', $vName === 'params.edit', 'jevrsvppro', 'fa-cogs', 0, 0, 11);
+				JevAdminJHtmlSidebar::addEntry(JText::_('JEV_ADMIN_RSVP_PRO_HEADER_TITLE'), '#', $vName === 'cpanel.cpanel', 'jevrsvppro', 'fa-users', 0, 120, 0, 'treeview ' . ($task === '' ? 'active' : ''));
+				JevAdminJHtmlSidebar::addEntry(JText::_('RSVP_SESSIONS'), 'index.php?option=com_rsvppro&task=sessions.list', $vName === 'sessions.list', 'jevrsvppro', 'fa-users', 0, 0, 120);
+				JevAdminJHtmlSidebar::addEntry(JText::_('RSVP_TEMPLATES'), 'index.php?option=com_rsvppro&task=templates.list', $vName === 'template.list', 'jevrsvppro', 'fa-edit', 0, 0, 120);
+				JevAdminJHtmlSidebar::addEntry(JText::_('RSVP_PRO_PAYMENT_METHODS'), 'index.php?option=com_rsvppro&task=pmethods.overview', $vName === 'pmethods.overview', 'jevrsvppro', 'fa-dollar', 0, 0, 120);
+				JevAdminJHtmlSidebar::addEntry(JText::_('RSVP_CONFIGURATION'), 'index.php?option=com_rsvppro&task=params.edit', $vName === 'params.edit', 'jevrsvppro', 'fa-cogs', 0, 0, 120);
 			}
 			// Custom Fields
 			if (in_array('jevcustomfields', $jevaddons_results))
 			{
-				JevAdminJHtmlSidebar::addEntry(JText::_('JEV_CUSTOM_FIELDS'), 'index.php?option=com_jevents&task=plugin.jev_customfields.overview', $vName === 'plugin.jev_customfields.overview', 'jevents', 'fa-object-group', 0, 12, 0);
+				JevAdminJHtmlSidebar::addEntry(JText::_('JEV_CUSTOM_FIELDS'), 'index.php?option=com_jevents&task=plugin.jev_customfields.overview', $vName === 'plugin.jev_customfields.overview', 'jevents', 'fa-object-group', 0, 130, 0);
 			}
 		}
 	}

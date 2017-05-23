@@ -107,6 +107,10 @@ if ($view === 'customcss') {
 	if ($cmd === 'cpanel.show' || strpos($cmd, '.') === 0) { $cmd = $view; }
 	$controllerName = 'CustomCss';
 }
+if ($view === 'importer') {
+	if ($cmd === 'cpanel.show' || strpos($cmd, '.') === 0) { $cmd = $view; }
+	$controllerName = 'importer';
+}
 if ($view === 'supportinfo') {
 	JFactory::getApplication()->redirect('index.php?option=com_jevents&task=cpanel.support');
 }

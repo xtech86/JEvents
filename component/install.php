@@ -749,6 +749,13 @@ SQL;
 			@$db->execute();
 		}
 
+		if (!array_key_exists("params", $cols))
+		{
+			$sql = "Alter table #__jevents_icsfile ADD COLUMN params TEXT NOT NULL";
+			$db->setQuery($sql);
+			@$db->execute();
+		}
+
 		$sql = "Alter table #__jevents_icsfile MODIFY COLUMN srcURL varchar(500) NOT NULL default ''";
 		$db->setQuery($sql);
 		$db->execute();

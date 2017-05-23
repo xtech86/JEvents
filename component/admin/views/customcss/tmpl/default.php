@@ -32,8 +32,8 @@ $toolbar = $bar->getItems() ? $bar->render() : "";
         <!-- Content Header (Page header) -->
         <section class="content-header">
             <h1>
-				<?php echo JText::_('ICALS'); ?>
-                <small><?php echo JText::_('JEV_ICALS_DESC'); ?></small>
+				<?php echo JText::_('JEV_CUSTOM_CSS'); ?>
+                <small><?php echo JText::_('Editor'); ?></small>
             </h1>
         </section>
 

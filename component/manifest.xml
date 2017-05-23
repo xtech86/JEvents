@@ -65,6 +65,7 @@
             <folder>models</folder>
             <folder>tables</folder>
             <folder>views</folder>
+            <folder>vendor</folder>
             <filename>access.xml</filename>
             <filename>category.xml</filename>
             <filename>config.xml</filename>

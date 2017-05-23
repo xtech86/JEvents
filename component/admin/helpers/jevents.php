@@ -123,6 +123,7 @@ class JEventsHelper
 		{
 			// Calendars / Feeds
 			JevAdminJHtmlSidebar::addEntry(JText::_('JEV_ADMIN_CALENDAR_FEEDS'), 'index.php?option=com_jevents&task=icals.list', $vName === 'icals.list', 'jevents', 'fa-calendar', 0, 10, 0, '');
+			JevAdminJHtmlSidebar::addEntry(JText::_('JEV_ADMIN_CALENDAR_IMPORTER'), 'index.php?option=com_jevents&view=importer', $vName === 'importer', 'jevents', 'fa-calendar', 0, 15, 0, '');
 
 			$params = JComponentHelper::getParams(JEV_COM_COMPONENT);
 			if ($params->get("authorisedonly", 0))

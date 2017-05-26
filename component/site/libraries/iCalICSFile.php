@@ -182,33 +182,34 @@ RAWTEXT;
 	}
 
 	/**
-	 * Used to create Ical from raw strring
+	 * Used to create iCal from raw string
 	 */
 	public function newICSFileFromString($rawtext,$icsid,$catid,$access=0,$state=1, $label="", $autorefresh=0, $ignoreembedcat=0){
 		$db	= JFactory::getDbo();
 		$temp = null;
 		$temp = new iCalICSFile($db);
-		if ($icsid>0){
+
+		if ($icsid > 0){
 			$temp->load($icsid);
-			$temp->icaltype=2;  // i.e. from file
+			$temp->icaltype = 2;  // i.e. from file
 		}
 		else {
 			$temp->_setup($icsid,$catid,$access,$state,$autorefresh,$ignoreembedcat);
 			$temp->srcURL = "";
-			$temp->filename = "_from_events_cat".$catid;
-			$temp->icaltype=2;  // i.e. from file
+			$temp->filename = "_from_events_cat" . $catid;
+			$temp->icaltype = 2;  // i.e. from file
 			if ($label!="") $temp->label = $label;
 			else $temp->label = $temp->filename;
 		}
 
 
-		$temp->_icalInfo =& JEVHelper::iCalInstance("",$rawtext);
+		$temp->_icalInfo =& JEVHelper::iCalInstance("", $rawtext);
 
 		return $temp;
 	}
 
 	/**
-	 * Method that updates details about the ical but does not touch the events contained
+	 * Method that updates details about the iCal but does not touch the events contained
 	 *
 	 */
 	public function updateDetails(){

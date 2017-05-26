@@ -228,6 +228,9 @@ class iCalEvent extends JTable  {
 		$temp->convertData();
 		$temp->setupEventDetail();
 		//		$temp->map_iCal_to_Jevents();
+
+		//var_Dump($temp);
+		//die();
 		return $temp;
 		//print_r($this->data);
 	}

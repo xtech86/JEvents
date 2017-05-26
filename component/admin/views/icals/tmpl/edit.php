@@ -22,7 +22,6 @@ $action = JFactory::getApplication()->isAdmin() ? "index.php" : "index.php?optio
 
 $bar = JToolBar::getInstance('newtoolbar');
 $toolbar = $bar->getItems() ? $bar->render() : "";
-
 ?>
 
 <div id="jev_adminui" class="jev_adminui skin-blue sidebar-mini">
@@ -60,15 +59,17 @@ $toolbar = $bar->getItems() ? $bar->render() : "";
 							global $task;
 
         if (isset($this->editItem->ics_id)) {
-            $id = $this->editItem->ics_id;
+            //Load in the data since we are editing.
+            $id = (int) $this->editItem->ics_id;
             $catid = $this->editItem->catid;
             $access = $this->editItem->access;
             $srcURL = $this->editItem->srcURL;
             $filename = $this->editItem->filename;
             $overlaps = $this->editItem->overlaps;
             $label = $this->editItem->label;
-            $icaltype = $this->editItem->icaltype;
-            if ($srcURL == "")
+            $icaltype = (int) $this->editItem->icaltype;
+            $icalparams = json_decode($this->editItem->params);
+            if ($srcURL === "")
 			{
                 $filemessage = JText::_("COM_JEVENTS_MANAGE_CALENDARS_OVERVIEW_LOADED_FROM_LOCAL_FILE_CALLLED") . " ";
 			}
@@ -78,6 +79,7 @@ $toolbar = $bar->getItems() ? $bar->render() : "";
 			}
         }
         else {
+            //Set default data since it is new.
             $id = 0;
             $catid = 0;
             $access = 0;
@@ -86,6 +88,7 @@ $toolbar = $bar->getItems() ? $bar->render() : "";
             $overlaps = 0;
             $label = "";
             $icaltype = 2;
+	        $icalparams = new stdClass();
             $filemessage = JText::_('FROM_FILE');
         }
 
@@ -116,41 +119,34 @@ $toolbar = $bar->getItems() ? $bar->render() : "";
 							echo JEventsHTML::buildScriptTag('end');
 
 							?>
-							<div class="control-group">
-								<div class="control-label">
-									<?php echo JText::_("Unique_Identifier"); ?>
-								</div>
-								<div class="controls">
-									<input class="inputbox" type="text" name="icsLabel" id="icsLabel"
-									       value="<?php echo $label; ?>" size="80"/>
-								</div>
-							</div>
-							<?php if ($this->users) { ?>
-							<div class="control-group">
-								<div class="control-label">
-									<?php echo JText::_("JEV_CALENDAR_OWNER"); ?>
-								</div>
-								<div class="controls">
-									<?php echo $this->users; ?>
-								</div>
-							</div>
-							<?php } ?>
-							<div class="control-group">
-								<div class="control-label">
-									<?php echo JText::_('JEV_EVENT_ACCESSLEVEL'); ?>
-								</div>
-								<div class="controls">
-									<?php echo $glist; ?>
-								</div>
+							<div class="form-group span3">
+								<label for="icsLabel">
+									<?php echo JText::_("UNIQUE_IDENTIFIER"); ?>
+                                </label>
+                                <input class="inputbox" type="text" name="icsLabel" id="icsLabel" value="<?php echo $label; ?>" size="80"/>
 							</div>
 
-							<div class="control-group">
-								<div class="control-label">
+							<?php if ($this->users) { ?>
+							<label class="form-group span3">
+								<label for="jevusers">
+									<?php echo JText::_("JEV_CALENDAR_OWNER"); ?>
+								</label>
+                                <?php echo $this->users; ?>
+							</div>
+							<?php } ?>
+							<div class="form-group span3">
+								<label for="access">
+									<?php echo JText::_('JEV_EVENT_ACCESSLEVEL'); ?>
+                                </label>
+                                <?php echo $glist; ?>
+
+							</div>
+
+							<div class="form-group">
+								<label for="catid">
 									<?php echo JText::_("JEV_FALLBACK_CATEGORY"); ?>
-								</div>
-								<div class="controls">
-									<?php echo JEventsHTML::buildCategorySelect($catid, "", null, $this->with_unpublished_cat, true, 0, 'catid'); ?>
-								</div>
+                                </label>
+                                <?php echo JEventsHTML::buildCategorySelect($catid, "", null, $this->with_unpublished_cat, true, 0, 'catid'); ?>
 							</div>
 
 							<?php
@@ -165,7 +161,7 @@ $toolbar = $bar->getItems() ? $bar->render() : "";
 								$checked0 = '';
 							}
 							?>
-							<div class="control-group">
+							<div class="form-group row span-12">
 								<div class="control-label">
 									<label title="" class="hasTip" for="ignoreembedcat"
 									       id="ignoreembedcat-lbl"><?php echo JText::_('JEV_IGNORE_EMBEDDED_CATEGORIES'); ?></label>
@@ -184,22 +180,28 @@ $toolbar = $bar->getItems() ? $bar->render() : "";
 								</div>
 							</div>
 
-							<?php if ($id == 0)
+							<?php if ($id === 0)
 							{ ?>
 								<ul class="nav nav-tabs" id="myicalTabs">
-									<li class="active"><a data-toggle="tab"
-									                      href="#from_scratch"><?php echo JText::_("FROM_SCRATCH"); ?></a>
+									<li class="active">
+                                        <a data-toggle="tab" href="#from_scratch"><?php echo JText::_("FROM_SCRATCH"); ?></a>
 									</li>
-									<li><a data-toggle="tab" href="#from_file"><?php echo JText::_("FROM_FILE"); ?></a>
+									<li>
+                                        <a data-toggle="tab" href="#from_file"><?php echo JText::_("FROM_FILE"); ?></a>
 									</li>
-									<li><a data-toggle="tab" href="#from_url"><?php echo JText::_("FROM_URL"); ?></a>
+									<li>
+                                        <a data-toggle="tab" href="#from_url"><?php echo JText::_("FROM_URL"); ?></a>
 									</li>
+                                    <li>
+                                        <a data-toggle="tab" href="#from_facebook_page"><?php echo JText::_("FROM_FACEBOOK"); ?></a>
+                                    </li>
 								</ul>
 								<?php
 							}
 							// Tabs
 							echo JHtml::_('bootstrap.startPane', 'myicalTabs', array('active' => 'from_scratch'));
 
+							//Load if from scratch or file.
 							if ($id == 0 || $icaltype == 2)
 							{
 								echo JHtml::_('bootstrap.addPanel', "myicalTabs", "from_scratch");
@@ -257,7 +259,7 @@ $toolbar = $bar->getItems() ? $bar->render() : "";
 								</div>
 
 
-								<?php if ($id == 0)
+                            <?php if ($id === 0)
 							{ ?>
 								<button name="newical" title="Create New"
 								        onclick="submitbutton('icals.new');return false;"><?php echo JText::_("CREATE_FROM_SCRATCH"); ?></button>
@@ -265,7 +267,7 @@ $toolbar = $bar->getItems() ? $bar->render() : "";
 							}
 							}
 
-							if ($id == 0 || $icaltype == 1)
+							if ($id === 0 || $icaltype === 1)
 							{
 								echo JHtml::_('bootstrap.endPanel');
 								echo JHtml::_('bootstrap.addPanel', "myicalTabs", "from_file");
@@ -280,7 +282,7 @@ $toolbar = $bar->getItems() ? $bar->render() : "";
 							}
 							}
 
-							if ($id == 0 || $icaltype == 0)
+							if ($id === 0 || $icaltype === 0)
 							{
 								echo JHtml::_('bootstrap.endPanel');
 								echo JHtml::_('bootstrap.addPanel', "myicalTabs", "from_url");
@@ -327,24 +329,170 @@ $toolbar = $bar->getItems() ? $bar->render() : "";
 									</div>
 								</div>
 
-								<input class="inputbox" type="text" name="uploadURL"
-								       id="uploadURL" <?php echo $disabled; ?> size="120"
-								       value="<?php echo $srcURL; ?>"/><br/><br/>
+								<input class="inputbox" type="text" name="uploadURL" id="uploadURL" <?php echo $disabled; ?> size="120" value="<?php echo $srcURL; ?>"/><br/><br/>
 								<?php if ($id == 0)
-							{ ?>
-								<button name="loadical" title="Load Ical" <?php echo $disabled; ?>
-								        onclick="var icalfile=document.getElementById('uploadURL').value;if (icalfile.length==0)return false; else submitbutton('icals.save');return false;"><?php echo JText::_('LOAD_ICAL_FROM_URL'); ?></button>
-								<?php
-							}
+                                { ?>
+                                    <button name="loadical" title="Load Ical" <?php echo $disabled; ?>
+                                            onclick="var icalfile=document.getElementById('uploadURL').value;if (icalfile.length == 0) return false; else submitbutton('icals.save');return false;"><?php echo JText::_('LOAD_ICAL_FROM_URL'); ?></button>
+                                    <?php
+                                }
 							}
 							echo JHtml::_('bootstrap.endPanel');
-							echo JHtml::_('bootstrap.endPane', 'myicalTabs');
-							?>
-							<input type="hidden" name="icsid" id="icsid" <?php echo $disabled; ?>
+
+							if ($id === 0 || $icaltype === 3)
+							{
+
+								echo JHtml::_('bootstrap.addPanel', "myicalTabs", "from_facebook_page");
+								?>
+                                <fieldset class="" id="ignoreembedcat">
+                                    <p><?php echo JText::_('JEV_FACEBOOK_INFO'); ?> </p>
+                                    <div class="form-group span3">
+                                        <label for="facebookapp_feed_id"> <?php echo JText::_('JEV_FACEBOOK_APP_FEED_ID'); ?> </label>
+                                        <input id="facebookapp_feed_id" type="text" name="facebookapp_feed_id" value="<?php echo isset($icalparams->facebookapp_feed_id) ? $icalparams->facebookapp_feed_id : ''; ?>" />
+                                    </div>
+                                    <div class="form-group span3">
+                                        <label for="facebookapp_id"> <?php echo JText::_('JEV_FACEBOOK_APP_ID'); ?> </label>
+                                        <input id="facebookapp_id" type="text" name="facebookapp_id" value="<?php echo isset($icalparams->facebookapp_id) ? $icalparams->facebookapp_id : ''; ?>" />
+                                    </div>
+                                    <div class="form-group span3">
+                                        <label for="facebookapp_secret"> <?php echo JText::_('JEV_FACEBOOK_APP_SECRET'); ?> </label>
+                                        <input id="facebookapp_secret" type="text" name="facebookapp_secret" value="<?php echo isset($icalparams->facebookapp_secret) ? $icalparams->facebookapp_secret : ''; ?>" />
+                                    </div>
+                                    <div class="form-group span3">
+                                        <label for="facebookapp_token"> <?php echo JText::_('JEV_FACEBOOK_APP_TOKEN'); ?> </label>
+                                        <input id="facebookapp_token" type="text" name="facebookapp_token" value="<?php echo isset($icalparams->facebookapp_token) ? $icalparams->facebookapp_token : ''; ?>" readonly />
+                                    </div>
+                                    <div class="form-group span3">
+                                        <label for=""> <?php echo JText::_('JEV_FACEBOOK_APP_GET_TOKEN'); ?> </label>
+                                        <?php $link = JUri::getInstance() . '&layout=fb_get_token&tmpl=component'; ?>
+
+                                       <!-- <a href="<?php echo $link; ?>" id="facebook_get_token" class="modal btn btn-primary" onclick="facebookInit(jQuery('#facebookapp_id').val();)">Authorize APP</a>-->
+                                        <a href="#" id="facebook_get_token" class="btn btn-primary" onclick="facebookInit(jQuery('#facebookapp_id').val());">Authorize APP</a>
+                                    </div>
+                                    <?php
+                                    if (!isset($this->editItem->autorefresh) || $this->editItem->autorefresh == 0)
+                                    {
+	                                    $checked0 = ' checked="checked"';
+	                                    $checked1 = '';
+                                    }
+                                    else
+                                    {
+	                                    $checked1 = ' checked="checked"';
+	                                    $checked0 = '';
+                                    }
+                                    ?>
+
+                                    <div class="form-group row span12">
+                                        <label>
+			                                <?php echo JText::_("JEV_EVENT_AUTOREFRESH"); ?>
+                                        </label>
+                                            <fieldset class="radio btn-group" id="ignoreembedcat">
+                                                <input id="autorefresh0" type="radio" value="0"
+                                                       name="autorefresh" <?php echo $checked0; ?>/>
+                                                <label for="autorefresh0"><?php echo JText::_('JEV_NO'); ?></label>
+                                                <input id="autorefresh1" type="radio" value="1"
+                                                       name="autorefresh" <?php echo $checked1; ?>/>
+                                                <label
+                                                        for="autorefresh1"><?php echo JText::_('JEV_YES'); ?></label><br/><br/>
+                                            </fieldset>
+                                    </div>
+
+                                    <div class="form-group row span-12">
+	                                    <?php if ($id === 0)
+	                                    { ?>
+                                        <button name="newical" title="Create New"
+                                                onclick="submitbutton('icals.new');return false;"><?php echo JText::_("CREATE_FROM_SCRATCH"); ?></button>
+                                        <?php } ?>
+                                    </div>
+                                </fieldset>
+								<?php
+								echo JHtml::_('bootstrap.endPanel');
+							}
+							echo JHtml::_('bootstrap.endPane', 'myicalTabs');  ?>
+
+                            <script>
+                                function getFbParams() {
+                                    app_id = jQuery('#facebookapp_id').val();
+                                    app_secret = jQuery('#facebookapp_secret').val();
+
+                                    var _href = jQuery('#facebook_get_token').attr("href");
+                                    jQuery('#facebook_get_token').attr("href", _href + '&app_id=' + app_id + '&app_secret=' + app_secret);
+                                }
+                            </script>
+
+                            <div id="fb-root"></div>
+                            <script src="https://connect.facebook.net/en_US/all.js"></script>
+                            <script type="text/javascript">
+                                function facebookInit(appId) {
+                                    FB.init({
+                                        appId: appId,
+                                        status: true,
+                                        cookie: true,
+                                        oauth: true
+                                    });
+
+                                    FB.getLoginStatus(function (stsResp) {
+                                        if (stsResp.authResponse) {
+                                            // We're logged in and ready to go!
+                                            if(stsResp.authResponse.accessToken) {
+                                                LongLifeToken = fetchLongLifeToken(stsResp.authResponse.accessToken);
+                                            }
+                                            //jQuery('#facebookapp_token').val(stsResp.authResponse.accessToken);
+                                            //console.log('WE have a response:' + stsResp.authResponse)
+                                        } else {
+                                            // We're not connected
+                                            FB.login(function(response) {
+                                                if (response.authResponse) {
+                                                    console.log('Welcome!  Fetching your information.... ');
+                                                    FB.api('/me', function(response) {
+                                                        // We need to get a new long live token via Ajax Serverside.
+                                                        // jQuery('#facebookapp_token').val(response.accessToken);
+                                                        if(response.accessToken) {
+                                                            LongLifeToken = fetchLongLifeToken(response.accessToken);
+                                                        }
+
+                                                        console.log('Good to see you, ' + response.name + '.');
+                                                        facebookInit(appId); //ReRun this to get token.
+                                                    });
+                                                } else {
+                                                    console.log('User cancelled login or did not fully authorize.');
+                                                }
+                                            }, {scope: 'email,user_events,manage_pages,rsvp_event'});
+                                            console.log('We are not logged in.');
+                                        }
+                                    });
+                                }
+
+                                function fetchLongLifeToken(ShortLifetoken) {
+                                    var token = '{<?php echo JSession::getFormToken();?>}';
+                                    jQuery.ajax({
+                                        type : 'POST',
+                                        dataType : 'json',
+                                        url : '<?php echo JUri::root(); ?>index.php?option=com_jevents&ttoption=com_jevents&typeaheadtask=gwejson&file=fb_long_life_token&path=admin&folder=gwejsonhelpers%2F&token=' + token,
+                                        data : {'json':JSON.stringify({'ShortLifeToken': ShortLifetoken, 'LongLifeToken' : '', 'AppID' : jQuery('#facebookapp_id').val(), 'AppSecret': jQuery('#facebookapp_secret').val()})},
+                                        contentType: "application/x-www-form-urlencoded; charset=utf-8",
+                                        scriptCharset: "utf-8"
+                                    })
+                                        .done(function( data ){
+                                            try {
+                                                jQuery('#facebookapp_token').val(data.LongLifeToken);
+                                            }
+                                            catch (e) {
+                                                console.log("The form failed and the exception was caught." + e);
+                                            }
+                                        })
+                                        .fail(function(x) {
+                                            console.log("We failed for some reason. " + x);
+                                        });
+                                }
+                            </script>
+
+                    <input type="hidden" name="icsid" id="icsid" <?php echo $disabled; ?>
 							       value="<?php echo $id; ?>"/>
 							<?php echo JHtml::_('form.token'); ?>
 							<input type="hidden" name="boxchecked" value="0"/>
 							<input type="hidden" name="task" value="icals.edit"/>
+                            <input type="hidden" name="params" value="1" />
 							<input type="hidden" name="option" value="<?php echo JEV_COM_COMPONENT; ?>"/>
 						</form>
 					</div>

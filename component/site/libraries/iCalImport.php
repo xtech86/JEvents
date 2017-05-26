@@ -153,12 +153,12 @@ class iCalImport
 			$this->srcURL="n/a";
 			$this->rawData = $rawtext;
 		}
-		;
+
 		// get rid of spurious carriage returns and spaces
 		//$this->rawData = preg_replace("/[\r\n]+ ([:;])/","$1",$this->rawData);
 
 		// simplify line feed
-		$this->rawData = str_replace("\r\n","\n",trim($this->rawData));
+		$this->rawData = str_replace("\r\n","\n", trim($this->rawData));
 
 		// remove spurious lines before calendar start
 		if (!JString::stristr($this->rawData,'BEGIN:VCALENDAR')) {
@@ -304,6 +304,7 @@ class iCalImport
 				$this->vevents[] = iCalEvent::iCalEventFromData($vevent);
 			}
 		}
+
 		return $this;
 	}
 

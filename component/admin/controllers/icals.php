@@ -218,15 +218,18 @@ class AdminIcalsController extends JControllerForm {
 
 	function save($key = null, $urlVar = null){
 
+		$app    = JFactory::getApplication();
+		$jinput = $app->input;
+		$task   = $jinput->getCmd("task");
 		// Check for request forgeries
-		if (JRequest::getCmd("task") != "icals.reload" && JRequest::getCmd("task") != "icals.reloadall"){
-			JRequest::checkToken() or jexit( 'Invalid Token' );
+		if ($task !== "icals.reload" && $task !== "icals.reloadall"){
+			JSession::checkToken() or jexit( 'Invalid Token' );
 		}
 
 		$authorised = false;
 		
-		if (JFactory::getApplication()->isAdmin()){
-			$redirect_task="icals.list";
+		if (JFactory::getApplication()->isClient('administrator')){
+			$redirect_task = "icals.list";
 		}
 		else {
 			$redirect_task="day.listevents";
@@ -234,12 +237,13 @@ class AdminIcalsController extends JControllerForm {
 
 		// clean this up later - this is a quick fix for frontend reloading
 		$autorefresh = 0;
-		$icsid = intval(JRequest::getVar('icsid',0));
+		$icsid = $jinput->getInt('icsid', 0);
 		if ($icsid>0){
 			$query = "SELECT icsf.* FROM #__jevents_icsfile as icsf WHERE ics_id=$icsid";
 			$db	= JFactory::getDbo();
 			$db->setQuery($query);
 			$currentICS = $db->loadObjectList();
+
 			if (count($currentICS)>0){
 				$currentICS= $currentICS[0];
 				if ($currentICS->autorefresh){
@@ -248,9 +252,11 @@ class AdminIcalsController extends JControllerForm {
 				}
 			}
 		}
-		$user = JFactory::getUser();				
+
+		$user = JFactory::getUser();
+
 		if (!($authorised || JEVHelper::isAdminUser($user))) {
-			$this->setRedirect( "index.php?option=".JEV_COM_COMPONENT."&task=$redirect_task", "Not Authorised - must be super admin" );
+			$this->setRedirect( "index.php?option=" . JEV_COM_COMPONENT . "&task=$redirect_task", "Not Authorised - must be super admin" );
 			$this->redirect();
 			return;
 		}
@@ -264,12 +270,11 @@ class AdminIcalsController extends JControllerForm {
 
 		$db	= JFactory::getDbo();
 
-		// include ical files
-		
+		// include iCal files
+		if ($icsid > 0 || $cid != 0){
 
-		if ($icsid>0 || $cid!=0){
-			$icsid = ($icsid>0)?$icsid:$cid;
-			$query = "SELECT icsf.* FROM #__jevents_icsfile as icsf WHERE ics_id=$icsid";
+			$icsid = ($icsid > 0) ? $icsid : $cid;
+			$query = "SELECT icsf.* FROM #__jevents_icsfile as icsf WHERE ics_id = $icsid";
 			$db->setQuery($query);
 			$currentICS = $db->loadObjectList();
 			if (count($currentICS)>0){
@@ -281,39 +286,57 @@ class AdminIcalsController extends JControllerForm {
 				
 			}
 			else {
-				$this->setRedirect( "index.php?option=".JEV_COM_COMPONENT."&task=$redirect_task", "Invalid Ical Details");
+				$this->setRedirect( "index.php?option=".JEV_COM_COMPONENT."&task=$redirect_task", "Invalid iCal Details");
 				$this->redirect();
 			}
 
-			$catid = JRequest::getInt('catid',$currentICS->catid);
+			$catid = $jinput->getInt('catid', $currentICS->catid);
+
 			if ($catid<=0 && $currentICS->catid>0){
-				$catid = intval($currentICS->catid);
+				$catid = (int) $currentICS->catid;
 			}
-			$access = intval(JRequest::getVar('access',$currentICS->access));
+
+			$access = (int) $jinput->get('access', $currentICS->access);
+
 			if ($access<0 && $currentICS->access>=0){
-				$access = intval($currentICS->access);
+				$access = (int) $currentICS->access;
 			}
-			$icsLabel = JRequest::getVar('icsLabel',$currentICS->label );
-			if (($icsLabel=="" || JRequest::getCmd("task") == "icals.reload") && JString::strlen($currentICS->label)>=0){
+
+
+			if ((int) $currentICS->icaltype === 3) {
+				$iCal = $this->generateFacebookData($currentICS, $catid);
+				$icsFile = iCalICSFile::newICSFileFromString($iCal, $icsid, $catid);
+
+				//var_dump($icsFile);die;
+
+				$this->setRedirect( "index.php?option=" . JEV_COM_COMPONENT . "&task=$redirect_task", JText::_( 'FACEBOOK_FEED_REFRESHED' ));
+				$this->redirect();
+			}
+
+			$icsLabel = $jinput->getString('icsLabel', $currentICS->label);
+
+			if (($icsLabel === '' || $task === "icals.reload") && JString::strlen($currentICS->label)>=0){
 				$icsLabel = $currentICS->label;
 			}
-			$isdefault = JRequest::getInt('isdefault',$currentICS->isdefault);
-			$overlaps = JRequest::getInt('overlaps',$currentICS->overlaps);
-			$autorefresh = JRequest::getInt('autorefresh',$autorefresh);
-			$ignoreembedcat = JRequest::getInt('ignoreembedcat',$currentICS->ignoreembedcat);
 
-			// This is a native ical - so we are only updating identifiers etc
-			if ($currentICS->icaltype==2){
+			$isdefault = $jinput->getInt('isdefault', $currentICS->isdefault);
+			$overlaps = $jinput->getInt('overlaps', $currentICS->overlaps);
+			$autorefresh = $jinput->getInt('autorefresh', $autorefresh);
+			$ignoreembedcat = $jinput->getInt('ignoreembedcat', $currentICS->ignoreembedcat);
+
+			// This is a native iCal - so we are only updating identifiers etc
+			if ($currentICS->icaltype == 2 || $currentICS->icaltype == 3){
 				$ics = new iCalICSFile($db);
 				$ics->load($icsid);
-				$ics->catid=$catid;
-				$ics->isdefault=$isdefault;
-				$ics->overlaps=$overlaps;
-				$ics->access=$access;
-				$ics->label=$icsLabel;
+				$ics->catid     = $catid;
+				$ics->isdefault = $isdefault;
+				$ics->overlaps  = $overlaps;
+				$ics->access    = $access;
+				$ics->label     = $icsLabel;
+
 				// TODO update access and state
 				$ics->updateDetails();
-				$this->setRedirect( "index.php?option=".JEV_COM_COMPONENT."&task=$redirect_task", JText::_( 'ICS_SAVED' ));
+				$this->setRedirect( "index.php?option=" . JEV_COM_COMPONENT . "&task=$redirect_task", JText::_( 'ICS_SAVED' ));
 				$this->redirect();
 			}
 
@@ -322,6 +345,7 @@ class AdminIcalsController extends JControllerForm {
 				echo "Can only reload URL based subscriptions";
 				return;
 			}
+
 			$uploadURL = $currentICS->srcURL;
 
 		}
@@ -334,6 +358,7 @@ class AdminIcalsController extends JControllerForm {
 			$uploadURL = JRequest::getVar('uploadURL','' );
 			$icsLabel = JRequest::getString('icsLabel','' );                        
 		}
+
 		if ($catid==0){
 			// Paranoia, should not be here, validation is done by java script
 			JFactory::getApplication()->enqueueMessage('Fatal Error - ' . JText::_('JEV_E_WARNCAT') , 'error');
@@ -343,18 +368,19 @@ class AdminIcalsController extends JControllerForm {
 			return;
 		}
 
+
 		// I need a better check and expiry information etc.
 		if (JString::strlen($uploadURL)>0){
-			$icsFile = iCalICSFile::newICSFileFromURL($uploadURL,$icsid,$catid,$access,$state,$icsLabel, $autorefresh, $ignoreembedcat);
+			$icsFile = iCalICSFile::newICSFileFromURL($uploadURL, $icsid, $catid, $access, $state, $icsLabel, $autorefresh, $ignoreembedcat);
 		}
 		else if (isset($_FILES['upload']) && is_array($_FILES['upload']) ) {
 			$file 			= $_FILES['upload'];
-			if ($file['size']==0 ){//|| !($file['type']=="text/calendar" || $file['type']=="application/octet-stream")){
+			if ($file['size'] == 0 ){//|| !($file['type']=="text/calendar" || $file['type']=="application/octet-stream")){
 				JFactory::getApplication()->enqueueMessage(JText::_('JEV_EMPTY_FILE_UPLOAD'), 'warning');
 				$icsFile = false;
 			}
 			else {
-				$icsFile = iCalICSFile::newICSFileFromFile($file,$icsid,$catid,$access,$state,$icsLabel);
+				$icsFile = iCalICSFile::newICSFileFromFile($file, $icsid, $catid, $access, $state, $icsLabel);
 			}
 		}
 
@@ -382,20 +408,21 @@ class AdminIcalsController extends JControllerForm {
 	 */
 	function savedetails(){
 		$authorised = false;
-
 		// Check for request forgeries
-		JRequest::checkToken() or jexit( 'Invalid Token' );
+		JSession::checkToken() or jexit( 'Invalid Token' );
 
-		if (JFactory::getApplication()->isAdmin()){
-			$redirect_task="icals.list";
-		}
-		else {
-			$redirect_task="month.calendar";
+		$app    = JFactory::getApplication();
+		$jinput = $app->input;
+
+		$redirect_task = "month.calendar";
+
+		if ($app->isClient('administrator')){
+			$redirect_task = "icals.list";
 		}
 
 		$user = JFactory::getUser();
 		if (!($authorised || JEVHelper::isAdminUser($user))) {
-			$this->setRedirect( "index.php?option=".JEV_COM_COMPONENT."&task=$redirect_task", "Not Authorised - must be super admin" );
+			$this->setRedirect( "index.php?option=" . JEV_COM_COMPONENT . "&task=$redirect_task", "Not Authorised - must be super admin" ); //TODO add language string.
 			$this->redirect();
 			return;
 		}
@@ -411,14 +438,14 @@ class AdminIcalsController extends JControllerForm {
 
 		$db	= JFactory::getDbo();
 
-		// include ical files
-		
+		// include iCal files
+		if ($icsid > 0 || $cid != 0){
+			$icsid = ($icsid > 0) ? $icsid : $cid;
 
-		if ($icsid>0 || $cid!=0){
-			$icsid = ($icsid>0)?$icsid:$cid;
 			$query = "SELECT icsf.* FROM #__jevents_icsfile as icsf WHERE ics_id=$icsid";
 			$db->setQuery($query);
 			$currentICS = $db->loadObjectList();
+
 			if (count($currentICS)>0){
 				$currentICS= $currentICS[0];
 			}
@@ -455,15 +482,22 @@ class AdminIcalsController extends JControllerForm {
 			// We are only updating identifiers etc
 			$ics = new iCalICSFile($db);
 			$ics->load($icsid);
-			$ics->catid=$catid;
-			$ics->isdefault=$isdefault;
-			$ics->overlaps=$overlaps;
-			$ics->created_by=JRequest::getInt("created_by",$currentICS->created_by);
-			$ics->state=$state;
-			$ics->access=$access;
-			$ics->label=$icsLabel;
-			$ics->srcURL= $uploadURL;
-			$ics->ignoreembedcat= $ignoreembed;
+			$ics->catid = $catid;
+			$ics->isdefault = $isdefault;
+			$ics->overlaps = $overlaps;
+			$ics->created_by = JRequest::getInt("created_by",$currentICS->created_by);
+			$ics->state = $state;
+			$ics->access = $access;
+			$ics->label = $icsLabel;
+			$ics->srcURL =  $uploadURL;
+			$ics->ignoreembedcat = $ignoreembed;
+			$ics->params = json_encode(array(
+				'facebookapp_id' => $jinput->get('facebookapp_id', ''),
+				'facebookapp_token' => $jinput->get('facebookapp_token', ''),
+				'facebookapp_secret' => $jinput->get('facebookapp_secret', ''),
+				'facebookapp_feed_id' => $jinput->get('facebookapp_feed_id', '')
+			));
+
 			// TODO update access and state
 			$ics->updateDetails();
 			$this->setRedirect( "index.php?option=".JEV_COM_COMPONENT."&task=$redirect_task", JText::_( 'ICS_SAVED' ));
@@ -571,22 +605,33 @@ class AdminIcalsController extends JControllerForm {
 	function newical() {
 
 		// Check for request forgeries
-		JRequest::checkToken() or jexit( 'Invalid Token' );
+		JSession::checkToken() or jexit( 'Invalid Token' );
+		$app    = JFactory::getApplication();
+		$jinput = $app->input;
 
 		// include ical files
-		$catid = intval(JRequest::getVar('catid',0));
+		$catid = (int) $jinput->get('catid', 0);
 		// Should come from the form or existing item
-		$access = JRequest::getInt('access',0);
+		$access = $jinput->getInt('access',0);
 		$state = 1;
-		$icsLabel = JRequest::getVar('icsLabel','');
+		$icsLabel = $jinput->getString('icsLabel','');
 
-		if ($catid==0){
+		//Map the params on in.
+		$jinput->set('params', array(
+				'facebookapp_id' => $jinput->get('facebookapp_id', ''),
+				'facebookapp_token' => $jinput->get('facebookapp_token', ''),
+				'facebookapp_secret' => $jinput->get('facebookapp_secret', ''),
+				'facebookapp_feed_id' => $jinput->get('facebookapp_feed_id', '')
+			));
+
+
+		if ($catid === 0){
 			// Paranoia, should not be here, validation is done by java script
-			JFactory::getApplication()->enqueueMessage('Fatal Error - ' . JText::_("JEV_E_WARNCAT"), 'error');
+			$app->enqueueMessage('Fatal Error - ' . JText::_("JEV_E_WARNCAT"), 'error');
 
 			// Set option variable.
 			$option = JEV_COM_COMPONENT;
-			JFactory::getApplication()->redirect( 'index.php?option=' . $option);
+			$app->redirect( 'index.php?option=' . $option);
 			return;
 		}
                         
@@ -595,9 +640,10 @@ class AdminIcalsController extends JControllerForm {
                 $query = "SELECT icsf.* FROM #__jevents_icsfile as icsf WHERE label=".$db->quote($icsLabel);
                 $db->setQuery($query);
                 $existing = $db->loadObject();
-                if ($existing){ 
-                    JFactory::getApplication()->enqueueMessage(JText::_('JEV_DUPLICATE_CALENDAR') , 'error');
 
+                if ($existing){
+
+                    $app->enqueueMessage(JText::_('JEV_DUPLICATE_CALENDAR') , 'error');
                     $this->setRedirect( "index.php?option=".JEV_COM_COMPONENT."&task=icals.edit");
                     $this->redirect();
                     return;
@@ -605,8 +651,20 @@ class AdminIcalsController extends JControllerForm {
                 }
                 
 		$icsid = 0;
-		$icsFile = iCalICSFile::editICalendar($icsid,$catid,$access,$state,$icsLabel);
-                $icsFile->created_by = JRequest::getInt("created_by",0);
+		$icsFile = iCalICSFile::editICalendar($icsid, $catid, $access, $state, $icsLabel);
+		$icsFile->created_by = $jinput->getInt("created_by",0);
+		//Map Facebook SDK
+		$icsFile->params = json_encode(array(
+			'facebookapp_id' => $jinput->get('facebookapp_id', ''),
+			'facebookapp_token' => $jinput->get('facebookapp_token', ''),
+			'facebookapp_secret' => $jinput->get('facebookapp_secret', ''),
+			'facebookapp_feed_id' => $jinput->get('facebookapp_feed_id', '')
+		));
+
+		if ($jinput->get('facebookapp_id', '') !== '') {
+			$icsFile->icaltype = 3;
+		}
+
 		$icsFileid = $icsFile->store();
 
 		$this->setRedirect( "index.php?option=".JEV_COM_COMPONENT."&task=icals.list", JText::_( 'ICAL_FILE_CREATED' ));
@@ -699,6 +757,112 @@ class AdminIcalsController extends JControllerForm {
 			$this->setRedirect($redirectURL, "You must first create at least one category");
 			$this->redirect();
 		}
+	}
+
+	function generateFacebookData($ical, $catid) {
+		$ical_params    = json_decode($ical->params);
+		$app_id         = $ical_params->facebookapp_id;
+		$app_token      = $ical_params->facebookapp_token;
+		$app_secret     = $ical_params->facebookapp_secret;
+		$feed_id        = $ical_params->facebookapp_feed_id;
+		$cats           = JEV_CommonFunctions::getCategoryData();
+		if(array_key_exists($catid, $cats)) {
+			$cat = $cats[$catid];
+		} else {
+			die('Error, not category set?');
+		}
+		session_start();
+		// Include the required dependencies.
+		require_once JPATH_ADMINISTRATOR . '/components/com_jevents/vendor/autoload.php';
+
+		// Initialize the Facebook PHP SDK v5.
+		$fb = new Facebook\Facebook([
+			'app_id'                => $app_id,
+			'app_secret'            => $app_secret,
+			'default_graph_version' => 'v2.9',
+		]);
+
+		$res    = $fb->get('/' . $feed_id . '/events', $app_token);
+		$data   = $res->getDecodedBody();
+
+		//Build the iCal Data
+		$iCal = "BEGIN:VCALENDAR\r\nPRODID:-//jEvents 3.5 for Joomla//EN\r\n";
+		$iCal .= "CALSCALE:GREGORIAN\r\nMETHOD:PUBLISH\r\n";
+		echo '<pre>';
+
+		foreach ($data['data'] as $event) {
+			$iCal .= "BEGIN:VEVENT\r\n";
+			$iCal .= "UID:FB" . $event['id'] . "\r\n";
+			$iCal .= "CATEGORIES:" . str_replace('\'', '', $cat->title) . "\r\n";
+			$iCal .= "SUMMARY:" . $event['name'] . "\r\n";
+
+			$location = '';
+			$loc_segments_count = count($event['place']);
+			if (is_array($event['place']['location'])) {
+				//Get rid of the location id for now.
+				unset($event['place']['id']);
+
+				$loc_details = $event['place']['location'];
+				unset($event['place']['location'], $loc_details['id']);
+				//Manipulate the data...
+				$event['place'] = array_merge($loc_details,  $event['place']);
+			}
+
+			$i = 0;
+			$geo = false;
+
+			if (is_array($event['place']))
+			{
+				foreach ($event['place'] as $key => $loc_row)
+				{
+					if($key === 'latitude') {
+						$geo .= $loc_row . ';';
+						unset($event['place'][$key]);
+						continue;
+					}
+					if($key === 'longitude') {
+						$geo .= $loc_row . "\r\n";
+						unset($event['place'][$key]);
+						continue;
+					}
+
+					if ($i > 0)
+					{
+						$location .= ',';
+					}
+					$location .= $loc_row;
+					$i++;
+				}
+			} else {
+				$location = '';
+			}
+
+			if ($location !== '')
+			{
+				$iCal .= "LOCATION:" . $location . "\r\n";
+			}
+
+			if($geo) {
+				$iCal .= "GEO:" . $geo . "\r\n";
+			}
+
+			//Times:
+			$iCal .= "DTSTAMP:" . $stamptime = JevDate::strftime("%Y%m%dT%H%M%SZ", time()) . "\r\n";
+			$iCal .= "DTSTART:" . strftime("%Y%m%dT%H%M%SZ", strtotime($event['start_time'])) . "\r\n";
+			if ($event['end_time'])
+			{
+				$iCal .= "DTEND:" . strftime("%Y%m%dT%H%M%SZ", strtotime($event['end_time'])) . "\r\n";
+			} else {
+				$iCal .="DTEND:" . JevDate::strftime('%Y-%m-%d 23:59:59',strtotime($event['start_time']));
+			}
+			$iCal .= "TRANSP:OPAQUE\r\n";
+			$iCal .= "END:VEVENT\r\n";
+		}
+//		echo $iCal;
+//		print_r($data);die;
+		$iCal .= "END:VCALENDAR";
+
+		return $iCal;
 	}
 
 }

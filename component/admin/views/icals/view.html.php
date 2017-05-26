@@ -42,6 +42,12 @@ class AdminIcalsViewIcals extends JEventsAbstractView
 	public function edit($tpl = null)
 	{
 
+		$app    = JFactory::getApplication();
+		$jinput = $app->input;
+
+		//Fetch layout to use, else fallback to edit
+		$layout = $jinput->getCmd('layout', 'edit');
+
 		JEVHelper::script('editicalJQ.js', 'components/' . JEV_COM_COMPONENT . '/assets/js/');
 
 		$document = JFactory::getDocument();
@@ -51,6 +57,7 @@ class AdminIcalsViewIcals extends JEventsAbstractView
 		{
 			$this->toolbarSave('icals.savedetails');
 		}
+
 		$this->toolbarCancel('icals.list');
 
 		$params = JComponentHelper::getParams(JEV_COM_COMPONENT);
@@ -68,12 +75,8 @@ class AdminIcalsViewIcals extends JEventsAbstractView
 		{
 			$rules         = JAccess::getAssetRules("com_jevents", true);
 			$creatorgroups = $rules->getData();
-			// need to merge the arrays because of stupid way Joomla! checks super user permissions
-			//$creatorgroups = array_merge($creatorgroups["core.admin"]->getData(), $creatorgroups["core.create"]->getData());
-			// use union orf arrays sincee getData no longer has string keys in the resultant array
-			//$creatorgroups = $creatorgroups["core.admin"]->getData()+ $creatorgroups["core.create"]->getData();
-			// use union orf arrays sincee getData no longer has string keys in the resultant array
 			$creatorgroupsdata = $creatorgroups["core.admin"]->getData();
+
 			// take the higher permission setting
 			foreach ($creatorgroups["core.create"]->getData() as $creatorgroup => $permission)
 			{
@@ -111,7 +114,7 @@ class AdminIcalsViewIcals extends JEventsAbstractView
 		}
 		if (count($userOptions) > 0)
 		{
-			$userlist = JHTML::_('select.genericlist', $userOptions, 'created_by', 'class="inputbox select2" size="1" ', 'value', 'text', $created_by);
+			$userList = JHTML::_('select.genericlist', $userOptions, 'created_by', 'class="inputbox select2" size="1" ', 'value', 'text', $created_by);
 		}
 		else
 		{
@@ -123,7 +126,7 @@ class AdminIcalsViewIcals extends JEventsAbstractView
 		JEventsHelper::addSubmenu();
 		$this->sidebar = JHtmlSidebar::render();
 
-		$this->setLayout("edit");
+		$this->setLayout($layout);
 
 	}
 

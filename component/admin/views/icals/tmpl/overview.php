@@ -120,7 +120,10 @@ JEVHelper::script('select2.full.min.js', 'administrator/components/' . JEV_COM_C
                                         </td>
                                         <td align="center">
 											<?php
-											$types = array("Remote", "Uploaded File", "Native");
+											$types = array(JText::_('COM_JEVENTS_MANAGE_CALENDARS_OVERVIEW_REMOTE'),
+                                                JText::_('COM_JEVENTS_MANAGE_CALENDARS_OVERVIEW_UPLOADED_FILE'),
+                                                JText::_('COM_JEVENTS_MANAGE_CALENDARS_OVERVIEW_NATIVE'),
+                                                JText::_('JEV_FACEBOOK_FEED'));
 											echo $types[$row->icaltype];
 											?>
                                         </td>
@@ -128,7 +131,7 @@ JEVHelper::script('select2.full.min.js', 'administrator/components/' . JEV_COM_C
                                         <td align="center">
 											<?php
 											// only offer reload for URL based ICS
-											if ($row->srcURL != "")
+											if ($row->srcURL != "" || (int) $row->icaltype === 3)
 											{
 												?>
                                                 <a href="javascript: void(0);"
@@ -152,7 +155,7 @@ JEVHelper::script('select2.full.min.js', 'administrator/components/' . JEV_COM_C
                                         </td>
                                         <td align="center">
 											<?php
-											if ($row->icaltype == 0)
+											if ((int) $row->icaltype === 0 || (int) $row->icaltype === 3)
 											{
 												$img = $row->autorefresh ? JHTML::_('image', 'admin/tick.png', '', array('title' => ''), true) : JHTML::_('image', 'admin/publish_x.png', '', array('title' => ''), true);
 												?>

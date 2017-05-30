@@ -1,16 +1,16 @@
 [
     {
-        "name": "facebook/graph-sdk",
+        "name": "facebook/graphsdk",
         "version": "5.5.x-dev",
         "version_normalized": "5.5.9999999.9999999-dev",
         "source": {
             "type": "git",
-            "url": "https://github.com/facebook/php-graph-sdk.git",
+            "url": "https://github.com/facebook/php-graphsdk.git",
             "reference": "93d7dc87e55a541d2e27d38f3aed40abbffdf6e1"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/facebook/php-graph-sdk/zipball/93d7dc87e55a541d2e27d38f3aed40abbffdf6e1",
+            "url": "https://api.github.com/repos/facebook/php-graphsdk/zipball/93d7dc87e55a541d2e27d38f3aed40abbffdf6e1",
             "reference": "93d7dc87e55a541d2e27d38f3aed40abbffdf6e1",
             "shasum": ""
         },
@@ -49,11 +49,11 @@
         "authors": [
             {
                 "name": "Facebook",
-                "homepage": "https://github.com/facebook/php-graph-sdk/contributors"
+                "homepage": "https://github.com/facebook/php-graphsdk/contributors"
             }
         ],
         "description": "Facebook SDK for PHP",
-        "homepage": "https://github.com/facebook/php-graph-sdk",
+        "homepage": "https://github.com/facebook/php-graphsdk",
         "keywords": [
             "facebook",
             "sdk"

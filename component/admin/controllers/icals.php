@@ -26,13 +26,13 @@ class AdminIcalsController extends JControllerForm {
 	 * Controler for the Ical Functions
 	 * @param array		configuration
 	 */
-	function __construct($config = array())
-	{
-		parent::__construct($config);
-		$this->registerTask( 'list',  'overview' );
-		$this->registerTask( 'new',  'newical' );
-		$this->registerTask( 'reload',  'save' );
-		$this->registerDefaultTask("overview");
+    function __construct($config = array())
+    {
+        parent::__construct($config);
+        $this->registerTask('list',  'overview');
+        $this->registerTask('new',  'newical');
+        $this->registerTask('reload',  'save');
+        $this->registerDefaultTask("overview");
 
 		$cfg = JEVConfig::getInstance();
 		$this->_debug = $cfg->get('jev_debug', 0);
@@ -302,27 +302,27 @@ class AdminIcalsController extends JControllerForm {
 				$access = (int) $currentICS->access;
 			}
 
+            $icsLabel = $jinput->getString('icsLabel', $currentICS->label);
+            $isdefault = $jinput->getInt('isdefault', $currentICS->isdefault);
+            $overlaps = $jinput->getInt('overlaps', $currentICS->overlaps);
+            $autorefresh = $jinput->getInt('autorefresh', $autorefresh);
+            $ignoreembedcat = $jinput->getInt('ignoreembedcat', $currentICS->ignoreembedcat);
 
 			if ((int) $currentICS->icaltype === 3) {
 				$iCal = $this->generateFacebookData($currentICS, $catid);
-				$icsFile = iCalICSFile::newICSFileFromString($iCal, $icsid, $catid);
-
-				//var_dump($icsFile);die;
+				$ics = new iCalICSFile($db);
+                $ics->load($icsid);
+                $icsFile = $ics->newICSFileFromString($iCal, $icsid, $catid);
+                $icsFile->icaltype = 3;
+                $icsFile->store();
 
 				$this->setRedirect( "index.php?option=" . JEV_COM_COMPONENT . "&task=$redirect_task", JText::_( 'FACEBOOK_FEED_REFRESHED' ));
 				$this->redirect();
 			}
 
-			$icsLabel = $jinput->getString('icsLabel', $currentICS->label);
-
 			if (($icsLabel === '' || $task === "icals.reload") && JString::strlen($currentICS->label)>=0){
 				$icsLabel = $currentICS->label;
 			}
-
-			$isdefault = $jinput->getInt('isdefault', $currentICS->isdefault);
-			$overlaps = $jinput->getInt('overlaps', $currentICS->overlaps);
-			$autorefresh = $jinput->getInt('autorefresh', $autorefresh);
-			$ignoreembedcat = $jinput->getInt('ignoreembedcat', $currentICS->ignoreembedcat);
 
 			// This is a native iCal - so we are only updating identifiers etc
 			if ($currentICS->icaltype == 2 || $currentICS->icaltype == 3){
@@ -352,6 +352,7 @@ class AdminIcalsController extends JControllerForm {
 		else {
 			$catid = JRequest::getInt('catid',0);
 			$ignoreembedcat = JRequest::getInt('ignoreembedcat',0);
+
 			// Should come from the form or existing item
 			$access = JRequest::getInt('access',0);
 			$state = 1;
@@ -360,6 +361,7 @@ class AdminIcalsController extends JControllerForm {
 		}
 
 		if ($catid==0){
+
 			// Paranoia, should not be here, validation is done by java script
 			JFactory::getApplication()->enqueueMessage('Fatal Error - ' . JText::_('JEV_E_WARNCAT') , 'error');
 
@@ -771,7 +773,7 @@ class AdminIcalsController extends JControllerForm {
 		} else {
 			die('Error, not category set?');
 		}
-		session_start();
+
 		// Include the required dependencies.
 		require_once JPATH_ADMINISTRATOR . '/components/com_jevents/vendor/autoload.php';
 
@@ -797,8 +799,8 @@ class AdminIcalsController extends JControllerForm {
 			$iCal .= "SUMMARY:" . $event['name'] . "\r\n";
 
 			$location = '';
-			$loc_segments_count = count($event['place']);
-			if (is_array($event['place']['location'])) {
+			$loc_segments_count = isset($event['place']) ? count($event['place']) : 0;
+			if (isset($event['place']['location']) && is_array($event['place']['location'])) {
 				//Get rid of the location id for now.
 				unset($event['place']['id']);
 
@@ -811,7 +813,7 @@ class AdminIcalsController extends JControllerForm {
 			$i = 0;
 			$geo = false;
 
-			if (is_array($event['place']))
+			if (isset($event['place']) && is_array($event['place']))
 			{
 				foreach ($event['place'] as $key => $loc_row)
 				{
@@ -821,7 +823,7 @@ class AdminIcalsController extends JControllerForm {
 						continue;
 					}
 					if($key === 'longitude') {
-						$geo .= $loc_row . "\r\n";
+						$geo .= $loc_row;
 						unset($event['place'][$key]);
 						continue;
 					}
@@ -849,17 +851,16 @@ class AdminIcalsController extends JControllerForm {
 			//Times:
 			$iCal .= "DTSTAMP:" . $stamptime = JevDate::strftime("%Y%m%dT%H%M%SZ", time()) . "\r\n";
 			$iCal .= "DTSTART:" . strftime("%Y%m%dT%H%M%SZ", strtotime($event['start_time'])) . "\r\n";
-			if ($event['end_time'])
+			if (isset($event['end_time']))
 			{
 				$iCal .= "DTEND:" . strftime("%Y%m%dT%H%M%SZ", strtotime($event['end_time'])) . "\r\n";
 			} else {
-				$iCal .="DTEND:" . JevDate::strftime('%Y-%m-%d 23:59:59',strtotime($event['start_time']));
+				$iCal .="DTEND:" . JevDate::strftime('%Y-%m-%d 23:59:59',strtotime($event['start_time'])) . "\r\n";
 			}
 			$iCal .= "TRANSP:OPAQUE\r\n";
 			$iCal .= "END:VEVENT\r\n";
 		}
-//		echo $iCal;
-//		print_r($data);die;
+
 		$iCal .= "END:VCALENDAR";
 
 		return $iCal;

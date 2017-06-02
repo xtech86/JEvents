@@ -142,7 +142,7 @@ class PlgSystemGwejson extends JPlugin
 		if ($input->get('typeahead', '', 'string')!="" || $input->get('prefetch', 0, 'int'))
 		{
 			try {
-				$requestObject = new stdClass();
+				$requestObject = new stdClass;
 				$requestObject->typeahead = $input->get('typeahead', '', 'string');
 				$data = null;
 				$data = ProcessJsonRequest($requestObject, $data);
@@ -157,7 +157,7 @@ class PlgSystemGwejson extends JPlugin
 		else  if ($input->get('json', '', 'raw'))
 		{
 			// Create JSON data structure
-			$data = new stdClass();
+			$data = new stdClass;
 			$data->error = 0;
 			$data->result = "ERROR";
 			$data->user = "";
@@ -235,7 +235,7 @@ class PlgSystemGwejson extends JPlugin
 	}
 
 	public static function throwerror ($msg){
-		$data = new stdClass();
+		$data = new stdClass;
 		//"document.getElementById('products').innerHTML='There was an error - no valid argument'");
 		$data->error = "alert('".$msg."')";
 		$data->result = "ERROR";

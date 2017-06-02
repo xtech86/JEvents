@@ -124,7 +124,7 @@ class JFormFieldJevcolumns extends JFormFieldText
 					$group[2] = $group[0];
 				}
 				list($id, $fieldlabel, $label) = $group;
-				$col = new stdClass();
+				$col = new stdClass;
 				$col->fieldlabel = $fieldlabel;
 				$col->id = $id;
 				$col->label = $label;

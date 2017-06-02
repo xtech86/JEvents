@@ -78,7 +78,7 @@ function DefaultLoadedFromTemplate($view, $template_name, $event, $mask, $templa
                                         if (!isset($templates[$template_name]['*'])){
                                             $templates[$template_name]['*'] = array();
                                         }
-					$templates[$template_name]['*'][0] =new stdClass();
+					$templates[$template_name]['*'][0] =new stdClass;
 					$templates[$template_name]['*'][0]->value = file_get_contents($templatefile);
 					$templates[$template_name]['*'][0]->params = null;
 					$templates[$template_name]['*'][0]->fromfile = true;
@@ -1323,7 +1323,7 @@ function DefaultLoadedFromTemplate($view, $template_name, $event, $mask, $templa
 								// Need to call conContentPrepare even thought its called on the template value below here
                                                                 // because is the field appears twice it won't do the replacement on the second item
                                                                 $params = new JRegistry(null);
-                                                                $tmprow = new stdClass();
+                                                                $tmprow = new stdClass;
                                                                 $tmprow->text = $event->contact_info();
                                                                 $tmprow->event = $event;
                                                                 $dispatcher = JEventDispatcher::getInstance();
@@ -1605,7 +1605,7 @@ function DefaultLoadedFromTemplate($view, $template_name, $event, $mask, $templa
 		// Call content plugins - BUT because emailcloak doesn't identify emails in input fields to a text substitution
 		$template_value = str_replace("@", "@£@", $template_value);
 		$params = new JRegistry(null);
-		$tmprow = new stdClass();
+		$tmprow = new stdClass;
 		$tmprow->text = $template_value;
 		$tmprow->event = $event;
 		$dispatcher = JEventDispatcher::getInstance();

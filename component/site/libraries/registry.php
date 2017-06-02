@@ -74,7 +74,7 @@ if (!defined("JEVREGISTRY"))
 				// If any node along the registry path does not exist, create it
 				if (!isset($ns->{$nodes[$i]}))
 				{
-					$ns->{$nodes[$i]} = new stdClass();
+					$ns->{$nodes[$i]} = new stdClass;
 				}
 				$ns = &$ns->{$nodes[$i]};
 			}

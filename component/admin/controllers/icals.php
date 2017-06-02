@@ -167,7 +167,7 @@ class AdminIcalsController extends JControllerForm {
 		if (is_array($cid) && count($cid)>0) $editItem=$cid[0];
 		else $editItem=0;
 
-		$item =new stdClass();
+		$item =new stdClass;
 		if ($editItem!=null){
 			$db	= JFactory::getDbo();
 			$query = "SELECT * FROM #__jevents_icsfile as ics where ics.ics_id=$editItem";

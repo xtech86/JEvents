@@ -35,7 +35,7 @@ function ProcessJsonRequest(&$requestObject, $returnData)
 
 	$resp = json_decode(file_get_contents($extend_url));
 
-	$requestObject->data    = new stdClass();
+	$requestObject->data    = new stdClass;
 	$requestObject->LongLifeToken = $resp->access_token;
 
 	return $requestObject;

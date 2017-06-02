@@ -27,10 +27,10 @@ class AdminIcalsViewIcals extends JEventsAbstractView
 		$document->setTitle(JText::_('ICALS'));
 
 		// Set toolbar items for the page
-		$this->toolbarpublishList('icals.publish');
-		$this->toolbarunpublishList('icals.unpublish');
 		$this->toolbaraddNew('icals.edit');
 		$this->toolbareditList('icals.edit');
+		$this->toolbarpublishList('icals.publish');
+		$this->toolbarunpublishList('icals.unpublish');
 		$this->toolbardeleteList('Delete Ical and all associated events and repeats?', 'icals.delete');
 
 		JEventsHelper::addSubmenu();

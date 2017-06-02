@@ -20,7 +20,7 @@ class JEVAccess {
 		global $acl;
 		$user = JFactory::getUser();
 
-		$this->access = new stdClass();
+		$this->access = new stdClass;
 		$acl = JFactory::getACL();
 		$this->access->canEdit	= $acl->acl_check( 'action', 'edit', 'users', JEVHelper::getUserType($user), 'content', 'all' );
 		$this->access->canEditOwn = $acl->acl_check( 'action', 'edit', 'users', JEVHelper::getUserType($user), 'content', 'own' );

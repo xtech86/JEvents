@@ -313,7 +313,7 @@ class JEventsDBModel
 		$rows = array();
 		$skipJEvents=false;
 		$dispatcher = JEventDispatcher::getInstance();
-		$dispatcher->trigger('fetchListRecentIcalEvents', array(&$skipJEvents, &$rows, $startdate, $enddate, $limit , $repeatdisplayoptionsZ));
+		$dispatcher->trigger('fetchListRecentIcalEvents', array(&$skipJEvents, &$rows, $startdate, $enddate, $limit , $repeatdisplayoptions));
 		if ($skipJEvents) {
 			return $rows;
 		}

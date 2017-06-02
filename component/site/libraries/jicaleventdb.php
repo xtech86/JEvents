@@ -28,7 +28,7 @@ class jIcalEventDB extends jEventCal {
 			$this->_multiday=$cfg->get('multiday',1);
 		}
 		// TODO - what is vevent is actually stdClass already
-		$this->data = new stdClass();
+		$this->data = new stdClass;
 		$array= get_object_vars($vevent);
 		foreach ($array as $key=>$val) {
 			if (strpos($key,"_")!==0  && $key!="_db"){

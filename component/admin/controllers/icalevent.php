@@ -1144,7 +1144,7 @@ class AdminIcaleventController extends JControllerAdmin
 		}
 
 		// convert event data to objewct so we can test permissions
-		$eventobj = new stdClass();
+		$eventobj = new stdClass;
 		foreach ($array as $key => $val)
 		{
 			$newkey = "_" . $key;

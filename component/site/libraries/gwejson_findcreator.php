@@ -118,7 +118,7 @@ function ProcessJsonRequest(&$requestObject, $returnData){
 	else {
 		$returnData = array();
 		foreach ($matches as $match) {
-			$result = new stdClass();
+			$result = new stdClass;
 			$result->title = $match->name. " (".$match->username.")";
 			$result->creator_id = $match->id;
 			$returnData[] = $result;

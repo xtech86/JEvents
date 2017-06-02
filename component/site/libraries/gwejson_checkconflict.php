@@ -111,7 +111,7 @@ function ProcessJsonRequest(&$requestObject, $returnData){
 		$returnData->allclear = 0;
 		foreach ($overlaps as $olp)
 		{
-			$overlap = new stdClass();
+			$overlap = new stdClass;
 			$overlap->event_id = $olp->eventid;
 			$overlap->eventdetail_id = $olp->eventdetail_id;
 			$overlap->summary = $olp->summary;

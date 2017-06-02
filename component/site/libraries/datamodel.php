@@ -784,7 +784,7 @@ class JEventsDataModel {
 				if (strpos($row->location(),'<a href=')===false){
 					$row->location(preg_replace('#(http://)('.$pattern.'*)#i', '<a href="\\1\\2">\\1\\2</a>', $row->location()));
 				}
-				$tmprow = new stdClass();
+				$tmprow = new stdClass;
 				$tmprow->text = $row->location();
 
 				$dispatcher	= JEventDispatcher::getInstance();
@@ -798,7 +798,7 @@ class JEventsDataModel {
 			if (strpos($row->contact_info(),'<a href=')===false){
 				$row->contact_info(preg_replace('#(http://)('.$pattern.'*)#i', '<a href="\\1\\2">\\1\\2</a>', $row->contact_info()));
 			}
-			$tmprow = new stdClass();
+			$tmprow = new stdClass;
 			$tmprow->text = $row->contact_info();
 
 			$dispatcher->trigger( 'onContentPrepare', array('com_jevents', &$tmprow, &$params, 0 ));
@@ -810,7 +810,7 @@ class JEventsDataModel {
 				$row->extra_info(preg_replace('#(http://)('.$pattern.'*)#i', '<a href="\\1\\2">\\1\\2</a>', $row->extra_info()));
 			}
 			//$row->extra_info(eregi_replace('[^(href=|href="|href=\')](((f|ht){1}tp://)[-a-zA-Z0-9@:%_\+.~#?&//=]+)','\\1', $row->extra_info()));
-			$tmprow = new stdClass();
+			$tmprow = new stdClass;
 			$tmprow->text = $row->extra_info();
 
 			$dispatcher->trigger( 'onContentPrepare', array('com_jevents', &$tmprow, &$params, 0 ));

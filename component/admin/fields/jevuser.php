@@ -106,7 +106,7 @@ class JFormFieldJEVuser extends JFormFieldList
 		$db->setQuery($sql);
 		$users = $db->loadObjectList();
 		
-		$nulluser = new stdClass();
+		$nulluser = new stdClass;
 		$nulluser->value = 0;
 		$nulluser->sendEmail = 0;
 		$nulluser->text = JText::_("SELECT_ADMIN");

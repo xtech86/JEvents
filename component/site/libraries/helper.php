@@ -3881,7 +3881,7 @@ SCRIPT;
                 $registry = JRegistry::getInstance("jevents");
                 $menufilters = $registry->get("jevents.menufilters", false);
                 if (!$menufilters) {
-                    $menufilters = new stdClass();
+                    $menufilters = new stdClass;
                     $registry->set("jevents.menufilters", $menufilters);
                 }
                 return $menufilters;

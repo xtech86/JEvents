@@ -11,7 +11,7 @@ if (isset($moddata))
                     	JPluginHelper::importPlugin('content');
                         $dispatcher = JEventDispatcher::getInstance();
 
-                        $eventdata = new stdClass();
+                        $eventdata = new stdClass;
 			$eventdata->text = $md;
                         $params = new JRegistry(null);
 			$results = $dispatcher->trigger('onContentPrepare', array('com_jevents', & $eventdata, & $params, 0));

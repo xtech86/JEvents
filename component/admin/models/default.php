@@ -138,7 +138,7 @@ class DefaultsModelDefault extends JModelLegacy
 		// Lets load the content if it doesn't already exist
 		if (empty($this->_data))
 		{
-			$default = new stdClass();
+			$default = new stdClass;
 			$default->id				= 0;
 			$default->name				= "";
 			$default->title				= "";

@@ -29,20 +29,23 @@ if (strpos($this->item->name, "com_") === 0)
 }
 
 
-if (JevJoomlaVersion::isCompatible("3.0.0"))
-{
-	if ($this->item->value == "" && file_exists(dirname(__FILE__) . '/' . $this->item->name . ".3.html"))
-		$this->item->value = file_get_contents(dirname(__FILE__) . '/' . $this->item->name . ".3.html");
-}
-if ($this->item->value == "" && file_exists(dirname(__FILE__) . '/' . $this->item->name . ".html"))
-	$this->item->value = file_get_contents(dirname(__FILE__) . '/' . $this->item->name . ".html");
 
-//Float layout check to load default value
-if ($this->item->name == 'icalevent.list_block1' && $this->item->value == "" && Jfile::exists(JPATH_SITE . '/components/com_jevents/views/float/defaults/icalevent.list_block1.html'))
+$this->item->value = file_get_contents(dirname(__FILE__) . '/' . $this->item->name . ".3.html");
+
+if ($this->item->value == "" && file_exists(dirname(__FILE__) . '/' . $this->item->name . ".html"))
+{
+	$this->item->value = file_get_contents(dirname(__FILE__) . '/' . $this->item->name . ".html");
+}
+
+// Float layout check to load default value
+if ($this->item->name == 'icalevent.list_block1'
+	&& $this->item->value == ""
+	&& Jfile::exists(JPATH_SITE . '/components/com_jevents/views/float/defaults/icalevent.list_block1.html'))
 {
 	$this->item->value = file_get_contents(JPATH_SITE . '/components/com_jevents/views/float/defaults/icalevent.list_block1.html');
 }
-if ($this->item->name == 'icalevent.list_block2' && $this->item->value == "" && Jfile::exists(JPATH_SITE . '/components/com_jevents/views/float/defaults/icalevent.list_block2.html'))
+if ($this->item->name == 'icalevent.list_block2' && $this->item->value == ""
+	&& Jfile::exists(JPATH_SITE . '/components/com_jevents/views/float/defaults/icalevent.list_block2.html'))
 {
 	$this->item->value = file_get_contents(JPATH_SITE . '/components/com_jevents/views/float/defaults/icalevent.list_block2.html');
 }

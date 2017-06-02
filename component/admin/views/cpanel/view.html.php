@@ -91,7 +91,7 @@ class AdminCpanelViewCpanel extends JEventsAbstractView
 		$app = JFactory::getApplication();
 		if (!isset($app->registeredurlparams))
 		{
-			$app->registeredurlparams = new stdClass();
+			$app->registeredurlparams = new stdClass;
 		}
 
 		if (!JevJoomlaVersion::isCompatible("3.0")) {
@@ -296,7 +296,7 @@ class AdminCpanelViewCpanel extends JEventsAbstractView
 									if (!$manifestdata = $this->getValidManifestFile($manifest))
 										continue;
 
-									$app = new stdClass();
+									$app = new stdClass;
 									$app->name = $manifestdata["name"];
 									$app->version = $manifestdata["version"];
 									$apps["layout_" . basename(dirname($manifest))] = $app;
@@ -317,7 +317,7 @@ class AdminCpanelViewCpanel extends JEventsAbstractView
 								if (!$manifestdata = $this->getValidManifestFile($manifest))
 									continue;
 
-								$app = new stdClass();
+								$app = new stdClass;
 								$app->name = $manifestdata["name"];
 								$app->version = $manifestdata["version"];
 								$apps["layout_" . basename(dirname($manifest))] = $app;
@@ -341,7 +341,7 @@ class AdminCpanelViewCpanel extends JEventsAbstractView
 								if (!$manifestdata = $this->getValidManifestFile($manifest))
 									continue;
 
-								$app = new stdClass();
+								$app = new stdClass;
 								$app->name = $manifestdata["name"];
 								$app->version = $manifestdata["version"];
 								$name = "module_" . str_replace(".xml", "", basename($manifest));
@@ -365,7 +365,7 @@ class AdminCpanelViewCpanel extends JEventsAbstractView
 								if (!$manifestdata = $this->getValidManifestFile($manifest))
 									continue;
 
-								$app = new stdClass();
+								$app = new stdClass;
 								$app->name = $manifestdata["name"];
 								$app->version = $manifestdata["version"];
 								$name = str_replace(".xml", "", basename($manifest));
@@ -390,7 +390,7 @@ class AdminCpanelViewCpanel extends JEventsAbstractView
 								if (!$manifestdata = $this->getValidManifestFile($manifest))
 									continue;
 
-								$app = new stdClass();
+								$app = new stdClass;
 								$app->name = $manifestdata["name"];
 								$app->version = $manifestdata["version"];
 								$name = "component_" . basename(dirname($manifest));
@@ -521,7 +521,7 @@ class AdminCpanelViewCpanel extends JEventsAbstractView
 			if (!$manifestdata = $this->getValidManifestFile($manifest))
 				continue;
 
-			$app = new stdClass();
+			$app = new stdClass;
 			$app->name = $manifestdata["name"];
 			$app->version = $manifestdata["version"];
 			$apps["layout_" . basename(dirname($manifest))] = $app;
@@ -533,7 +533,7 @@ class AdminCpanelViewCpanel extends JEventsAbstractView
 			if (!$manifestdata = $this->getValidManifestFile($manifest))
 				continue;
 
-			$app = new stdClass();
+			$app = new stdClass;
 			$app->name = $manifestdata["name"];
 			$app->version = $manifestdata["version"];
 			$apps["layout_" . str_replace(".xml", "", basename($manifest))] = $app;
@@ -554,7 +554,7 @@ class AdminCpanelViewCpanel extends JEventsAbstractView
 			if (!$manifestdata = $this->getValidManifestFile($manifest))
 				continue;
 
-			$app = new stdClass();
+			$app = new stdClass;
 			$app->name = $manifestdata["name"];
 			$app->version = $manifestdata["version"];
 			$name = str_replace(".xml", "", basename($manifest));
@@ -571,7 +571,7 @@ class AdminCpanelViewCpanel extends JEventsAbstractView
 			if (!$manifestdata = $this->getValidManifestFile($manifest))
 				continue;
 
-			$app = new stdClass();
+			$app = new stdClass;
 			$app->name = $manifestdata["name"];
 			$app->version = $manifestdata["version"];
 			$name = "component_" . basename(dirname($manifest));
@@ -593,7 +593,7 @@ class AdminCpanelViewCpanel extends JEventsAbstractView
 			if (!$manifestdata = $this->getValidManifestFile($manifest))
 				continue;
 
-			$app = new stdClass();
+			$app = new stdClass;
 			$app->name = $manifestdata["name"];
 			$app->version = $manifestdata["version"];
 			$app->criticalversion = "";
@@ -696,7 +696,7 @@ class AdminCpanelViewCpanel extends JEventsAbstractView
 		$output = "";
 		foreach ($apps as $appname => $app)
 		{
-			$row = new stdClass();
+			$row = new stdClass;
 			$row->version = $app->version;
 			$row->criticalversion = "";
 			if (array_key_exists($appname, $criticals))
@@ -728,7 +728,7 @@ class AdminCpanelViewCpanel extends JEventsAbstractView
 		$apps = array();
 
 		// Joomla
-		$app = new stdClass();
+		$app = new stdClass;
 		$app->name = "Joomla";
 		$version = new JVersion();
 		$app->version = $version->getShortVersion();
@@ -753,7 +753,7 @@ class AdminCpanelViewCpanel extends JEventsAbstractView
 			if (!$manifestdata = $this->getValidManifestFile($manifest))
 				continue;
 
-			$app = new stdClass();
+			$app = new stdClass;
 			$app->name = $manifestdata["name"];
 			$app->version = $manifestdata["version"];
 			// is sh404sef disabled ?
@@ -793,7 +793,7 @@ class AdminCpanelViewCpanel extends JEventsAbstractView
 			if (!$manifestdata = $this->getValidManifestFile($manifest))
 				continue;
 
-			$app = new stdClass();
+			$app = new stdClass;
 			$app->name = $manifestdata["name"];
 			$app->version = $manifestdata["version"];
 			$app->criticalversion = "";
@@ -810,7 +810,7 @@ class AdminCpanelViewCpanel extends JEventsAbstractView
 			if (!$manifestdata = $this->getValidManifestFile($manifest))
 				continue;
 
-			$app = new stdClass();
+			$app = new stdClass;
 			$app->name = $manifestdata["name"];
 			$app->version = $manifestdata["version"];
 			$apps["layout_" . basename(dirname($manifest))] = $app;
@@ -824,7 +824,7 @@ class AdminCpanelViewCpanel extends JEventsAbstractView
 			if (!$manifestdata = $this->getValidManifestFile($manifest))
 				continue;
 
-			$app = new stdClass();
+			$app = new stdClass;
 			$app->name = $manifestdata["name"];
 			$app->version = $manifestdata["version"];
 			$apps[str_replace(".xml", "", "layout_" . basename($manifest))] = $app;
@@ -848,7 +848,7 @@ class AdminCpanelViewCpanel extends JEventsAbstractView
 			if (!$manifestdata = $this->getValidManifestFile($manifest))
 				continue;
 
-			$app = new stdClass();
+			$app = new stdClass;
 			$app->name = $manifestdata["name"];
 			$app->version = $manifestdata["version"];
 			$name = str_replace(".xml", "", basename($manifest));

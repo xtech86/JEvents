@@ -132,7 +132,7 @@ class ExtModLatestView extends DefaultModLatestView
 
 		if ($this->modparams->get("contentplugins", 0)){
 			$dispatcher = JEventDispatcher::getInstance();
-			$eventdata = new stdClass();
+			$eventdata = new stdClass;
 			//$eventdata->text = str_replace("{/toggle","{/toggle}",$content);
 			$eventdata->text = $content;
 			$dispatcher->trigger('onContentPrepare', array('com_jevents', &$eventdata, &$this->modparams, 0));

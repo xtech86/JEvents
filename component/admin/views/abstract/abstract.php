@@ -1141,4 +1141,24 @@ class JEventsAbstractView extends JViewLegacy
 		JFactory::getDocument()->setTitle(strip_tags($title) . ' - ' . $app->get('sitename') . ' - ' . JText::_('JADMINISTRATION'));
 	}
 
+
+	/**
+	 * Writes a save button for a given option.
+	 * Apply operation leads to a save action only (does not leave edit mode).
+	 *
+	 * @param   string  $task  An override for the task.
+	 * @param   string  $alt   An override for the alt text.
+	 *
+	 * @return  void
+	 *
+	 * @since   1.5
+	 */
+	public  function toolbarResetLayout($task = 'resetlayout', $alt = 'JEV_RESET_LAYOUT')
+	{
+		$bar = JToolbar::getInstance('newtoolbar');
+
+		// Add an apply button
+		$bar->appendButton('Standard', 'save', $alt, $task, false);
+	}
+
 }

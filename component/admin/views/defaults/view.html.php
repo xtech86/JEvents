@@ -112,6 +112,7 @@ class AdminDefaultsViewDefaults extends JEventsAbstractView
 		$this->toolbarApply("defaults.apply");
 		$this->toolbarSave("defaults.save");
 		$this->toolbarCancel("defaults.cancel");
+		$this->toolbarResetLayout('defaults.resetlayout');
 
 		JEventsHelper::addSubmenu();
 

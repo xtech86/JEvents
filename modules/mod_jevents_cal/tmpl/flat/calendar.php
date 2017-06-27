@@ -195,6 +195,8 @@ class FlatModCalView extends DefaultModCalView {
 						$dayOfWeek = JevDate::strftime ( "%w", $currentDay ["cellDate"] );
 
 						$class = ($currentDay ["today"]) ? "flatcal_todaycell" : "flatcal_daycell";
+						//var_Dump($currentDay);
+						echo date('D', $currentDay['cellDate']);
 						$linkclass = "flatcal_daylink";
 						if ($dayOfWeek == 0 && ! $currentDay ["today"]) {
 							$class = "flatcal_sundaycell";

@@ -154,6 +154,7 @@ class AdminDefaultsController extends JControllerForm {
 
 		// Get/Create the model
 		if ($model =  $this->getModel("default", "defaultsModel")) {
+
 			// Push the model into the view (as default)
 			$this->view->setModel($model, true);
 		}
@@ -178,7 +179,7 @@ class AdminDefaultsController extends JControllerForm {
 			return;
 		}
 		$name = $cid[0];
-		$sql = "UPDATE #__jev_defaults SET state=0 where id=".$db->Quote($name);
+		$sql = "UPDATE #__jev_defaults SET state = 0 where id=".$db->Quote($name);
 		$db->setQuery($sql);
 		$db->execute();
 
@@ -242,13 +243,13 @@ class AdminDefaultsController extends JControllerForm {
 		$jinput = JFactory::getApplication()->input;
 		$id = $jinput->getInt("id", 0);
 
-		if ($id >0 ){
+		if ($id > 0 ){
 
 			// Get/Create the model
 			if ($model =  $this->getModel("default", "defaultsModel")) {
 				//TODO find a work around for getting post array with JInput.
 				if ($model->store(JRequest::get("post",JREQUEST_ALLOWRAW))){
-					if ($jinput->getCmd("task") == "defaults.apply"){
+					if ($jinput->getCmd("task") == "defaults.apply" || $jinput->getCmd("task") == "defaults.resetlayout"){
 						$this->setRedirect("index.php?option=".JEV_COM_COMPONENT."&task=defaults.edit&id=$id",JText::_("JEV_TEMPLATE_SAVED"));
 						$this->redirect();
 						return;
@@ -258,7 +259,7 @@ class AdminDefaultsController extends JControllerForm {
 					return;
 				}
 				else {
-					echo "<script> alert('".$model->getErrorMessage()."'); window.history.go(-1); </script>\n";
+					echo "<script> alert('".$model->getErrorMessage() . "'); window.history.go(-1); </script>\n";
 					exit();
 				}
 			}
@@ -269,6 +270,11 @@ class AdminDefaultsController extends JControllerForm {
 		}
 
 
+	}
+
+	function resetlayout($key = NULL, $urlVar = NULL) {
+
+		return $this->save($key, $urlVar);
 	}
 
 	private function populateLanguages() {

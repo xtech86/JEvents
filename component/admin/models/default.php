@@ -73,7 +73,12 @@ class DefaultsModelDefault extends JModelLegacy
 	function store($data)
 	{
 
-		if (isset($data["params"]) && is_array($data["params"])){
+		if($data['task'] === 'defaults.resetlayout') {
+			$data['value'] = '';
+		}
+
+		if (isset($data["params"]) && is_array($data["params"]))
+		{
 			if (isset($data["id"])) {
 				$this->setId(intval($data["id"]));
 				$this->_loadData();
@@ -127,7 +132,6 @@ class DefaultsModelDefault extends JModelLegacy
 			' WHERE d.id = '.$this->_db->Quote($this->_id);
 			$this->_db->setQuery($query);
 			$this->_data = $this->_db->loadObject();
-			//echo $this->_db->getErrorMsg();
 			return (boolean) $this->_data;
 		}
 		return true;

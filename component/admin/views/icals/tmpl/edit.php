@@ -10,6 +10,7 @@
  */
 defined('_JEXEC') or die('Restricted access');
 
+JHtml::_('behavior.modal');
 
 global $task, $catid;
 $db     = JFactory::getDbo();
@@ -109,7 +110,7 @@ $toolbar = $bar->getItems() ? $bar->render() : "";
 								}
 
 								var form = document.adminForm;
-								if (form.catid.value == "0"){
+								if (document.getElementById('catid').value == "0"){
 									alert( "<?php echo html_entity_decode(JText::_('JEV_E_WARNCAT')); ?>" );
 									return(false);
 								} else {
@@ -446,15 +447,20 @@ $toolbar = $bar->getItems() ? $bar->render() : "";
                                                         if (response.accessToken) {
                                                             LongLifeToken = fetchLongLifeToken(response.accessToken);
                                                         }
-
-                                                        console.log('Good to see you, ' + response.name + '.');
+                                                        jQuery('#alertModal').addClass('modal-success');
+                                                        jQuery('#alertModal .modal-body').html('<p id="notice">Good to see you, ' + response.name + '</p>');
+                                                        jQuery('#alertModal').modal("show");
                                                         facebookInit(appId); // ReRun this to get the token.
                                                     });
                                                 } else {
-                                                    console.log('User cancelled login or did not fully authorize.');
+                                                    jQuery('#alertModal').addClass('modal-danger');
+                                                    jQuery('#alertModal .modal-body').html('<p id="error">Opps, you cancelled login or did not fully authorize..</p>');
+                                                    jQuery('#alertModal').modal("show");
                                                 }
                                             }, {scope: 'email,user_events,manage_pages,rsvp_event'});
-                                            console.log('We are not logged in.');
+                                            jQuery('#alertModal').addClass('modal-danger');
+                                            jQuery('#alertModal .modal-body').html('<p id="error">Sorry, you are not logged in.</p>');
+                                            jQuery('#alertModal').modal("show");
                                         }
                                     });
                                 }
@@ -510,4 +516,25 @@ $toolbar = $bar->getItems() ? $bar->render() : "";
 	<!-- Add the sidebar's background. This div must be placed
 		   immediately after the control sidebar -->
 	<div class="control-sidebar-bg" style="position: fixed; height: auto;"></div>
+	<!-- Modal -->
+	<div class="modal fade" id="alertModal" role="dialog">
+		<div class="modal-dialog">
+			<!-- Modal content-->
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">×</span>
+					</button>
+					<h4 class="modal-title">Error</h4>
+				</div>
+				<div class="modal-body">
+					<p id="error"></p>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal" aria-label="Close">Close</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- End Alert Modal-->
 </div>

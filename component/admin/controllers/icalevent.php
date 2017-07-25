@@ -457,7 +457,15 @@ class AdminIcaleventController extends JControllerAdmin
 			$id = $jinput->getInt("evid", 0);
 		}
 
-		if (!JEVHelper::isEventCreator())
+		// Check if the user is the event editor?
+		if ($id !== 0 && !JEVHelper::isEventEditor())
+		{
+			throw new Exception( JText::_('ALERTNOTAUTH'), 403);
+			return false;
+		}
+
+		// Check if a new event and is event creator
+		if ($id == 0 && !JEVHelper::isEventCreator())
 		{
 			throw new Exception( JText::_('ALERTNOTAUTH'), 403);
 			return false;
@@ -1121,11 +1129,44 @@ class AdminIcaleventController extends JControllerAdmin
 		$cache = JFactory::getCache('com_jevents');
 		$cache->clean(JEV_COM_COMPONENT);
 		$jinput = JFactory::getApplication()->input;
+		$array  = $jinput->getArray(array(), null, 'RAW');
 
-		//TODO Find a replacement for the below, standard jinput methods strip the array clean.
+		if (version_compare(JVERSION, '3.7.1', '>='))
+        {
 
-		$array = JRequest::get('request', JREQUEST_ALLOWHTML);
+			$filter = JFilterInput::getInstance(null, null, 1, 1);
 
+			//Joomla! no longer provides HTML allowed in JInput so we need to fetch raw
+			//Then filter on through with JFilterInput to HTML
+
+			foreach ($array as $key => $row)
+			{
+				//Single row check
+				if (!is_array($row))
+				{
+					$array[$key] = $filter->clean($row, 'HTML');
+				}
+				else
+				{
+					//1 Deep row check
+					foreach ($array[$key] as $key1 => $sub_row)
+					{
+						//2 Deep row check
+						if (!is_array($sub_row))
+						{
+							$array[$key][$key1] = $filter->clean($sub_row, 'HTML');
+						}
+						else
+						{
+							foreach ($sub_row as $key2 => $sub_sub_row)
+							{
+								$array[$key][$key1][$key2] = $filter->clean($sub_sub_row, 'HTML');
+							}
+						}
+					}
+				}
+			}
+		}
 
 		// Should we allow raw content through unfiltered
 		if ($params->get("allowraw", 0))
@@ -1387,6 +1428,7 @@ class AdminIcaleventController extends JControllerAdmin
 		// just incase we don't have jevents plugins registered yet
 		JPluginHelper::importPlugin("jevents");
 		$res = $dispatcher->trigger('onPublishEvent', array($cid, $newstate));
+		$pub_filter = $jinput->get('published_fv', 0);
 
 		if (JFactory::getApplication()->isAdmin())
 		{
@@ -1400,7 +1442,7 @@ class AdminIcaleventController extends JControllerAdmin
 			$rettask = JRequest::getString("rettask", "day.listevents");
 			// Don't return to the event detail since we may be filtering on published state!
 			//$this->setRedirect( JRoute::_('index.php?option=' . JEV_COM_COMPONENT. "&task=icalrepeat.detail&evid=$id&year=$year&month=$month&day=$day&Itemid=$Itemid",false),"IcalEvent  : New published state Saved");
-			$this->setRedirect(JRoute::_('index.php?option=' . JEV_COM_COMPONENT . "&task=$rettask&year=$year&month=$month&day=$day&Itemid=$Itemid", false), JText::_('JEV_EVENT_PUBLISH_STATE_SAVED'));
+			$this->setRedirect(JRoute::_('index.php?option=' . JEV_COM_COMPONENT . "&task=$rettask&year=$year&month=$month&day=$day&Itemid=$Itemid&published_fv=$pub_filter", false), JText::_('JEV_EVENT_PUBLISH_STATE_SAVED'));
 			$this->redirect();
 		}
 

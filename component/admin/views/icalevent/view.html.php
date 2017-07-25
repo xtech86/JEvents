@@ -71,7 +71,7 @@ class AdminIcaleventViewIcalevent extends JEventsAbstractView
 
 		$state = intval(JFactory::getApplication()->getUserStateFromRequest("stateIcalEvents", 'state', 3));
 		$options = array();
-					$options[] = JHTML::_('select.option', '3', JText::_('JOPTION_SELECT_PUBLISHED'));
+		$options[] = JHTML::_('select.option', '3', JText::_('JOPTION_SELECT_PUBLISHED'));
 		$options[] = JHTML::_('select.option', '1', JText::_('PUBLISHED'));
 		$options[] = JHTML::_('select.option', '2', JText::_('UNPUBLISHED'));
 		$options[] = JHTML::_('select.option', '-1', JText::_('JTRASH'));
@@ -120,6 +120,8 @@ class AdminIcaleventViewIcalevent extends JEventsAbstractView
 
 	function edit($tpl = null)
 	{
+		$params = JComponentHelper::getParams(JEV_COM_COMPONENT);
+
 		$document = JFactory::getDocument();
 		//Define to keep editor happy that it is defined.
 		$editStrings = "";
@@ -130,12 +132,15 @@ class AdminIcaleventViewIcalevent extends JEventsAbstractView
 		JEVHelper::script('editicalJQ.js', 'components/' . JEV_COM_COMPONENT . '/assets/js/');
         JEVHelper::script('JevStdRequiredFieldsJQ.js', 'components/' . JEV_COM_COMPONENT . '/assets/js/');
 
-		if ($this->row->title() <= "")
+		if ($this->row->title() === '')
 		{
 			$document->setTitle(JText::_('CREATE_ICAL_EVENT'));
-
 			// Set toolbar items for the page
 			$this->toolbartitle(JText::_('CREATE_ICAL_EVENT'), 'jevents');
+			JToolBarHelper::title(JText::_('CREATE_ICAL_EVENT'), 'jevents');
+
+			// Set default noendtime
+			$this->row->noendtime((int) $params->get('default_noendtime', '0'));
 		}
 		else
 		{
@@ -149,26 +154,42 @@ class AdminIcaleventViewIcalevent extends JEventsAbstractView
 		{
 			if ($this->editCopy)
 			{
-				$this->toolbarConfirmButton("icalevent.apply", JText::_("JEV_SAVE_COPY_WARNING"), 'apply', 'apply', 'JEV_SAVE', false);
+
+				if (JEVHelper::isEventEditor() || JEVHelper::canEditEvent($this->row))
+				{
+					$this->toolbarConfirmButton("icalevent.apply", JText::_("JEV_SAVE_COPY_WARNING"), 'apply', 'apply', 'JEV_SAVE', false);
+				}
 				$this->toolbarConfirmButton("icalevent.save", JText::_("JEV_SAVE_COPY_WARNING"), 'save', 'save', 'JEV_SAVE_CLOSE', false);
 				$this->toolbarConfirmButton("icalevent.savenew", JText::_("JEV_SAVE_COPY_WARNING"), 'save', 'save', 'JEV_SAVE_NEW', false);
 			}
 			else
 			{
-				$this->toolbarConfirmButton("icalevent.apply", JText::_("JEV_SAVE_ICALEVENT_WARNING"), 'apply', 'apply', 'JEV_SAVE', false);
+				if (JEVHelper::isEventEditor() || JEVHelper::canEditEvent($this->row))
+				{
+					$this->toolbarConfirmButton("icalevent.apply", JText::_("JEV_SAVE_ICALEVENT_WARNING"), 'apply', 'apply', 'JEV_SAVE', false);
+				}
 				$this->toolbarConfirmButton("icalevent.save", JText::_("JEV_SAVE_ICALEVENT_WARNING"), 'save', 'save', 'JEV_SAVE_CLOSE', false);
-				$this->toolbarConfirmButton("icalevent.savenew", JText::_("JEV_SAVE_ICALEVENT_WARNING"), 'save', 'save', 'JEV_SAVE_NEW', false);
+				$this->toolbarConfirmButton("icalevent.savenew", JText::_("JEV_SAVE_COPY_WARNING"), 'save', 'save', 'JEV_SAVE_NEW', false);
+
 			}
 		}
 		else
 		{
-			if (JEVHelper::isEventEditor() )
+
+			$canEditOwn = false;
+			$params = JComponentHelper::getParams(JEV_COM_COMPONENT);
+			if (!$params->get("authorisedonly", 0))
+				$juser = JFactory::getUser();
+				$canEditOwn = $juser->authorise('core.edit.own', 'com_jevents');
+			if (JEVHelper::isEventEditor() || $canEditOwn)
 			{
-				$this->toolbarApply('icalevent.apply', "JEV_SAVE");
-				$this->toolbarSave('icalevent.save');
-				$this->toolbarSave2new('icalevent.savenew', "JEV_SAVE_NEW");
+				$this->toolbarButton("icalevent.apply", 'apply', 'apply', 'JEV_SAVE', false);
 			}
+			$this->toolbarButton("icalevent.save", 'save', 'save', 'JEV_SAVE_CLOSE', false);
+			$this->toolbarConfirmButton("icalevent.savenew", JText::_("JEV_SAVE_COPY_WARNING"), 'save', 'save', 'JEV_SAVE_NEW', false);
 		}
+
+
 
 		JEventsHelper::addSubmenu();
 		$this->sidebar = JHtmlSidebar::render();

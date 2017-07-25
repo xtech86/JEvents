@@ -192,29 +192,46 @@ class AdminIcalsController extends JControllerForm {
 
 	}
 
-        function reloadall(){
+    function reloadall(){
+
 		@set_time_limit(1800);
+
 		if (JFactory::getApplication()->isAdmin()){
 			$redirect_task="icals.list";
 		}
-		else {
+		else
+		{
+
 			$redirect_task="day.listevents";
 		}
-              $query = "SELECT icsf.* FROM #__jevents_icsfile as icsf";
-			$db	= JFactory::getDbo();
-			$db->setQuery($query);
-			$allICS = $db->loadObjectList();
-                    foreach ($allICS as $currentICS){
-                    //only update cals from url
-                   if ($currentICS->icaltype=='0' && $currentICS->autorefresh==1){
-                        JRequest::setVar('icsid',$currentICS->ics_id);
-                        $this->save();
-                   }
-                   }
-                $message = JText::_( 'ICS_ALL_FILES_IMPORTED' );
-		$this->setRedirect( "index.php?option=".JEV_COM_COMPONENT."&task=$redirect_task", $message);
-		$this->redirect();
+
+        $query = "SELECT icsf.* FROM #__jevents_icsfile as icsf";
+		$db	= JFactory::getDbo();
+		$db->setQuery($query);
+		$allICS = $db->loadObjectList();
+
+        foreach ($allICS as $currentICS){
+	        //only update cals from url
+	        if ($currentICS->icaltype=='0' && $currentICS->autorefresh==1){
+		        JRequest::setVar('icsid',$currentICS->ics_id);
+		        $this->save();
+	        }
         }
+
+	    $user = JFactory::getUser();
+	    $guest = (int) $user->get('guest');
+
+	    $link = "index.php?option=".JEV_COM_COMPONENT."&task=$redirect_task";
+	    $message = JText::_( 'ICS_ALL_FILES_IMPORTED' );
+
+	    if ($guest === 1) {
+		    $this->setRedirect( $link);
+	    } else {
+		    $this->setRedirect( $link, $message);
+	    }
+
+		$this->redirect();
+    }
 
 	function save($key = null, $urlVar = null){
 
@@ -225,6 +242,9 @@ class AdminIcalsController extends JControllerForm {
 		if ($task !== "icals.reload" && $task !== "icals.reloadall"){
 			JSession::checkToken() or jexit( 'Invalid Token' );
 		}
+
+		$user = JFactory::getUser();
+		$guest = (int) $user->get('guest');
 
 		$authorised = false;
 		
@@ -397,9 +417,16 @@ class AdminIcalsController extends JControllerForm {
 			$icsFileid = $icsFile->store();
 			$message = JText::_( 'ICS_FILE_IMPORTED' );
 		}
-		if (JRequest::getCmd("task") != "icals.reloadall")
+		if (JRequest::getCmd("task") !== "icals.reloadall")
 		{
-			$this->setRedirect("index.php?option=" . JEV_COM_COMPONENT . "&task=$redirect_task", $message);
+			$link = "index.php?option=" . JEV_COM_COMPONENT . "&task=$redirect_task";
+
+			if ($guest === 1) {
+				$this->setRedirect($link);
+			} else
+			{
+				$this->setRedirect($link, $message);
+			}
 			$this->redirect();
 		}
 	}
@@ -409,6 +436,7 @@ class AdminIcalsController extends JControllerForm {
 	 *
 	 */
 	function savedetails(){
+		$user = JFactory::getUser();
 		$authorised = false;
 		// Check for request forgeries
 		JSession::checkToken() or jexit( 'Invalid Token' );
@@ -418,11 +446,12 @@ class AdminIcalsController extends JControllerForm {
 
 		$redirect_task = "month.calendar";
 
+		$user = JFactory::getUser();
+
 		if ($app->isClient('administrator')){
 			$redirect_task = "icals.list";
 		}
 
-		$user = JFactory::getUser();
 		if (!($authorised || JEVHelper::isAdminUser($user))) {
 			$this->setRedirect( "index.php?option=" . JEV_COM_COMPONENT . "&task=$redirect_task", "Not Authorised - must be super admin" ); //TODO add language string.
 			$this->redirect();

@@ -124,6 +124,13 @@ class JEventsDBModel
                         if (isset($this->datamodel->mmcatids) && count($this->datamodel->mmcatids)>0 && !$this->cfg->get("include_subcats", 1)) {
                             $where .= " AND c.id in (".$this->datamodel->mmcatidList.")";
                         }
+			else {
+				$reg =  JFactory::getConfig();
+				$modparams = $reg->get("jev.modparams", false);
+				if ($modparams && isset($this->datamodel->mmcatids) && count($this->datamodel->mmcatids)>0 && !$modparams->get("include_subcats", 1)) {
+					$where .= " AND c.id in (".$this->datamodel->mmcatidList.")";
+				}
+			}
                         
 			$q_published = JFactory::getApplication()->isAdmin() ? "\n AND c.published >= 0" : "\n AND c.published = 1";
 			$jevtask = JRequest::getString("jevtask");
@@ -2949,7 +2956,7 @@ select @@sql_mode;
 		}
 		else
 		{
-			$query = "SELECT ev.*, rpt.*, rr.*, det.*, ev.state as published $extrafields"
+			$query = "SELECT ev.*, rpt.*, rr.*, det.*, ev.state as published, ev.created as created $extrafields"
 					. "\n , YEAR(rpt.startrepeat) as yup, MONTH(rpt.startrepeat ) as mup, DAYOFMONTH(rpt.startrepeat ) as dup"
 					. "\n , YEAR(rpt.endrepeat  ) as ydn, MONTH(rpt.endrepeat   ) as mdn, DAYOFMONTH(rpt.endrepeat   ) as ddn"
 					. "\n , HOUR(rpt.startrepeat) as hup, MINUTE(rpt.startrepeat ) as minup, SECOND(rpt.startrepeat ) as sup"

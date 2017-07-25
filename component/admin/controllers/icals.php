@@ -197,12 +197,12 @@ class AdminIcalsController extends JControllerForm {
 		@set_time_limit(1800);
 
 		if (JFactory::getApplication()->isAdmin()){
-			$redirect_task="icals.list";
+			$redirect_task = "icals.list";
 		}
 		else
 		{
 
-			$redirect_task="day.listevents";
+			$redirect_task = "day.listevents";
 		}
 
         $query = "SELECT icsf.* FROM #__jevents_icsfile as icsf";
@@ -211,9 +211,11 @@ class AdminIcalsController extends JControllerForm {
 		$allICS = $db->loadObjectList();
 
         foreach ($allICS as $currentICS){
-	        //only update cals from url
-	        if ($currentICS->icaltype=='0' && $currentICS->autorefresh==1){
-		        JRequest::setVar('icsid',$currentICS->ics_id);
+
+	        //only update iCals from url
+	        if ($currentICS->icaltype == '0' && $currentICS->autorefresh == 1){
+
+		        JRequest::setVar('icsid', $currentICS->ics_id);
 		        $this->save();
 	        }
         }
@@ -225,7 +227,7 @@ class AdminIcalsController extends JControllerForm {
 	    $message = JText::_( 'ICS_ALL_FILES_IMPORTED' );
 
 	    if ($guest === 1) {
-		    $this->setRedirect( $link);
+		    $this->setRedirect( $link );
 	    } else {
 		    $this->setRedirect( $link, $message);
 	    }
@@ -526,7 +528,7 @@ class AdminIcalsController extends JControllerForm {
 				'facebookapp_id' => $jinput->get('facebookapp_id', ''),
 				'facebookapp_token' => $jinput->get('facebookapp_token', ''),
 				'facebookapp_secret' => $jinput->get('facebookapp_secret', ''),
-				'facebookapp_feed_id' => $jinput->get('facebookapp_feed_id', '')
+				'facebookapp_feed_id' => $jinput->getString('facebookapp_feed_id', '')
 			));
 
 			// TODO update access and state
@@ -652,7 +654,7 @@ class AdminIcalsController extends JControllerForm {
 				'facebookapp_id' => $jinput->get('facebookapp_id', ''),
 				'facebookapp_token' => $jinput->get('facebookapp_token', ''),
 				'facebookapp_secret' => $jinput->get('facebookapp_secret', ''),
-				'facebookapp_feed_id' => $jinput->get('facebookapp_feed_id', '')
+				'facebookapp_feed_id' => $jinput->getString('facebookapp_feed_id', '')
 			));
 
 
@@ -666,30 +668,30 @@ class AdminIcalsController extends JControllerForm {
 			return;
 		}
                         
-                // Check for duplicates
-                $db = JFactory::getDbo();
-                $query = "SELECT icsf.* FROM #__jevents_icsfile as icsf WHERE label=".$db->quote($icsLabel);
-                $db->setQuery($query);
-                $existing = $db->loadObject();
+        // Check for duplicates
+        $db = JFactory::getDbo();
+        $query = "SELECT icsf.* FROM #__jevents_icsfile as icsf WHERE label=".$db->quote($icsLabel);
+        $db->setQuery($query);
+        $existing = $db->loadObject();
 
-                if ($existing){
+        if ($existing){
 
-                    $app->enqueueMessage(JText::_('JEV_DUPLICATE_CALENDAR') , 'error');
-                    $this->setRedirect( "index.php?option=".JEV_COM_COMPONENT."&task=icals.edit");
-                    $this->redirect();
-                    return;
+            $app->enqueueMessage(JText::_('JEV_DUPLICATE_CALENDAR') , 'error');
+            $this->setRedirect( "index.php?option=".JEV_COM_COMPONENT."&task=icals.edit");
+            $this->redirect();
+            return;
 
-                }
+        }
                 
 		$icsid = 0;
 		$icsFile = iCalICSFile::editICalendar($icsid, $catid, $access, $state, $icsLabel);
 		$icsFile->created_by = $jinput->getInt("created_by",0);
-		//Map Facebook SDK
+		// Map Facebook SDK
 		$icsFile->params = json_encode(array(
 			'facebookapp_id' => $jinput->get('facebookapp_id', ''),
 			'facebookapp_token' => $jinput->get('facebookapp_token', ''),
 			'facebookapp_secret' => $jinput->get('facebookapp_secret', ''),
-			'facebookapp_feed_id' => $jinput->get('facebookapp_feed_id', '')
+			'facebookapp_feed_id' => $jinput->getString('facebookapp_feed_id', '')
 		));
 
 		if ($jinput->get('facebookapp_id', '') !== '') {
@@ -790,109 +792,127 @@ class AdminIcalsController extends JControllerForm {
 		}
 	}
 
-	function generateFacebookData($ical, $catid) {
-		$ical_params    = json_decode($ical->params);
-		$app_id         = $ical_params->facebookapp_id;
-		$app_token      = $ical_params->facebookapp_token;
-		$app_secret     = $ical_params->facebookapp_secret;
-		$feed_id        = $ical_params->facebookapp_feed_id;
-		$cats           = JEV_CommonFunctions::getCategoryData();
-		if(array_key_exists($catid, $cats)) {
-			$cat = $cats[$catid];
-		} else {
-			die('Error, not category set?');
-		}
+	function generateFacebookData($ical, $catid)
+	{
+		$ical_params = json_decode($ical->params);
+		$app_id      = $ical_params->facebookapp_id;
+		$app_token   = $ical_params->facebookapp_token;
+		$app_secret  = $ical_params->facebookapp_secret;
+		$cats        = JEV_CommonFunctions::getCategoryData();
 
-		// Include the required dependencies.
-		require_once JPATH_ADMINISTRATOR . '/components/com_jevents/vendor/autoload.php';
+		$feed_ids   = explode(',', str_replace(' ', '', $ical_params->facebookapp_feed_id));
 
-		// Initialize the Facebook PHP SDK v5.
-		$fb = new Facebook\Facebook([
-			'app_id'                => $app_id,
-			'app_secret'            => $app_secret,
-			'default_graph_version' => 'v2.9',
-		]);
-
-		$res    = $fb->get('/' . $feed_id . '/events', $app_token);
-		$data   = $res->getDecodedBody();
-
-		//Build the iCal Data
-		$iCal = "BEGIN:VCALENDAR\r\nPRODID:-//jEvents 3.5 for Joomla//EN\r\n";
-		$iCal .= "CALSCALE:GREGORIAN\r\nMETHOD:PUBLISH\r\n";
-		echo '<pre>';
-
-		foreach ($data['data'] as $event) {
-			$iCal .= "BEGIN:VEVENT\r\n";
-			$iCal .= "UID:FB" . $event['id'] . "\r\n";
-			$iCal .= "CATEGORIES:" . str_replace('\'', '', $cat->title) . "\r\n";
-			$iCal .= "SUMMARY:" . $event['name'] . "\r\n";
-
-			$location = '';
-			$loc_segments_count = isset($event['place']) ? count($event['place']) : 0;
-			if (isset($event['place']['location']) && is_array($event['place']['location'])) {
-				//Get rid of the location id for now.
-				unset($event['place']['id']);
-
-				$loc_details = $event['place']['location'];
-				unset($event['place']['location'], $loc_details['id']);
-				//Manipulate the data...
-				$event['place'] = array_merge($loc_details,  $event['place']);
+			if (array_key_exists($catid, $cats))
+			{
+				$cat = $cats[$catid];
+			}
+			else
+			{
+				die('Error, not category set?');
 			}
 
-			$i = 0;
-			$geo = false;
+			// Include the required dependencies.
+			require_once JPATH_ADMINISTRATOR . '/components/com_jevents/vendor/autoload.php';
 
-			if (isset($event['place']) && is_array($event['place']))
+			//Build the iCal Data
+			$iCal = "BEGIN:VCALENDAR\r\nPRODID:-//jEvents 3.5 for Joomla//EN\r\n";
+			$iCal .= "CALSCALE:GREGORIAN\r\nMETHOD:PUBLISH\r\n";
+			echo '<pre>';
+
+		foreach ($feed_ids as $feed_id)
+		{
+
+			// Initialize the Facebook PHP SDK v5.
+			$fb = new Facebook\Facebook([
+				'app_id'                => $app_id,
+				'app_secret'            => $app_secret,
+				'default_graph_version' => 'v2.9',
+			]);
+
+			$res  = $fb->get('/' . $feed_id . '/events', $app_token);
+			$data = $res->getDecodedBody();
+
+			foreach ($data['data'] as $event)
 			{
-				foreach ($event['place'] as $key => $loc_row)
+				$iCal .= "BEGIN:VEVENT\r\n";
+				$iCal .= "UID:FB" . $event['id'] . "\r\n";
+				$iCal .= "CATEGORIES:" . str_replace('\'', '', $cat->title) . "\r\n";
+				$iCal .= "SUMMARY:" . $event['name'] . "\r\n";
+
+				$location           = '';
+				$loc_segments_count = isset($event['place']) ? count($event['place']) : 0;
+				if (isset($event['place']['location']) && is_array($event['place']['location']))
 				{
-					if($key === 'latitude') {
-						$geo .= $loc_row . ';';
-						unset($event['place'][$key]);
-						continue;
-					}
-					if($key === 'longitude') {
-						$geo .= $loc_row;
-						unset($event['place'][$key]);
-						continue;
-					}
+					//Get rid of the location id for now.
+					unset($event['place']['id']);
 
-					if ($i > 0)
-					{
-						$location .= ',';
-					}
-					$location .= $loc_row;
-					$i++;
+					$loc_details = $event['place']['location'];
+					unset($event['place']['location'], $loc_details['id']);
+					//Manipulate the data...
+					$event['place'] = array_merge($loc_details, $event['place']);
 				}
-			} else {
-				$location = '';
-			}
 
-			if ($location !== '')
-			{
-				$iCal .= "LOCATION:" . $location . "\r\n";
-			}
+				$i   = 0;
+				$geo = false;
 
-			if($geo) {
-				$iCal .= "GEO:" . $geo . "\r\n";
-			}
+				if (isset($event['place']) && is_array($event['place']))
+				{
+					foreach ($event['place'] as $key => $loc_row)
+					{
+						if ($key === 'latitude')
+						{
+							$geo .= $loc_row . ';';
+							unset($event['place'][$key]);
+							continue;
+						}
+						if ($key === 'longitude')
+						{
+							$geo .= $loc_row;
+							unset($event['place'][$key]);
+							continue;
+						}
 
-			//Times:
-			$iCal .= "DTSTAMP:" . $stamptime = JevDate::strftime("%Y%m%dT%H%M%SZ", time()) . "\r\n";
-			$iCal .= "DTSTART:" . strftime("%Y%m%dT%H%M%SZ", strtotime($event['start_time'])) . "\r\n";
-			if (isset($event['end_time']))
-			{
-				$iCal .= "DTEND:" . strftime("%Y%m%dT%H%M%SZ", strtotime($event['end_time'])) . "\r\n";
-			} else {
-				$iCal .="DTEND:" . JevDate::strftime('%Y-%m-%d 23:59:59',strtotime($event['start_time'])) . "\r\n";
+						if ($i > 0)
+						{
+							$location .= ',';
+						}
+						$location .= $loc_row;
+						$i++;
+					}
+				}
+				else
+				{
+					$location = '';
+				}
+
+				if ($location !== '')
+				{
+					$iCal .= "LOCATION:" . $location . "\r\n";
+				}
+
+				if ($geo)
+				{
+					$iCal .= "GEO:" . $geo . "\r\n";
+				}
+
+				//Times:
+				$iCal .= "DTSTAMP:" . $stamptime = JevDate::strftime("%Y%m%dT%H%M%SZ", time()) . "\r\n";
+				$iCal .= "DTSTART:" . strftime("%Y%m%dT%H%M%SZ", strtotime($event['start_time'])) . "\r\n";
+				if (isset($event['end_time']))
+				{
+					$iCal .= "DTEND:" . strftime("%Y%m%dT%H%M%SZ", strtotime($event['end_time'])) . "\r\n";
+				}
+				else
+				{
+					$iCal .= "DTEND:" . JevDate::strftime('%Y-%m-%d 23:59:59', strtotime($event['start_time'])) . "\r\n";
+				}
+				$iCal .= "TRANSP:OPAQUE\r\n";
+				$iCal .= "END:VEVENT\r\n";
 			}
-			$iCal .= "TRANSP:OPAQUE\r\n";
-			$iCal .= "END:VEVENT\r\n";
 		}
 
-		$iCal .= "END:VCALENDAR";
+			$iCal .= "END:VCALENDAR";
 
-		return $iCal;
-	}
-
+			return $iCal;
+		}
 }

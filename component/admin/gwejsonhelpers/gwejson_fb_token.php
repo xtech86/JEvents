@@ -30,13 +30,19 @@ function ProcessJsonRequest(&$requestObject, $returnData)
 	$app_secret = $requestObject->AppSecret;
 	$app_short_token = $requestObject->ShortLifeToken;
 
+	$longLifeTokenUrl = "https://graph.facebook.com/oauth/access_token?client_id=" . $app_id . "&client_secret=" . $app_secret . "&grant_type=fb_exchange_token&fb_exchange_token=" . $app_short_token;
 
-	$extend_url = "https://graph.facebook.com/oauth/access_token?client_id=" . $app_id . "&client_secret=" . $app_secret . "&grant_type=fb_exchange_token&fb_exchange_token=" . $app_short_token;
-
-	$resp = json_decode(file_get_contents($extend_url));
+	$resp = json_decode(file_get_contents($longLifeTokenUrl));
 
 	$requestObject->data    = new stdClass;
 	$requestObject->LongLifeToken = $resp->access_token;
+
+	$neverExpireTokenUrl =  "https://graph.facebook.com/oauth/access_token?client_id=" . $app_id . "&client_secret=" . $app_secret . "&grant_type=fb_exchange_token&fb_exchange_token=" . $resp->access_token;
+
+	$NEresp = json_decode(file_get_contents($neverExpireTokenUrl));
+
+	$requestObject->NeverExpireToken = $NEresp->access_token;
+
 
 	return $requestObject;
 }

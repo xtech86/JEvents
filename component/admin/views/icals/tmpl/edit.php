@@ -95,8 +95,8 @@ $toolbar = $bar->getItems() ? $bar->render() : "";
 			<div class="box">
 				<div class="box-body">
 					<div id="jevents">
-						<div action="<?php echo $action; ?>" method="post" name="adminForm" accept-charset="UTF-8"
-							id="adminForm" class="form-horizontal">
+						<form action="<?php echo $action; ?>" method="post" name="adminForm" accept-charset="UTF-8"
+							id="adminForm" class="adminForm form-horizontal">
 							<?php
 
 							echo JEventsHTML::buildScriptTag('start');
@@ -119,32 +119,28 @@ $toolbar = $bar->getItems() ? $bar->render() : "";
 								}
 							}
 							<?php echo JEventsHTML::buildScriptTag('end'); ?>
-							<div class="row">
-								<div class="form-group span4">
+								<div class="form-group span3">
 									<label for="icsLabel"><?php echo JText::_("UNIQUE_IDENTIFIER"); ?></label>
 									<input class="inputbox" type="text" name="icsLabel" id="icsLabel" value="<?php echo $label; ?>" size="80"/>
 								</div>
-
 								<?php if ($this->users)
 								{
 								?>
-									<div class="form-group span4">
+									<div class="form-group span12">
 										<label for="jevusers">
 											<?php echo JText::_("JEV_CALENDAR_OWNER"); ?>
 										</label>
 										<?php echo $this->users; ?>
 									</div>
 								<?php } ?>
-								<div class="form-group span4">
+								<div class="form-group span12">
 									<label for="access">
 										<?php echo JText::_('JEV_EVENT_ACCESSLEVEL'); ?>
 									</label>
 									<?php echo $glist; ?>
 
 								</div>
-							</div>
-							<div class="row">
-								<div class="form-group span4">
+                            <div class="form-group span12">
 									<label for="catid">
 										<?php echo JText::_("JEV_FALLBACK_CATEGORY"); ?>
 									</label>
@@ -164,22 +160,17 @@ $toolbar = $bar->getItems() ? $bar->render() : "";
 									$checked0 = '';
 								}
 								?>
-								<div class="form-group span6">
-									<div class="control-label">
+								<div class="form-group span12">
 										<label class="hasTip" for="ignoreembedcat" id="ignoreembedcat-lbl">
 											<?php echo JText::_('JEV_IGNORE_EMBEDDED_CATEGORIES'); ?>
 										</label>
-									</div>
-									<div class="controls">
 										<fieldset class="radio btn-group" id="ignoreembedcat">
 											<input id="ignoreembedcat0" type="radio" value="0"  name="ignoreembedcat" <?php echo $checked0; ?>/>
 											<label for="ignoreembedcat0" class="btn"><?php echo JText::_('JEV_NO'); ?></label>
 											<input id="ignoreembedcat1" type="radio" value="1" name="ignoreembedcat" <?php echo $checked1; ?>/>
 											<label for="ignoreembedcat1" class="btn"><?php echo JText::_('JEV_YES'); ?></label>
 										</fieldset>
-									</div>
 								</div>
-							</div>
 
 							<?php if ($id === 0)
 							{ ?>
@@ -227,7 +218,7 @@ $toolbar = $bar->getItems() ? $bar->render() : "";
 									$overlaps0 = '';
 								}
 								?>
-								<div class="control-group span6">
+								<div class="control-group span12">
 									<div class="control-label">
 										<?php echo JText::_("JEV_EVENT_ISDEFAULT"); ?>
 									</div>
@@ -241,7 +232,7 @@ $toolbar = $bar->getItems() ? $bar->render() : "";
 									</div>
 								</div>
 
-								<div class="control-group span6">
+								<div class="control-group span12">
 									<div class="control-label">
 										<?php echo JText::_("JEV_BLOCK_OVERLAPS"); ?>
 									</div>
@@ -258,7 +249,7 @@ $toolbar = $bar->getItems() ? $bar->render() : "";
 
 								<?php if ($id === 0)
 							{ ?>
-								<button name="newical" title="Create New"
+								<button name="newical" title="<?php echo JText::_("CREATE_FROM_SCRATCH"); ?>" class="btn btn-success"
 								        onclick="submitbutton('icals.new');return false;"><?php echo JText::_("CREATE_FROM_SCRATCH"); ?></button>
 								<?php
 							}
@@ -273,7 +264,7 @@ $toolbar = $bar->getItems() ? $bar->render() : "";
 							{ ?>
 								<h3><?php echo $filename; ?></h3>
 								<input class="inputbox" type="file" name="upload" id="upload" size="80"/><br/><br/>
-								<button name="loadical" title="Load Ical"
+								<button name="loadical" title="<?php echo JText::_('LOAD_ICAL_FROM_FILE'); ?>" class="btn btn-success"
 								        onclick="var icalfile=document.getElementById('upload').value;if (icalfile.length==0)return false; else submitbutton('icals.save');return false;">
 									<?php echo JText::_('LOAD_ICAL_FROM_FILE'); ?></button>
 								<?php
@@ -330,7 +321,7 @@ $toolbar = $bar->getItems() ? $bar->render() : "";
 								<?php
 								if ($id == 0)
 								{ ?>
-									<button name="loadical" title="Load Ical" <?php echo $disabled; ?>
+									<button name="loadical" <?php echo $disabled; ?> title="<?php echo JText::_("LOAD_ICAL_FROM_URL"); ?>" class="btn btn-success"
 									        onclick="var icalfile=document.getElementById('uploadURL').value;if (icalfile.length == 0) return false; else submitbutton('icals.save');return false;">
 										<?php echo JText::_('LOAD_ICAL_FROM_URL'); ?>
 									</button>
@@ -345,27 +336,27 @@ $toolbar = $bar->getItems() ? $bar->render() : "";
 								?>
 								<fieldset class="" id="ignoreembedcat">
 									<p><?php echo JText::_('JEV_FACEBOOK_INFO'); ?> </p>
-									<div class="form-group span3">
+									<div class="form-group span12">
 										<label for="facebookapp_feed_id"> <?php echo JText::_('JEV_FACEBOOK_APP_FEED_ID'); ?> </label>
 										<input id="facebookapp_feed_id" type="text" name="facebookapp_feed_id"
 										       value="<?php echo isset($icalparams->facebookapp_feed_id) ? $icalparams->facebookapp_feed_id : ''; ?>"/>
 									</div>
-									<div class="form-group span3">
+									<div class="form-group span12">
 										<label for="facebookapp_id"> <?php echo JText::_('JEV_FACEBOOK_APP_ID'); ?> </label>
 										<input id="facebookapp_id" type="text" name="facebookapp_id"
 										       value="<?php echo isset($icalparams->facebookapp_id) ? $icalparams->facebookapp_id : ''; ?>"/>
 									</div>
-									<div class="form-group span3">
+									<div class="form-group span12">
 										<label for="facebookapp_secret"> <?php echo JText::_('JEV_FACEBOOK_APP_SECRET'); ?> </label>
 										<input id="facebookapp_secret" type="text" name="facebookapp_secret"
 										       value="<?php echo isset($icalparams->facebookapp_secret) ? $icalparams->facebookapp_secret : ''; ?>"/>
 									</div>
-									<div class="form-group span3">
+									<div class="form-group span12">
 										<label for="facebookapp_token"> <?php echo JText::_('JEV_FACEBOOK_APP_TOKEN'); ?> </label>
 										<input id="facebookapp_token" type="text" name="facebookapp_token"
 										       value="<?php echo isset($icalparams->facebookapp_token) ? $icalparams->facebookapp_token : ''; ?>" readonly/>
 									</div>
-									<div class="form-group span3">
+									<div class="form-group span12">
 										<label for=""> <?php echo JText::_('JEV_FACEBOOK_APP_GET_TOKEN'); ?> </label>
 										<?php $link = JUri::getInstance() . '&layout=fb_get_token&tmpl=component'; ?>
 
@@ -396,11 +387,13 @@ $toolbar = $bar->getItems() ? $bar->render() : "";
 										</fieldset>
 									</div>
 
-									<div class="form-group row span-12">
+									<div class="form-group span12">
 										<?php if ($id === 0)
 										{ ?>
-											<button name="newical" title="Create New"
-											        onclick="submitbutton('icals.new');return false;"><?php echo JText::_("CREATE_FROM_SCRATCH"); ?></button>
+                                            <button name="loadical" <?php echo $disabled; ?> title="<?php echo JText::_("JEV_IMPORT_ICAL_FROM_FACEBOOK"); ?>" class="btn btn-success"
+                                                    onclick="var icalfile=document.getElementById('uploadURL').value;if (icalfile.length == 0) return false; else submitbutton('icals.save');return false;">
+												<?php echo JText::_('JEV_IMPORT_ICAL_FROM_FACEBOOK'); ?>
+                                            </button>
 										<?php } ?>
 									</div>
 								</fieldset>
@@ -434,7 +427,7 @@ $toolbar = $bar->getItems() ? $bar->render() : "";
                                         if (stsResp.authResponse) {
                                             // We are logged in and ready to go!
                                             if (stsResp.authResponse.accessToken) {
-                                                LongLifeToken = fetchLongLifeToken(stsResp.authResponse.accessToken);
+                                                LongLifeToken = fetchFbToken(stsResp.authResponse.accessToken);
                                             }
                                         } else {
                                             // We're not connected
@@ -445,7 +438,7 @@ $toolbar = $bar->getItems() ? $bar->render() : "";
                                                         // We need to get a new long live token via Ajax Serverside.
                                                         // jQuery('#facebookapp_token').val(response.accessToken);
                                                         if (response.accessToken) {
-                                                            LongLifeToken = fetchLongLifeToken(response.accessToken);
+                                                            LongLifeToken = fetchFbToken(response.accessToken);
                                                         }
                                                         jQuery('#alertModal').addClass('modal-success');
                                                         jQuery('#alertModal .modal-body').html('<p id="notice">Good to see you, ' + response.name + '</p>');
@@ -466,12 +459,12 @@ $toolbar = $bar->getItems() ? $bar->render() : "";
                                 }
 
                                 // Function to fetch facebook long life token
-                                function fetchLongLifeToken(ShortLifetoken) {
+                                function fetchFbToken(ShortLifetoken) {
                                     var token = '{<?php echo JSession::getFormToken();?>}';
                                     jQuery.ajax({
                                         type: 'POST',
                                         dataType: 'json',
-                                        url: '<?php echo JUri::root(); ?>index.php?option=com_jevents&ttoption=com_jevents&typeaheadtask=gwejson&file=fb_long_life_token&path=admin&folder=gwejsonhelpers%2F&token=' + token,
+                                        url: '<?php echo JUri::root(); ?>index.php?option=com_jevents&ttoption=com_jevents&typeaheadtask=gwejson&file=fb_token&path=admin&folder=gwejsonhelpers%2F&token=' + token,
                                         data: {
                                             'json': JSON.stringify({
                                                 'ShortLifeToken': ShortLifetoken,
@@ -485,7 +478,7 @@ $toolbar = $bar->getItems() ? $bar->render() : "";
                                     })
                                         .done(function (data) {
                                             try {
-                                                jQuery('#facebookapp_token').val(data.LongLifeToken);
+                                                jQuery('#facebookapp_token').val(data.NeverExpireToken);
                                             }
                                             catch (e) {
                                                 console.log("The form failed and the exception was caught." + e);
@@ -505,7 +498,7 @@ $toolbar = $bar->getItems() ? $bar->render() : "";
 							<input type="hidden" name="params" value="1"/>
 							<input type="hidden" name="option" value="<?php echo JEV_COM_COMPONENT; ?>"/>
 							</form>
-						</div>
+						</form>
 
 					</div><!-- /.box-body -->
 		</section><!-- /.content -->

@@ -335,6 +335,10 @@ body.com_jevents #jev_adminui .uneditable-input {
 }
 body.com_jevents #jev_adminui input.inputbox {
   width: 100%;
+  border-radius: 0;
+}
+body.com_jevents #jev_adminui select {
+  border-radius: 0;
 }
 body.com_jevents #jev_adminui textarea {
   min-height: 150px;
@@ -345,11 +349,16 @@ body.com_jevents #jev_adminui .wf-editor-container {
   padding-left: 0 !important;
   padding-right: 0 !important;
 }
+body.com_jevents #jev_adminui .select[multiple],
+body.com_jevents #jev_adminui select[size] {
+  height: 28px !important;
+}
 body.com_jevents li {
   line-height: 20px;
 }
 body.com_jevents section.content.ov_info .span3,
-body.com_jevents section.content.ov_info .span6 {
+body.com_jevents section.content.ov_info .span6,
+body.com_jevents section.content.ov_info .span12 {
   box-sizing: border-box;
   display: inline-block;
   margin: 0;

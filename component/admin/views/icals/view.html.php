@@ -48,7 +48,7 @@ class AdminIcalsViewIcals extends JEventsAbstractView
 		// Fetch layout to use, else fallback to edit
 		$layout = $jinput->getCmd('layout', 'edit');
 
-		JEVHelper::script('editicalJQ.js', 'components/' . JEV_COM_COMPONENT . '/assets/js/');
+		//JEVHelper::script('editicalJQ.js', 'components/' . JEV_COM_COMPONENT . '/assets/js/');
 
 		$document = JFactory::getDocument();
 		$document->setTitle(JText::_('EDIT_ICS'));

@@ -428,6 +428,8 @@ $toolbar = $bar->getItems() ? $bar->render() : "";
                                             // We are logged in and ready to go!
                                             if (stsResp.authResponse.accessToken) {
                                                 LongLifeToken = fetchFbToken(stsResp.authResponse.accessToken);
+                                                console.log(LongLifeToken);
+                                                alert('1Long Life token: ' + LongLifeToken);
                                             }
                                         } else {
                                             // We're not connected
@@ -439,27 +441,24 @@ $toolbar = $bar->getItems() ? $bar->render() : "";
                                                         // jQuery('#facebookapp_token').val(response.accessToken);
                                                         if (response.accessToken) {
                                                             LongLifeToken = fetchFbToken(response.accessToken);
+                                                            //alert('Long Life token: ' + LongLifeToken);
                                                         }
-                                                        jQuery('#alertModal').addClass('modal-success');
-                                                        jQuery('#alertModal .modal-body').html('<p id="notice">Good to see you, ' + response.name + '</p>');
-                                                        jQuery('#alertModal').modal("show");
+                                                        alert('Good to see you, ' + response.name);
+
                                                         facebookInit(appId); // ReRun this to get the token.
                                                     });
                                                 } else {
-                                                    jQuery('#alertModal').addClass('modal-danger');
-                                                    jQuery('#alertModal .modal-body').html('<p id="error">Opps, you cancelled login or did not fully authorize..</p>');
-                                                    jQuery('#alertModal').modal("show");
+                                                    alert('Opps, you cancelled login or did not fully authorize..');
                                                 }
                                             }, {scope: 'email,user_events,manage_pages,rsvp_event'});
-                                            jQuery('#alertModal').addClass('modal-danger');
-                                            jQuery('#alertModal .modal-body').html('<p id="error">Sorry, you are not logged in.</p>');
-                                            jQuery('#alertModal').modal("show");
+                                            alert('Sorry, you are not logged in.');
                                         }
                                     });
                                 }
 
                                 // Function to fetch facebook long life token
-                                function fetchFbToken(ShortLifetoken) {
+                                function fetchFbToken(ShortLifetoken)
+                                {
                                     var token = '{<?php echo JSession::getFormToken();?>}';
                                     jQuery.ajax({
                                         type: 'POST',
@@ -469,24 +468,26 @@ $toolbar = $bar->getItems() ? $bar->render() : "";
                                             'json': JSON.stringify({
                                                 'ShortLifeToken': ShortLifetoken,
                                                 'LongLifeToken': '',
+	                                            'NeverExpireToken': '',
                                                 'AppID': jQuery('#facebookapp_id').val(),
                                                 'AppSecret': jQuery('#facebookapp_secret').val()
                                             })
                                         },
                                         contentType: "application/x-www-form-urlencoded; charset=utf-8",
                                         scriptCharset: "utf-8"
-                                    })
-                                        .done(function (data) {
-                                            try {
-                                                jQuery('#facebookapp_token').val(data.NeverExpireToken);
-                                            }
-                                            catch (e) {
-                                                console.log("The form failed and the exception was caught." + e);
-                                            }
-                                        })
-                                        .fail(function (x) {
-                                            console.log("We failed for some reason. " + x);
-                                        });
+                                    }).done(function ( data ) {
+                                        try {
+                                            jQuery('#facebookapp_token').val(data.NeverExpireToken);
+                                        }
+                                        catch (e) {
+                                            //alert('The form failed? Check console log.');
+                                            //console.log("The form failed and the exception was caught." + e);
+                                        }
+                                    }).fail(function (x)
+                                    {
+                                            //alert('The form failed? Check console log.');
+                                            //console.log("We failed for some reason. " + x);
+                                    });
                                 }
 							</script>
 

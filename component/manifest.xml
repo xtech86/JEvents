@@ -59,6 +59,7 @@
             <folder>assets</folder>
             <folder>controllers</folder>
             <folder>fields</folder>
+            <folder>gwejsonhelpers</folder>
             <folder>helpers</folder>
             <folder>layouts</folder>
             <folder>libraries</folder>

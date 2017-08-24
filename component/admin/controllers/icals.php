@@ -12,6 +12,7 @@
 defined( '_JEXEC' ) or die( 'Restricted access' );
 
 jimport('joomla.application.component.controllerform');
+jimport('joomla.filesystem.file');
 
 use Joomla\Utilities\ArrayHelper;
 use Joomla\String\StringHelper;
@@ -56,16 +57,16 @@ class AdminIcalsController extends JControllerForm {
 		$option = JEV_COM_COMPONENT;
 		$db	= JFactory::getDbo();
 
-		
+
 		$catid		= intval( JFactory::getApplication()->getUserStateFromRequest( "catid{$option}", 'catid', 0 ));
 		$limit		= intval( JFactory::getApplication()->getUserStateFromRequest( "viewlistlimit", 'limit', JFactory::getApplication()->getCfg('list_limit',10) ));
 		$limitstart = intval( JFactory::getApplication()->getUserStateFromRequest( "view{$option}limitstart", 'limitstart', 0 ));
 		$search		= JFactory::getApplication()->getUserStateFromRequest( "search{$option}", 'search', '' );
 		$search		= $db->escape( trim( strtolower( $search ) ) );
 		$where		= array();
-                
+
                 // Trap cancelled edit and reset category ID.
-                $icsid = intval(JRequest::getVar('icsid',-1));  
+                $icsid = intval(JRequest::getVar('icsid',-1));
                 if ($icsid>-1){
                     $catid=0;
                 }
@@ -88,13 +89,13 @@ class AdminIcalsController extends JControllerForm {
 			$limitstart = 0;
 		}
 
-		
+
 		$query = "SELECT icsf.*, a.title as _groupname"
 		. "\n FROM #__jevents_icsfile as icsf "
 		. "\n LEFT JOIN #__viewlevels AS a ON a.id = icsf.access"
 		. ( count( $where ) ? "\n WHERE " . implode( ' AND ', $where ) : '' )
 		;
-		
+
 		$query .= "\n ORDER BY icsf.isdefault DESC, icsf.label ASC";
 		if ($limit>0){
 			$query .= "\n LIMIT $limitstart, $limit";
@@ -182,7 +183,7 @@ class AdminIcalsController extends JControllerForm {
 		$this->view->setLayout('edit');
 
 		// for Admin interface only
-		
+
 		$this->view->assign('with_unpublished_cat',JFactory::getApplication()->isAdmin());
 
 		$this->view->assign('editItem',$item);
@@ -249,7 +250,7 @@ class AdminIcalsController extends JControllerForm {
 		$guest = (int) $user->get('guest');
 
 		$authorised = false;
-		
+
 		if (JFactory::getApplication()->isClient('administrator')){
 			$redirect_task = "icals.list";
 		}
@@ -305,7 +306,7 @@ class AdminIcalsController extends JControllerForm {
 					$authorised = true;
 					$autorefresh=1;
 				}
-				
+
 			}
 			else {
 				$this->setRedirect( "index.php?option=".JEV_COM_COMPONENT."&task=$redirect_task", "Invalid iCal Details");
@@ -331,12 +332,13 @@ class AdminIcalsController extends JControllerForm {
             $ignoreembedcat = $jinput->getInt('ignoreembedcat', $currentICS->ignoreembedcat);
 
 			if ((int) $currentICS->icaltype === 3) {
-				$iCal = $this->generateFacebookData($currentICS, $catid);
+
+				$csvData = $this->generateFacebookData($currentICS, $catid);
 				$ics = new iCalICSFile($db);
-                $ics->load($icsid);
-                $icsFile = $ics->newICSFileFromString($iCal, $icsid, $catid);
-                $icsFile->icaltype = 3;
-                $icsFile->store();
+				$ics->load($icsid);
+				$icsFile = $ics->newICSFileFromString($csvData, $icsid, $catid);
+				$icsFile->icaltype = 3;
+				$icsFile->store();
 
 				$this->setRedirect( "index.php?option=" . JEV_COM_COMPONENT . "&task=$redirect_task", JText::_( 'FACEBOOK_FEED_REFRESHED' ));
 				$this->redirect();
@@ -379,7 +381,7 @@ class AdminIcalsController extends JControllerForm {
 			$access = JRequest::getInt('access',0);
 			$state = 1;
 			$uploadURL = JRequest::getVar('uploadURL','' );
-			$icsLabel = JRequest::getString('icsLabel','' );                        
+			$icsLabel = JRequest::getString('icsLabel','' );
 		}
 
 		if ($catid==0){
@@ -642,8 +644,9 @@ class AdminIcalsController extends JControllerForm {
 		$app    = JFactory::getApplication();
 		$jinput = $app->input;
 
-		// include ical files
+		// Include iCal files
 		$catid = (int) $jinput->get('catid', 0);
+
 		// Should come from the form or existing item
 		$access = $jinput->getInt('access',0);
 		$state = 1;
@@ -659,6 +662,7 @@ class AdminIcalsController extends JControllerForm {
 
 
 		if ($catid === 0){
+
 			// Paranoia, should not be here, validation is done by java script
 			$app->enqueueMessage('Fatal Error - ' . JText::_("JEV_E_WARNCAT"), 'error');
 
@@ -667,7 +671,7 @@ class AdminIcalsController extends JControllerForm {
 			$app->redirect( 'index.php?option=' . $option);
 			return;
 		}
-                        
+
         // Check for duplicates
         $db = JFactory::getDbo();
         $query = "SELECT icsf.* FROM #__jevents_icsfile as icsf WHERE label=".$db->quote($icsLabel);
@@ -682,7 +686,7 @@ class AdminIcalsController extends JControllerForm {
             return;
 
         }
-                
+
 		$icsid = 0;
 		$icsFile = iCalICSFile::editICalendar($icsid, $catid, $access, $state, $icsLabel);
 		$icsFile->created_by = $jinput->getInt("created_by",0);
@@ -802,23 +806,23 @@ class AdminIcalsController extends JControllerForm {
 
 		$feed_ids   = explode(',', str_replace(' ', '', $ical_params->facebookapp_feed_id));
 
-			if (array_key_exists($catid, $cats))
-			{
-				$cat = $cats[$catid];
-			}
-			else
-			{
-				die('Error, not category set?');
-			}
+		if (array_key_exists($catid, $cats))
+		{
+			$cat = $cats[$catid];
+		}
+		else
+		{
+			die('Error, no category set?');
+		}
 
-			// Include the required dependencies.
-			require_once JPATH_ADMINISTRATOR . '/components/com_jevents/vendor/autoload.php';
+		// Include the required dependencies.
+		require_once JPATH_ADMINISTRATOR . '/components/com_jevents/vendor/autoload.php';
 
-			//Build the iCal Data
-			$iCal = "BEGIN:VCALENDAR\r\nPRODID:-//jEvents 3.5 for Joomla//EN\r\n";
-			$iCal .= "CALSCALE:GREGORIAN\r\nMETHOD:PUBLISH\r\n";
-			echo '<pre>';
+		//Build the Data
 
+		$csvData = '';
+
+		$f = 0;
 		foreach ($feed_ids as $feed_id)
 		{
 
@@ -826,20 +830,55 @@ class AdminIcalsController extends JControllerForm {
 			$fb = new Facebook\Facebook([
 				'app_id'                => $app_id,
 				'app_secret'            => $app_secret,
-				'default_graph_version' => 'v2.9',
+				'default_graph_version' => 'v2.10',
 			]);
 
-			$res  = $fb->get('/' . $feed_id . '/events', $app_token);
+			$fields = 'id,name,category,description,cover,place,start_time,end_time,timezone';
+
+			$res  = $fb->get('/' . $feed_id . '/events?fields=' . $fields, $app_token);
 			$data = $res->getDecodedBody();
+
+			// Set an import file, handy for debugging etc.
+			$filename = 'jevents_fb_import.csv';
+			$fh = fopen(JPATH_SITE . '/tmp/' . $filename, 'wb+');
+
+			if($f === 0)
+			{
+				// Only Insert for the first feed.
+				$csvData = '"CATEGORIES","SUMMARY","LOCATION","GEO","DESCRIPTION","CONTACT","X-EXTRAINFO","DTSTART","DTEND","TIMEZONE","RRULE","UID","upload_image1","upload_image1_title"';
+			}
+
+			$filesImages = false;
+
+			if(JFile::exists(JPATH_SITE . '/plugins/jevents/jevfiles/jevfiles.xml')) {
+				$filesImages        = true;
+				$filesImagesPlugin  = JPluginHelper::getPlugin('jevents', 'jevfiles');
+				$filesImagesParams    = new JRegistry($filesImagesPlugin->params);
+				$imagePath          = JPATH_SITE . '/images/' . $filesImagesParams->get('folder', 'jevents') . '/';
+				$thumbWidth         = $filesImagesParams->get('thumbw', 120);
+				$thumbHeight         = $filesImagesParams->get('thumbh', 90);
+			}
 
 			foreach ($data['data'] as $event)
 			{
-				$iCal .= "BEGIN:VEVENT\r\n";
-				$iCal .= "UID:FB" . $event['id'] . "\r\n";
-				$iCal .= "CATEGORIES:" . str_replace('\'', '', $cat->title) . "\r\n";
-				$iCal .= "SUMMARY:" . $event['name'] . "\r\n";
+
+				// New Line
+				$csvData .= "\r\n";
+
+				$csvRow = array();
+				if (isset($event['category']) && in_array($event['category'], $cats))
+				{
+					$csvRow['cat'] = '"' . $event['category'] . '"';
+				}
+				else
+				{
+					$csvRow['cat'] = '"' . $cats[$catid]->title . '"';
+				}
+
+				$csvRow['summary'] =  '"' . $event['name'] . '"';
 
 				$location           = '';
+				$csvRow['location'] = '""';
 				$loc_segments_count = isset($event['place']) ? count($event['place']) : 0;
 				if (isset($event['place']['location']) && is_array($event['place']['location']))
 				{
@@ -887,32 +926,70 @@ class AdminIcalsController extends JControllerForm {
 
 				if ($location !== '')
 				{
-					$iCal .= "LOCATION:" . $location . "\r\n";
+					$csvRow['location'] = '"' . $location . '"';
 				}
+
+				$csvRow['geo'] = '""';
 
 				if ($geo)
 				{
-					$iCal .= "GEO:" . $geo . "\r\n";
+					$csvRow['geo'] = '"' . $geo . '"';
 				}
 
-				//Times:
-				$iCal .= "DTSTAMP:" . $stamptime = JevDate::strftime("%Y%m%dT%H%M%SZ", time()) . "\r\n";
-				$iCal .= "DTSTART:" . strftime("%Y%m%dT%H%M%SZ", strtotime($event['start_time'])) . "\r\n";
+				// Description
+
+				$csvRow['description'] = '"' . htmlspecialchars($event['description']) . '"';
+				$csvRow['contact'] = '""';
+				$csvRow['X-EXTRAINFO'] = '""';
+
+				// Times:
+				$csvRow['DTSTART'] = '"' . strftime("%Y%m%dT%H%M%SZ", strtotime($event['start_time'])) . '"';
 				if (isset($event['end_time']))
 				{
-					$iCal .= "DTEND:" . strftime("%Y%m%dT%H%M%SZ", strtotime($event['end_time'])) . "\r\n";
+					$csvRow['DTEND'] =  '"' . strftime("%Y%m%dT%H%M%SZ", strtotime($event['end_time'])) . '"';
 				}
 				else
 				{
-					$iCal .= "DTEND:" . JevDate::strftime('%Y-%m-%d 23:59:59', strtotime($event['start_time'])) . "\r\n";
+					$csvRow['DTEND'] = '"' . JevDate::strftime('%Y-%m-%d 23:59:59', strtotime($event['start_time'])) . '"';
 				}
-				$iCal .= "TRANSP:OPAQUE\r\n";
-				$iCal .= "END:VEVENT\r\n";
+
+				$csvRow['timezone'] = '"' . $event['timezone'] . '"';
+
+				$csvRow['rrule'] = '""';
+				$csvRow['uid'] = '"FB' . $event['id'] . '"';
+
+				if($filesImages && isset($event['cover']))
+				{
+					// Download the image!
+					if (!JFile::exists(JPATH_SITE . $imagePath . 'FB' . $event['id'] . '.jpg'))
+					{
+						copy($event['cover']['source'], $imagePath . '/originals/orig_FB' . $event['id'] . '.jpg');
+						$image = new JImage($imagePath . '/originals/orig_FB' . $event['id'] . '.jpg');
+						$image = $image->resize($thumbWidth, $thumbHeight, true, JImage::SCALE_INSIDE);
+						$image->toFile($imagePath . '/thumbnails/thumb_FB' . $event['id'] . '.jpg', '.jpg', array("quality" => 90));
+					}
+
+					$csvRow['upload_image1']       = '"' . 'FB' . $event['id'] . '.jpg' . '"';
+					$csvRow['upload_image1_title'] = '"' . $event['name'] . '"';
+				} else {
+
+					$csvRow['upload_image1']       = '""';
+					$csvRow['upload_image1_title'] = '""';
+				}
+
+				// End csvRow array and set it to the Data var
+				$csvData .= implode(',', $csvRow);
 			}
+
+			$f++;
 		}
 
-			$iCal .= "END:VCALENDAR";
+		fwrite($fh, $csvData);
+		fclose($fh);
 
-			return $iCal;
+		//return JPATH_SITE . '/tmp/' . $filename;
+
+//		var_Dump($csvData);die;
+		return $csvData;
 		}
 }

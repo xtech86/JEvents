@@ -11,6 +11,8 @@
 // Check to ensure this file is included in Joomla!
 defined('_JEXEC') or die();
 
+JLoader::register('JEventsHelper',JEV_ADMINPATH . "helpers/jevents.php");
+
 /**
  * HTML View class for the component
  *
@@ -136,8 +138,7 @@ class AdminIcaleventViewIcalevent extends JEventsAbstractView
 		{
 			$document->setTitle(JText::_('CREATE_ICAL_EVENT'));
 			// Set toolbar items for the page
-			$this->toolbartitle(JText::_('CREATE_ICAL_EVENT'), 'jevents');
-			JToolBarHelper::title(JText::_('CREATE_ICAL_EVENT'), 'jevents');
+			$this->toolbarTitle(JText::_('CREATE_ICAL_EVENT'), 'jevents');
 
 			// Set default noendtime
 			$this->row->noendtime((int) $params->get('default_noendtime', '0'));
@@ -157,19 +158,19 @@ class AdminIcaleventViewIcalevent extends JEventsAbstractView
 
 				if (JEVHelper::isEventEditor() || JEVHelper::canEditEvent($this->row))
 				{
-					$this->toolbarConfirmButton("icalevent.apply", JText::_("JEV_SAVE_COPY_WARNING"), 'apply', 'apply', 'JEV_SAVE', false);
+					$this->toolbarApply("icalevent.apply", 'JEV_SAVE');
 				}
-				$this->toolbarConfirmButton("icalevent.save", JText::_("JEV_SAVE_COPY_WARNING"), 'save', 'save', 'JEV_SAVE_CLOSE', false);
-				$this->toolbarConfirmButton("icalevent.savenew", JText::_("JEV_SAVE_COPY_WARNING"), 'save', 'save', 'JEV_SAVE_NEW', false);
+				$this->toolbarSave("icalevent.save", 'JEV_SAVE_CLOSE');
+				$this->toolbarSave2new("icalevent.savenew", 'JEV_SAVE_NEW');
 			}
 			else
 			{
 				if (JEVHelper::isEventEditor() || JEVHelper::canEditEvent($this->row))
 				{
-					$this->toolbarConfirmButton("icalevent.apply", JText::_("JEV_SAVE_ICALEVENT_WARNING"), 'apply', 'apply', 'JEV_SAVE', false);
+					$this->toolbarApply("icalevent.apply",  'JEV_SAVE');
 				}
-				$this->toolbarConfirmButton("icalevent.save", JText::_("JEV_SAVE_ICALEVENT_WARNING"), 'save', 'save', 'JEV_SAVE_CLOSE', false);
-				$this->toolbarConfirmButton("icalevent.savenew", JText::_("JEV_SAVE_COPY_WARNING"), 'save', 'save', 'JEV_SAVE_NEW', false);
+				$this->toolbarSave("icalevent.save", 'JEV_SAVE_CLOSE');
+				$this->toolbarSave2new("icalevent.savenew", 'JEV_SAVE_NEW');
 
 			}
 		}
@@ -183,10 +184,10 @@ class AdminIcaleventViewIcalevent extends JEventsAbstractView
 				$canEditOwn = $juser->authorise('core.edit.own', 'com_jevents');
 			if (JEVHelper::isEventEditor() || $canEditOwn)
 			{
-				$this->toolbarButton("icalevent.apply", 'apply', 'apply', 'JEV_SAVE', false);
+				$this->toolbarApply("icalevent.apply", 'JEV_SAVE');
 			}
-			$this->toolbarButton("icalevent.save", 'save', 'save', 'JEV_SAVE_CLOSE', false);
-			$this->toolbarConfirmButton("icalevent.savenew", JText::_("JEV_SAVE_COPY_WARNING"), 'save', 'save', 'JEV_SAVE_NEW', false);
+			$this->toolbarSave("icalevent.save", 'JEV_SAVE_CLOSE');
+			$this->toolbarSave2new("icalevent.savenew", "JEV_SAVE_NEW");
 		}
 
 
@@ -194,8 +195,7 @@ class AdminIcaleventViewIcalevent extends JEventsAbstractView
 		JEventsHelper::addSubmenu();
 		$this->sidebar = JHtmlSidebar::render();
 
-		$this->toolbarCancel('icalevent.list');
-		//JToolBarHelper::help( 'screen.icalevent.edit', true);
+		$this->toolbarCancel();
 
 		// TODO move this into JForm field type!
 		$this->setCreatorLookup();
@@ -244,10 +244,10 @@ class AdminIcaleventViewIcalevent extends JEventsAbstractView
 		}
 		$this->form->setFieldAttribute("description", "buttons", "false");
 
-                
+
                 $dispatcher = JEventDispatcher::getInstance();
                 $dispatcher->trigger('onTranslateEvent', array(&$this->row, $lang), true);
-                                
+
 		$this->addTranslationToolbar();
 	}
 
@@ -269,9 +269,9 @@ class AdminIcaleventViewIcalevent extends JEventsAbstractView
 
 		// Add a standard button
 		$bar->appendButton('confirm', JText::_("JEV_DELETE_TRANSLATION_WARNING"),  'trash',  'JEV_DELETE', "icalevent.deletetranslation", false);
-		
+
 	}
-	
+
 	protected function csvimport($tpl = null)
 	{
 
@@ -346,7 +346,7 @@ class AdminIcaleventViewIcalevent extends JEventsAbstractView
 				$db->setQuery($sql);
 				$userCount = $db->loadResult();
 
-				if ($userCount<=200) {                                
+				if ($userCount<=200) {
                                     $sql = "SELECT * FROM #__users where id IN (" . implode(",", array_values($users)) . ") and block=0 ORDER BY name asc";
                                     $db->setQuery($sql);
                                     $users = $db->loadObjectList();
@@ -354,7 +354,7 @@ class AdminIcaleventViewIcalevent extends JEventsAbstractView
                                 else {
                                     return null;
                                 }
-                                    
+
 			}
 
 			// get list of creators - if fewer than 200

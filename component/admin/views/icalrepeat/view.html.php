@@ -57,6 +57,7 @@ class AdminIcalrepeatViewIcalrepeat extends JEventsAbstractView
 		$document->setTitle(JText::_('EDIT_ICAL_REPEAT'));
 
 		// Set toolbar items for the page
+		$this->toolbarTitle(JText::_('EDIT_ICAL_REPEAT'), 'jevents');
 		JToolBarHelper::title(JText::_('EDIT_ICAL_REPEAT'), 'jevents');
 
 		$this->toolbarApply('icalrepeat.apply', "JEV_SAVE");

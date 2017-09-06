@@ -54,7 +54,6 @@ JEVHelper::stylesheet('jev_cp.css', 'administrator/components/' . JEV_COM_COMPON
 
 $bar     = JToolBar::getInstance('newtoolbar');
 $toolbar = $bar->getItems() ? $bar->render() : "";
-
 ?>
 
     <div id="jev_adminui" class="jev_adminui skin-blue sidebar-mini">

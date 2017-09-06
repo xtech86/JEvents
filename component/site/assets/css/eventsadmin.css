@@ -798,3 +798,5 @@ div#jevents .jevcolour .minicolors-theme-bootstrap .minicolors-input {
     background-image:none;
     vertical-align:baseline;
 }
+
+#newtoolbar > div {display:inline-block;}

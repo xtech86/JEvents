@@ -787,8 +787,8 @@ class AdminIcalsController extends JControllerForm {
 		$db	= JFactory::getDbo();
 		$query = "SELECT COUNT(*) AS count FROM #__categories WHERE extension = '$component_name' AND `published` = 1;";  // RSH 9/28/10 added check for valid published, J!1.6 sets deleted categoris to published = -2
 		$db->setQuery($query);
-		$count = intval($db->loadResult());
-		if ($count<=0){
+		$count = (int) $db->loadResult();
+		if ($count <= 0){
 			// RSH 9/28/10 - Added check for J!1.6 to use different URL for reroute
 			$redirectURL = "index.php?option=com_categories&extension=" . JEV_COM_COMPONENT;
 			$this->setRedirect($redirectURL, "You must first create at least one category");
@@ -944,10 +944,10 @@ class AdminIcalsController extends JControllerForm {
 				$csvRow['X-EXTRAINFO'] = '""';
 
 				// Times:
-				$csvRow['DTSTART'] = '"' . strftime("%Y%m%dT%H%M%SZ", strtotime($event['start_time'])) . '"';
+				$csvRow['DTSTART'] = '"' . JevDate::strftime("%Y%m%dT%H%M%SZ", strtotime($event['start_time'])) . '"';
 				if (isset($event['end_time']))
 				{
-					$csvRow['DTEND'] =  '"' . strftime("%Y%m%dT%H%M%SZ", strtotime($event['end_time'])) . '"';
+					$csvRow['DTEND'] =  '"' . JevDate::strftime("%Y%m%dT%H%M%SZ", strtotime($event['end_time'])) . '"';
 				}
 				else
 				{
@@ -964,8 +964,8 @@ class AdminIcalsController extends JControllerForm {
 					// Download the image!
 					if (!JFile::exists(JPATH_SITE . $imagePath . 'FB' . $event['id'] . '.jpg'))
 					{
-						copy($event['cover']['source'], $imagePath . '/originals/orig_FB' . $event['id'] . '.jpg');
-						$image = new JImage($imagePath . '/originals/orig_FB' . $event['id'] . '.jpg');
+						copy($event['cover']['source'], $imagePath . '/originals/FB' . $event['id'] . '.jpg');
+						$image = new JImage($imagePath . '/originals/FB' . $event['id'] . '.jpg');
 						$image = $image->resize($thumbWidth, $thumbHeight, true, JImage::SCALE_INSIDE);
 						$image->toFile($imagePath . '/thumbnails/thumb_FB' . $event['id'] . '.jpg', '.jpg', array("quality" => 90));
 					}

@@ -961,7 +961,7 @@ class AdminIcalsController extends JControllerForm {
 
 				if($filesImages && isset($event['cover']))
 				{
-					// Download the image!
+					// Download the image!git fe
 					if (!JFile::exists(JPATH_SITE . $imagePath . 'FB' . $event['id'] . '.jpg'))
 					{
 						copy($event['cover']['source'], $imagePath . '/originals/FB' . $event['id'] . '.jpg');

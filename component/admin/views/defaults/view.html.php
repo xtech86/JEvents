@@ -143,7 +143,6 @@ class AdminDefaultsViewDefaults extends JEventsAbstractView
 				$item->value = file_get_contents(JPATH_ADMINISTRATOR . "/components/" . $parts[0] . "/views/defaults/tmpl/" . $iname . ".html");
 			}
 		}
-
 		$this->assignRef('item', $item);
 		$this->assignRef('requiredfields', $requiredfields);
 

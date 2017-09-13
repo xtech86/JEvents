@@ -36,15 +36,17 @@ class iCalImport
 	function __construct () {
 
 	}
-	// constructor
-	function import($filename,$rawtext="")
+
+	// Constructor
+	function import($filename, $rawtext="")
 	{
 		@ini_set("max_execution_time",600);
 
 		echo JText::sprintf("Importing events from ical file %s", $filename)."<br/>";
 		$cfg = JEVConfig::getInstance();
 		$option = JEV_COM_COMPONENT;
-		// resultant data goes here
+
+		// Resultant data goes here
 		if ($filename!=""){
 			$file = $filename;
 			if (!@file_exists($file)) {

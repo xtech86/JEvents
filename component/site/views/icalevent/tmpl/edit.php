@@ -2,9 +2,9 @@
 defined('_JEXEC') or die('Restricted access');
 
 if (!isset($this->jevviewdone)){
-	$this->loadModules("jevpreeditevent");
+	//$this->loadModules("jevpreeditevent");
 
-	include_once(JEV_ADMINPATH."/views/icalevent/tmpl/".basename(__FILE__));
+	include_once(JEV_ADMINPATH."/views/icalevent/tmpl/edit_original.php");
 
 	/*
 	$bar =  JToolBar::getInstance('toolbar');
@@ -14,6 +14,6 @@ if (!isset($this->jevviewdone)){
 	 */
 	$this->jevviewdone = true;
 
-	$this->loadModules("jevposteditevent");
+	//$this->loadModules("jevposteditevent");
 
 }

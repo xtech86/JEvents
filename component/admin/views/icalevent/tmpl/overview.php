@@ -82,6 +82,10 @@ $toolbar = $bar->getItems() ? $bar->render() : "";
 									<?php if (!$this->_largeDataSet)
 									{ ?>
 										<td align="right" width="100%">  </td>
+										<td align="right">
+											<input type="text" name="search" value="<?php echo $this->search; ?>" class="inputbox"
+											       onChange="document.adminForm.submit();" placeholder="<?php echo JText::_('JEV_SEARCH');  ?>"/>
+										</td>
 										<td align="right"><?php echo $this->plist; ?></td>
 									<?php } ?>
 									<td align="right"><?php echo $this->clist; ?> </td>
@@ -91,9 +95,6 @@ $toolbar = $bar->getItems() ? $bar->render() : "";
 										<td align="right"><?php echo $this->statelist; ?> </td>
 										<td align="right"><?php echo $this->userlist; ?> </td>
 									<?php } ?>
-									<td>
-										<input type="text" name="search" value="<?php echo $this->search; ?>" class="inputbox" onChange="document.adminForm.submit();" placeholder="<?php echo JText::_('JEV_SEARCH');  ?>"/>
-									</td>
 									<?php if (JevJoomlaVersion::isCompatible("3.0"))
 									{ ?>
 										<td align="right">
@@ -110,7 +111,10 @@ $toolbar = $bar->getItems() ? $bar->render() : "";
 									<th nowrap="nowrap">
 										<?php echo JHtml::_('grid.checkall'); ?>
 									</th>
-									<th nowrap="nowrap"><?php echo JText::_('REPEATS'); ?></th>
+									<th nowrap="nowrap">
+										<div class=" btn-micro repeatslist">
+											<span class="icon-list"> </span>
+										</div></th>
 									<th  nowrap="nowrap" class="hidden-phone"><?php echo JText::_('STATUS'); ?></th>
 									<th style="width:40%" class="title" width="50%" nowrap="nowrap">
 										<?php echo JHTML::_('grid.sort', 'JEV_EVENT', 'title', $orderdir, $order, "icalevent.list"); ?>

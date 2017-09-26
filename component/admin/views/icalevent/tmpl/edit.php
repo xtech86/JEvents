@@ -56,46 +56,46 @@ $bar     = JToolBar::getInstance('newtoolbar');
 $toolbar = $bar->getItems() ? $bar->render() : "";
 ?>
 
-    <div id="jev_adminui" class="jev_adminui skin-blue sidebar-mini">
-        <header class="main-header">
+	<div id="jev_adminui" class="jev_adminui skin-blue sidebar-mini">
+		<header class="main-header">
 			<?php echo JEventsHelper::addAdminHeader($items = array(), $toolbar); ?>
-        </header>
-        <!-- =============================================== -->
-        <!-- Left side column. contains the sidebar -->
-        <!-- sidebar: style can be found in sidebar.less -->
+		</header>
+		<!-- =============================================== -->
+		<!-- Left side column. contains the sidebar -->
+		<!-- sidebar: style can be found in sidebar.less -->
 		<?php echo $this->sidebar; ?>
-        <!-- /.sidebar -->
-        <!-- =============================================== -->
-        <!-- Content Wrapper. Contains page content -->
-        <div class="content-wrapper" style="min-height: 1096px;">
-            <!-- Content Header (Page header) -->
-            <section class="content-header">
-                <h1>
+		<!-- /.sidebar -->
+		<!-- =============================================== -->
+		<!-- Content Wrapper. Contains page content -->
+		<div class="content-wrapper" style="min-height: 1096px;">
+			<!-- Content Header (Page header) -->
+			<section class="content-header">
+				<h1>
 					<?php echo JText::_("JEV_ADMIN_EVENTS_MANAGEMENT"); ?>
-                    <small><?php echo JText::_("JEV_ADMIN_EVENTS_MANAGEMENT_STRAPLINE"); ?></small>
-                </h1>
-            </section>
+					<small><?php echo JText::_("JEV_ADMIN_EVENTS_MANAGEMENT_STRAPLINE"); ?></small>
+				</h1>
+			</section>
 
-            <!-- Main content -->
-            <section class="content ov_info">
+			<!-- Main content -->
+			<section class="content ov_info">
 
-                <!-- Default box -->
-                <div class="box">
-                    <form action="index.php" method="post" name="adminForm" id="adminForm">
-                        <div class="box-body">
+				<!-- Default box -->
+				<div class="box">
+					<form action="index.php" method="post" name="adminForm" id="adminForm">
+						<div class="box-body">
 
-                            <div id="jevents" <?php
+							<div id="jevents" <?php
 							echo (!JFactory::getApplication()->isAdmin() && $params->get("darktemplate", 0)) ? "class='jeventsdark $accesslevels'" : "class='$accesslevels' ";
 							?> >
-                                <form action="<?php echo $action; ?>" method="post" name="adminForm"
-                                      enctype='multipart/form-data' id="adminForm" class="form-horizontal jevbootstrap">
+								<form action="<?php echo $action; ?>" method="post" name="adminForm"
+								      enctype='multipart/form-data' id="adminForm" class="form-horizontal jevbootstrap">
 									<?php
 									ob_start();
 
 									// these are needed for front end admin
 									ob_start();
 									?>
-                                    <div class="jev_edit_event_notice">
+									<div class="jev_edit_event_notice">
 										<?php
 										if ($this->editCopy)
 										{
@@ -122,37 +122,37 @@ $toolbar = $bar->getItems() ? $bar->render() : "";
 										{
 											$repeatStyle = "style='display:none;'";
 											?>
-                                            <h3><?php echo JText::_('YOU_ARE_EDITING_AN_ICAL_REPEAT'); ?></h3>
-                                            <input type="hidden" name="cid[]" value="<?php echo $this->rp_id; ?>"/>
+											<h3><?php echo JText::_('YOU_ARE_EDITING_AN_ICAL_REPEAT'); ?></h3>
+											<input type="hidden" name="cid[]" value="<?php echo $this->rp_id; ?>"/>
 											<?php
 										}
 										?>
-                                    </div>
+									</div>
 									<?php
 
 									if ($params->get("checkconflicts", 0))
 									{
 										?>
-                                        <div id='jevoverlapwarning'>
-                                            <div><?php echo JText::_("JEV_OVERLAPPING_EVENTS_WARNING"); ?></div>
+										<div id='jevoverlapwarning'>
+											<div><?php echo JText::_("JEV_OVERLAPPING_EVENTS_WARNING"); ?></div>
 											<?php
 											// event deletors get the right to override this
 											if (JEVHelper::isEventDeletor(true) && JText::_("JEV_OVERLAPPING_EVENTS_OVERRIDE") != "JEV_OVERLAPPING_EVENTS_OVERRIDE")
 											{
 												?>
-                                                <div>
-                                                    <strong>
-                                                        <label><?php echo JText::_("JEV_OVERLAPPING_EVENTS_OVERRIDE"); ?>
-                                                            <!-- not checked by default !!! //-->
-                                                            <input type="checkbox" name="overlapoverride" value="1"/>
-                                                        </label>
-                                                    </strong>
-                                                </div>
+												<div>
+													<strong>
+														<label><?php echo JText::_("JEV_OVERLAPPING_EVENTS_OVERRIDE"); ?>
+															<!-- not checked by default !!! //-->
+															<input type="checkbox" name="overlapoverride" value="1"/>
+														</label>
+													</strong>
+												</div>
 												<?php
 											}
 											?>
-                                            <div id="jevoverlaps"></div>
-                                        </div>
+											<div id="jevoverlaps"></div>
+										</div>
 										<?php
 									}
 
@@ -184,7 +184,7 @@ $toolbar = $bar->getItems() ? $bar->render() : "";
 									if (isset($this->row->_uid))
 									{
 										?>
-                                        <input type="hidden" name="uid" value="<?php echo $this->row->_uid; ?>"/>
+										<input type="hidden" name="uid" value="<?php echo $this->row->_uid; ?>"/>
 										<?php
 									}
 
@@ -192,34 +192,33 @@ $toolbar = $bar->getItems() ? $bar->render() : "";
 									// I need $year,$month,$day So that I can return to an appropriate date after saving an event (the repetition ids have all changed so I can't go back there!!)
 									list($year, $month, $day) = JEVHelper::getYMD();
 									?>
-                                    <input type="hidden" name="jevtype" value="icaldb"/>
-                                    <input type="hidden" name="boxchecked" value="0"/>
-                                    <input type="hidden" name="updaterepeats" value="0"/>
-                                    <input type="hidden" name="task"
-                                           value="<?php echo $jinput->getCmd("task", "icalevent.edit"); ?>"/>
-                                    <input type="hidden" name="option" value="<?php echo JEV_COM_COMPONENT; ?>"/>
-                                    <input type="hidden" name="rp_id"
-                                           value="<?php echo isset($this->rp_id) ? $this->rp_id : -1; ?>"/>
-                                    <input type="hidden" name="year" value="<?php echo $year; ?>"/>
-                                    <input type="hidden" name="month" value="<?php echo $month; ?>"/>
-                                    <input type="hidden" name="day" value="<?php echo $day; ?>"/>
-                                    <input type="hidden" name="evid" id="evid" value="<?php echo $this->ev_id; ?>"/>
-                                    <input type="hidden" name="valid_dates" id="valid_dates" value="1"/>
+									<input type="hidden" name="jevtype" value="icaldb"/>
+									<input type="hidden" name="boxchecked" value="0"/>
+									<input type="hidden" name="updaterepeats" value="0"/>
+									<input type="hidden" name="task" value="<?php echo $jinput->getCmd("task", "icalevent.edit"); ?>"/>
+									<input type="hidden" name="option" value="<?php echo JEV_COM_COMPONENT; ?>"/>
+									<input type="hidden" name="rp_id" value="<?php echo isset($this->rp_id) ? $this->rp_id : -1; ?>"/>
+									<input type="hidden" name="year" value="<?php echo $year; ?>"/>
+									<input type="hidden" name="month" value="<?php echo $month; ?>"/>
+									<input type="hidden" name="day" value="<?php echo $day; ?>"/>
+									<input type="hidden" name="evid" id="evid" value="<?php echo $this->ev_id; ?>"/>
+									<input type="hidden" name="valid_dates" id="valid_dates" value="1"/>
+
 									<?php if (!JFactory::getApplication()->isAdmin())
 									{ ?>
-                                        <input type="hidden" name="Itemid" id="Itemid"
-                                               value="<?php echo JEVHelper::getItemid(); ?>"/>
+										<input type="hidden" name="Itemid" id="Itemid"
+										       value="<?php echo JEVHelper::getItemid(); ?>"/>
 									<?php } ?>
 									<?php
 									if ($this->editCopy)
 									{
 										?>
-                                        <input type="hidden" name="old_evid" id="old_evid"
-                                               value="<?php echo $this->old_ev_id; ?>"/>
+										<input type="hidden" name="old_evid" id="old_evid"
+										       value="<?php echo $this->old_ev_id; ?>"/>
 										<?php
 									}
 									?>
-                                    <script type="text/javascript">
+									<script type="text/javascript">
 										<?php
 										if (!empty($this->requiredtags))
 										{
@@ -332,7 +331,7 @@ $toolbar = $bar->getItems() ? $bar->render() : "";
                                             submitform(pressbutton);
                                         }
                                         //-->
-                                    </script>
+									</script>
 
 									<?php
 									$this->searchtags[]  = "{{HIDDENINFO}}";
@@ -342,22 +341,22 @@ $toolbar = $bar->getItems() ? $bar->render() : "";
 									$this->blanktags[] = "";
 									?>
 
-                                    <div class="adminform nav-tabs-custom">
+									<div class="adminform nav-tabs-custom">
 										<?php
 										if (!$cfg->get('com_single_pane_edit', 0))
 										{
 											?>
-                                            <ul class="nav nav-tabs" id="myEditTabs">
-                                                <li class="active"><a data-toggle="tab"
-                                                                      href="#common"><?php echo JText::_("JEV_TAB_COMMON"); ?></a>
-                                                </li>
+											<ul class="nav nav-tabs" id="myEditTabs">
+												<li class="active"><a data-toggle="tab"
+												                      href="#common"><?php echo JText::_("JEV_TAB_COMMON"); ?></a>
+												</li>
 												<?php
 												if (!$cfg->get('com_single_pane_edit', 0) && !$cfg->get('timebeforedescription', 0))
 												{
 													?>
-                                                    <li><a data-toggle="tab"
-                                                           href="#calendar"><?php echo JText::_("JEV_TAB_CALENDAR"); ?></a>
-                                                    </li>
+													<li><a data-toggle="tab"
+													       href="#calendar"><?php echo JText::_("JEV_TAB_CALENDAR"); ?></a>
+													</li>
 													<?php
 												}
 												if (!$cfg->get('com_single_pane_edit', 0))
@@ -375,9 +374,9 @@ $toolbar = $bar->getItems() ? $bar->render() : "";
 																$extraTab['title'] = JText::_($extraTab['title']);
 															}
 															?>
-                                                            <li><a data-toggle="tab"
-                                                                   href="#<?php echo $extraTab['paneid'] ?>"><?php echo $extraTab['title']; ?></a>
-                                                            </li>
+															<li><a data-toggle="tab"
+															       href="#<?php echo $extraTab['paneid'] ?>"><?php echo $extraTab['title']; ?></a>
+															</li>
 															<?php
 														}
 													}
@@ -385,220 +384,208 @@ $toolbar = $bar->getItems() ? $bar->render() : "";
 												if ($assoc)
 												{
 													?>
-                                                    <li><a data-toggle="tab"
-                                                           href="#associations"><?php echo JText::_('COM_JEVENTS_ITEM_ASSOCIATIONS_FIELDSET_LABEL', true); ?></a>
-                                                    </li>
+													<li><a data-toggle="tab"
+													       href="#associations"><?php echo JText::_('COM_JEVENTS_ITEM_ASSOCIATIONS_FIELDSET_LABEL', true); ?></a>
+													</li>
 													<?php
 												}
 												?>
-                                            </ul>
+											</ul>
 											<?php
 											// Tabs
 											echo JHtml::_('bootstrap.startPane', 'myEditTabs', array('active' => 'common'));
 											echo JHtml::_('bootstrap.addPanel', 'myEditTabs', "common");
 										}
 										?>
-                                        <div class="row">
-                                        <div class="span4">
-                                            <div class="row jevtitle form-group">
-												<?php
-												echo $this->form->getLabel("title");
-												echo str_replace("/>", " data-placeholder='xx' />", $this->form->getInput("title"));
-												?>
-                                            </div>
-											<?php
-											if ($this->form->getInput("priority"))
-											{
-												?>
-                                                <div class="row jevpriority form-group">
+										<div class="row">
+											<div class="span4">
+												<div class="row jevtitle form-group">
 													<?php
-													echo $this->form->getLabel("priority");
-													echo $this->form->getInput("priority");
+													echo $this->form->getLabel("title");
+													echo str_replace("/>", " data-placeholder='xx' />", $this->form->getInput("title"));
 													?>
-                                                </div>
+												</div>
 												<?php
-											}
-											?>
-											<?php
-											if ($this->form->getInput("creator"))
-											{
-												?>
-                                                <div class="row jevcreator form-group">
-													<?php
-													echo $this->form->getLabel("creator");
-													echo $this->form->getInput("creator");
-													?>
-                                                </div>
-												<?php
-											}
-
-											// This could be hidden!
-											if ($this->form->getLabel("ics_id"))
-											{
-												?>
-                                                <div class="row jevcalendar form-group">
-													<?php
-													echo $this->form->getLabel("ics_id");
-													echo $this->form->getInput("ics_id");
-													?>
-                                                </div>
-												<?php
-											}
-											else
-											{
-												echo $this->form->getInput("ics_id");
-											}
-
-											if ($this->form->getInput("lockevent"))
-											{
-												?>
-                                                <div class="row jevlockevent form-group">
-													<?php
-													echo $this->form->getLabel("lockevent");
-													echo $this->form->getInput("lockevent");
-													?>
-                                                </div>
-												<?php
-											}
-
-											if ($this->form->getLabel("catid"))
-											{
-												?>
-                                                <div class="row jevcategory form-group">
-													<?php
-													if ($this->form->getLabel("catid"))
-													{
-														echo $this->form->getLabel("catid");
-														echo $this->form->getInput("catid");
-													}
-													?>
-                                                </div>
-												<?php
-											}
-
-											if ($this->repeatId === 0 && $this->form->getLabel("access") ){
-												?>
-                                                <div class="row  jevaccess">
-													<?php
-													if ($this->form->getLabel("access"))
-													{
-														?>
-                                                        <div class="span2">
-															<?php
-															echo $this->form->getLabel("access");
-															?>
-                                                        </div>
-                                                        <div class="span10 accesslevel ">
-															<?php echo $this->form->getInput("access"); ?>
-                                                        </div>
-														<?php
-													}
-													?>
-                                                </div>
-												<?php
-											}
-
-											if ($this->repeatId !== 0){
-												//Do Nothing, repeats do not yet have states
-											} else if ($this->form->getLabel("state")) {
-												?>
-                                                <div class="row jevpublished">
-                                                    <div class="span2">
-														<?php echo $this->form->getLabel("state"); ?>
-                                                    </div>
-                                                    <div class="span10">
-														<?php echo $this->form->getInput("state"); ?>
-                                                    </div>
-                                                </div>
-												<?php
-											}
-											else
-											{
-												// hidden field!
-												echo $this->form->getInput("state");
-											}
-
-											if ($this->form->getInput("color"))
-											{
-												?>
-                                                <div class="row jevcolour form-group">
-													<?php
-													echo $this->form->getLabel("color");
-													echo $this->form->getInput("color");
-													?>
-                                                </div>
-												<?php
-											}
-											?>
-                                            <div class="row jeveditlocation form-group" id="jeveditlocation">
-												<?php
-												echo $this->form->getLabel("location");
-												echo $this->form->getInput("location");
-												?>
-                                            </div>
-                                            <div class="row jev_contact form-group">
-												<?php
-												echo $this->form->getLabel("contact_info");
-												echo $this->form->getInput("contact_info");
-												?>
-                                            </div>
-                                        </div>
-                                        <div class="span8">
-											<?php
-											if ($cfg->get('timebeforedescription', 0))
-											{
-												ob_start();
-												echo $this->loadTemplate("datetime");
-												$this->searchtags[]  = "{{CALTAB}}";
-												$output              = ob_get_clean();
-												$this->replacetags[] = $output;
-												echo $output;
-												$this->blanktags[] = "";
-											}
-											?>
-
-                                            <div class="row jev_description form-group" id="jeveditor">
-												<?php echo $this->form->getLabel("jevcontent");
-
-												// There is a TinyMCE issue in Joomla! 3.6 where it loads the javascript twice if we do this
-												//echo $this->form->getInput("jevcontent");
-												// so instead we use the value we already have in the replace tags
-												$index = array_search("{{DESCRIPTION}}", $this->searchtags, false);
-												if ($index !== false)
+												if ($this->form->getInput("priority"))
 												{
-													echo $this->replacetags[$index];
+													?>
+													<div class="row jevpriority form-group">
+														<?php
+														echo $this->form->getLabel("priority");
+														echo $this->form->getInput("priority");
+														?>
+													</div>
+													<?php
 												}
 												?>
-                                            </div>
-                                            <div class="row jev_extrainfo form-group">
 												<?php
-												echo $this->form->getLabel("extra_info");
-												echo $this->form->getInput("extra_info");
-												?>
-                                            </div>
-                                        </div>
-                                        </div>
-                                        <div class="row">
-										<?php
-										foreach ($this->customfields as $key => $val)
-										{
-											// skip custom fields that are already displayed on other tabs
-											if (isset($val["group"]) && $val["group"] != "default")
-											{
-												continue;
-											}
+												if ($this->form->getInput("creator"))
+												{
+													?>
+													<div class="row jevcreator form-group">
+														<?php
+														echo $this->form->getLabel("creator");
+														echo $this->form->getInput("creator");
+														?>
+													</div>
+													<?php
+												}
 
-											?>
-                                                <div class="row jevplugin_<?php echo $key; ?> form-group" <?php echo isset($this->customfields[$key]["showon"]) ? $this->customfields[$key]["showon"] : ""; ?>>
-                                                    <div class="span2">
-                                                        <label><?php echo $this->customfields[$key]["label"]; ?></label>
-                                                        <?php echo $this->customfields[$key]["input"]; ?>
-                                                    </div>
-                                                </div>
+												// This could be hidden!
+												if ($this->form->getLabel("ics_id"))
+												{
+													?>
+													<div class="row jevcalendar form-group">
+														<?php
+														echo $this->form->getLabel("ics_id");
+														echo $this->form->getInput("ics_id");
+														?>
+													</div>
+													<?php
+												}
+												else
+												{
+													echo $this->form->getInput("ics_id");
+												}
+
+												if ($this->form->getInput("lockevent"))
+												{
+													?>
+													<div class="row jevlockevent form-group">
+														<?php
+														echo $this->form->getLabel("lockevent");
+														echo $this->form->getInput("lockevent");
+														?>
+													</div>
+													<?php
+												}
+
+												if ($this->form->getLabel("catid"))
+												{
+													?>
+													<div class="row jevcategory form-group">
+														<?php
+														if ($this->form->getLabel("catid"))
+														{
+															echo $this->form->getLabel("catid");
+															echo $this->form->getInput("catid");
+														}
+														?>
+													</div>
+													<?php
+												}
+
+												if ($this->repeatId === 0 && $this->form->getLabel("access") ){
+													?>
+													<div class="row jevaccess form-group">
+														<?php
+														if ($this->form->getLabel("access"))
+														{
+															echo $this->form->getLabel("access");
+															echo $this->form->getInput("access");
+														}
+														?>
+													</div>
+													<?php
+												}
+
+												if ($this->repeatId !== 0){
+													//Do Nothing, repeats do not yet have states
+												} else if ($this->form->getLabel("state")) {
+													?>
+													<div class="row jevpublished form-group">
+														<?php echo $this->form->getLabel("state"); ?>
+														<?php echo $this->form->getInput("state"); ?>
+													</div>
+													<?php
+												}
+												else
+												{
+													// hidden field!
+													echo $this->form->getInput("state");
+												}
+
+												if ($this->form->getInput("color"))
+												{
+													?>
+													<div class="row jevcolour form-group">
+														<?php
+														echo $this->form->getLabel("color");
+														echo $this->form->getInput("color");
+														?>
+													</div>
+													<?php
+												}
+												?>
+												<div class="row jeveditlocation form-group" id="jeveditlocation">
+													<?php
+													echo $this->form->getLabel("location");
+													echo $this->form->getInput("location");
+													?>
+												</div>
+												<div class="row jev_contact form-group">
+													<?php
+													echo $this->form->getLabel("contact_info");
+													echo $this->form->getInput("contact_info");
+													?>
+												</div>
+												<div class="row jev_extrainfo form-group">
+													<?php
+													echo $this->form->getLabel("extra_info");
+													echo $this->form->getInput("extra_info");
+													?>
+												</div>
+											</div>
+											<div class="span8">
+												<?php
+												if ($cfg->get('timebeforedescription', 0))
+												{
+													ob_start();
+													echo $this->loadTemplate("datetime");
+													$this->searchtags[]  = "{{CALTAB}}";
+													$output              = ob_get_clean();
+													$this->replacetags[] = $output;
+													echo $output;
+													$this->blanktags[] = "";
+												}
+												?>
+
+												<div class="row jev_description form-group" id="jeveditor">
+													<?php echo $this->form->getLabel("jevcontent");
+
+													// There is a TinyMCE issue in Joomla! 3.6 where it loads the javascript twice if we do this
+													//echo $this->form->getInput("jevcontent");
+													// so instead we use the value we already have in the replace tags
+													$index = array_search("{{DESCRIPTION}}", $this->searchtags, false);
+													if ($index !== false)
+													{
+														echo $this->replacetags[$index];
+													}
+													?>
+												</div>
+											</div>
+										</div>
+										<div class="row">
 											<?php
-										}
-										?>
-                                        </div>
+											foreach ($this->customfields as $key => $val)
+											{
+												// skip custom fields that are already displayed on other tabs
+												if (isset($val["group"]) && $val["group"] != "default")
+												{
+													continue;
+												}
+
+												?>
+												<div class="row jevplugin_<?php echo $key; ?> form-group" <?php echo isset($this->customfields[$key]["showon"]) ? $this->customfields[$key]["showon"] : ""; ?>>
+													<div class="span2">
+														<label><?php echo $this->customfields[$key]["label"]; ?></label>
+														<?php echo $this->customfields[$key]["input"]; ?>
+													</div>
+												</div>
+												<?php
+											}
+											?>
+										</div>
 										<?php
 
 										if (!$cfg->get('com_single_pane_edit', 0) && !$cfg->get('timebeforedescription', 0))
@@ -652,37 +639,37 @@ $toolbar = $bar->getItems() ? $bar->render() : "";
 											echo JHtml::_('bootstrap.endPane', 'myEditTabs');
 										}
 										?>
-                                    </div>
+									</div>
 									<?php
 									$output = ob_get_clean();
 									if (!$this->loadEditFromTemplate('icalevent.edit_page', $this->row, 0, $this->searchtags, $this->replacetags, $this->blanktags))
 									{
 										echo $output;
-									}
+									} ?>
 
-									echo $toolbar;
-									?>
+								</form>
+							</div><!-- /.box-body -->
+							<div class="box-footer">
 
-                                </form>
-                            </div><!-- /.box-body -->
-                            <div class="box-footer">
+							</div><!-- /.box-footer-->
+					</form>
+				</div><!-- /.box -->
 
-                            </div><!-- /.box-footer-->
-                    </form>
-                </div><!-- /.box -->
-
-            </section><!-- /.content -->
-        </div>
-        <!-- /.content-wrapper -->
-		<?php echo JEventsHelper::addAdminFooter(); ?>
-        <!-- /.control-sidebar -->
-        <!-- Add the sidebar's background. This div must be placed
+			</section><!-- /.content -->
+		</div>
+		<!-- /.content-wrapper -->
+		<?php
+		echo JEventsHelper::addAdminFooter(); ?>
+		<!-- /.control-sidebar -->
+		<!-- Add the sidebar's background. This div must be placed
 			   immediately after the control sidebar -->
-        <div class="control-sidebar-bg" style="position: fixed; height: auto;"></div>
-    </div>
+		<div class="control-sidebar-bg" style="position: fixed; height: auto;"></div>
+	</div>
 <?php
 $app = JFactory::getApplication();
-if ($app->isSite())
+
+$client = $app->isClient('site');
+if ($client)
 {
 	if ($params->get('com_edit_toolbar', 0) == 1 || $params->get('com_edit_toolbar', 0) == 2)
 	{

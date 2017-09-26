@@ -1366,6 +1366,7 @@ class AdminIcaleventController extends JControllerAdmin
 		// clean out the cache
 		$cache = JFactory::getCache('com_jevents');
 		$cache->clean(JEV_COM_COMPONENT);
+		$jinput = JFactory::getApplication()->input;
 
 		// Must be at least an event creator to publish events
 		$is_event_editor = JEVHelper::isEventPublisher();

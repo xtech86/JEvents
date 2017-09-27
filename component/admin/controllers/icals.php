@@ -944,10 +944,10 @@ class AdminIcalsController extends JControllerForm {
 				$csvRow['X-EXTRAINFO'] = '""';
 
 				// Times:
-				$csvRow['DTSTART'] = '"' . JevDate::strftime("%Y%m%dT%H%M%SZ", strtotime($event['start_time'])) . '"';
+				$csvRow['DTSTART'] = '"' . JevDate::strftime("%Y%m%dT%H%M%S", strtotime($event['start_time'])) . '"';
 				if (isset($event['end_time']))
 				{
-					$csvRow['DTEND'] =  '"' . JevDate::strftime("%Y%m%dT%H%M%SZ", strtotime($event['end_time'])) . '"';
+					$csvRow['DTEND'] =  '"' . JevDate::strftime("%Y%m%dT%H%M%S", strtotime($event['end_time'])) . '"';
 				}
 				else
 				{

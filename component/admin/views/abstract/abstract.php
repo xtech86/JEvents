@@ -1148,7 +1148,7 @@ class JEventsAbstractView extends JViewLegacy
 		$bar = JToolbar::getInstance('newtoolbar');
 
 		// Add an apply button
-		$bar->appendButton('Standard', 'save', $alt, $task, false);
+		$bar->appendButton('Standard', 'wand', $alt, $task, false);
 	}
 
 }

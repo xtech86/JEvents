@@ -893,7 +893,10 @@ class AdminIcalsController extends JControllerForm {
 				}
 
 				$i   = 0;
-				$geo = false;
+				$geolat = false;
+				$geolon = false;
+
+				$lcd = array();
 
 				if (isset($event['place']) && is_array($event['place']))
 				{
@@ -901,40 +904,60 @@ class AdminIcalsController extends JControllerForm {
 					{
 						if ($key === 'latitude')
 						{
-							$geo .= $loc_row . ';';
+							$geolat .= $loc_row . ';';
 							unset($event['place'][$key]);
 							continue;
 						}
 						if ($key === 'longitude')
 						{
-							$geo .= $loc_row;
+							$geolon .= $loc_row;
 							unset($event['place'][$key]);
 							continue;
 						}
 
-						if ($i > 0)
-						{
-							$location .= ',';
+						if ($key === 'name') {
+							$lcd[1] = $loc_row;
 						}
-						$location .= $loc_row;
-						$i++;
+
+						if ($key === 'street') {
+							$lcd[2] = $loc_row;
+						}
+						if ($key === 'town') {
+							$lcd[3] = $loc_row;
+						}
+						if ($key === 'state') {
+							$lcd[4] = $loc_row;
+						}
+						if ($key === 'zip') {
+							$lcd[5] = $loc_row;
+						}
 					}
 				}
 				else
 				{
 					$location = '';
 				}
-
-				if ($location !== '')
+				$lcd_cnt = count($lcd);
+				if ($lcd_cnt > 0)
 				{
-					$csvRow['location'] = '"' . $location . '"';
+					$location = '';
+					$x = 1;
+
+					ksort($lcd);
+					var_dump($lcd);
+					foreach ($lcd as $lkey => $locd) {
+						$location .= $locd;
+							$location .= ',';
+						$x++;
+					}
+					$csvRow['location'] = '"' . substr($location, 0, -1) . '"';
 				}
 
 				$csvRow['geo'] = '""';
 
-				if ($geo)
+				if ($geolat)
 				{
-					$csvRow['geo'] = '"' . $geo . '"';
+					$csvRow['geo'] = '"' . $geolat . $geolon . '"';
 				}
 
 				// Description
@@ -984,9 +1007,6 @@ class AdminIcalsController extends JControllerForm {
 
 			$f++;
 		}
-
-		fwrite($fh, $csvData);
-		fclose($fh);
 
 		//return JPATH_SITE . '/tmp/' . $filename;
 

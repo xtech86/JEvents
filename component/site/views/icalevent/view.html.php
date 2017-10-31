@@ -53,16 +53,16 @@ class ICalEventViewIcalevent extends AdminIcaleventViewIcalevent
 		JEVHelper::script('editicalJQ.js', 'components/' . JEV_COM_COMPONENT . '/assets/js/');
 		JEVHelper::script('JevStdRequiredFieldsJQ.js', 'components/' . JEV_COM_COMPONENT . '/assets/js/');
 
-		if (strlen($this->row->title()) <= 0)
+		if (strlen($this->row->title()) > 0)
 		{
 			// Set toolbar items for the page
-			JToolBarHelper::title(JText::_('EDIT_ICAL_EVENT'), 'jevents');
+			JToolbarHelper::title(JText::_('EDIT_ICAL_EVENT'), 'jevents');
 			$document->setTitle(JText::_('EDIT_ICAL_EVENT'));
 		}
 		else
 		{
 			// Set toolbar items for the page
-			JToolBarHelper::title(JText::_('CREATE_ICAL_EVENT'), 'jevents');
+			JToolbarHelper::title(JText::_('CREATE_ICAL_EVENT'), 'jevents');
 			$document->setTitle(JText::_('CREATE_ICAL_EVENT'));
 		}
 
@@ -166,7 +166,7 @@ class ICalEventViewIcalevent extends AdminIcaleventViewIcalevent
 		$this->datamodel = new JEventsDataModel();
 		$dispatcher->trigger('onJEventsHeader', array($this));
 		?>
-		<div style="clear:both"
+		<div style="clear:both"  
 		<?php
 		$mainframe = JFactory::getApplication();
 		$params = JComponentHelper::getParams(JEV_COM_COMPONENT);
@@ -331,3 +331,4 @@ class ICalEventViewIcalevent extends AdminIcaleventViewIcalevent
 	    }
 
     }
+    

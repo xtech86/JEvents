@@ -195,7 +195,7 @@ class AdminIcaleventViewIcalevent extends JEventsAbstractView
 		JEventsHelper::addSubmenu();
 		$this->sidebar = JHtmlSidebar::render();
 
-		$this->toolbarCancel();
+		$this->toolbarCancel('icalevent.cancel');
 
 		// TODO move this into JForm field type!
 		$this->setCreatorLookup();

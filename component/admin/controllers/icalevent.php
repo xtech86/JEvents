@@ -554,7 +554,9 @@ class AdminIcaleventController extends JControllerAdmin
 			$calsql = 'SELECT * FROM #__jevents_icsfile WHERE ics_id=' . intval($row->icsid());
 			$db->setQuery($calsql);
 			$cal = $db->loadObject();
-			if ($cal && $cal->icaltype == 0)
+
+			// Offer to URL and Facebook Events
+			if (($cal) && ($cal->icaltype == 0 || $cal->icaltype == 3) )
 			{
 				$nativeCals[$cal->ics_id] = $cal;
 				$this->view->assign("offerlock", 1);

@@ -47,8 +47,8 @@ function launchJevModal(selector, url) {
 	}
 	else {
 		// This is needed to stop multiple page loads
-		jQuery(selector).off('shown');
-		jQuery(selector).on('shown', function () {
+        jQuery(selector).off('show');
+        jQuery(selector).on('show', function () {
 			//jQuery(selector+' iframe').attr("src","about:blank");
 			jQuery(selector+' iframe').attr("src",url);
 		});

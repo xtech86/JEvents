@@ -81,7 +81,7 @@ $toolbar = $bar->getItems() ? $bar->render() : "";
 
 				<!-- Default box -->
 				<div class="box">
-					<form action="index.php" method="post" name="adminForm" id="adminForm">
+					<form action="index.php" method="post" name="adminForm" id="adminForm" class="jevedit">
 						<div class="box-body">
 
 							<div id="jevents" <?php

@@ -104,7 +104,10 @@ class com_jeventsInstallerScript
 	private function createTables() {
 
 		$db = JFactory::getDbo();
-		$db->setDebug(0);
+		if (version_compare(JVERSION, "4.0", '<'))
+		{
+			$db->setDebug(0);
+		}
 		if (version_compare(JVERSION, "3.3", 'ge')){
 			$charset = ($db->hasUTFSupport()) ?  ' DEFAULT CHARACTER SET `utf8`' : '';
 			$rowcharset = ($db->hasUTFSupport()) ?  'CHARACTER SET utf8' : '';
@@ -155,7 +158,9 @@ CREATE TABLE IF NOT EXISTS #__jevents_vevent(
 SQL;
 		$db->setQuery($sql);
 		$db->execute();
-		echo $db->getErrorMsg();
+				if (version_compare(JVERSION, "4.0", '<')) {
+			echo $db->getErrorMsg();
+		}
 
 
 		/**
@@ -208,7 +213,9 @@ CREATE TABLE IF NOT EXISTS #__jevents_vevdetail(
 SQL;
 		$db->setQuery($sql);
 		$db->execute();
-		echo $db->getErrorMsg();
+				if (version_compare(JVERSION, "4.0", '<')) {
+			echo $db->getErrorMsg();
+		}
 
 		$sql = <<<SQL
 CREATE TABLE IF NOT EXISTS #__jevents_rrule (
@@ -236,7 +243,9 @@ CREATE TABLE IF NOT EXISTS #__jevents_rrule (
 SQL;
 		$db->setQuery($sql);
 		$db->execute();
-		echo $db->getErrorMsg();
+				if (version_compare(JVERSION, "4.0", '<')) {
+			echo $db->getErrorMsg();
+		}
 
 
 		$sql = <<<SQL
@@ -260,7 +269,9 @@ CREATE TABLE IF NOT EXISTS #__jevents_repetition (
 SQL;
 		$db->setQuery($sql);
 		$db->execute();
-		echo $db->getErrorMsg();
+				if (version_compare(JVERSION, "4.0", '<')) {
+			echo $db->getErrorMsg();
+		}
 
 		// exception_type 0=delete, 1=other exception
 		$sql = <<<SQL
@@ -280,7 +291,9 @@ CREATE TABLE IF NOT EXISTS #__jevents_exception (
 SQL;
 		$db->setQuery($sql);
 		$db->execute();
-		echo $db->getErrorMsg();
+				if (version_compare(JVERSION, "4.0", '<')) {
+			echo $db->getErrorMsg();
+		}
 
 		/**
 		 * create table if it doesn't exit
@@ -321,7 +334,9 @@ CREATE TABLE IF NOT EXISTS #__jevents_icsfile(
 SQL;
 		$db->setQuery($sql);
 		$db->execute();
-		echo $db->getErrorMsg();
+				if (version_compare(JVERSION, "4.0", '<')) {
+			echo $db->getErrorMsg();
+		}
 
 		// 1. Make sure users table exists
 		$sql = <<<SQL
@@ -359,7 +374,9 @@ SQL;
 		$db->setQuery($sql);
 		if (!$db->execute())
 		{
+					if (version_compare(JVERSION, "4.0", '<')) {
 			echo $db->getErrorMsg();
+		}
 		}
 
 		$sql = <<<SQL
@@ -381,7 +398,9 @@ CREATE TABLE IF NOT EXISTS #__jev_defaults (
 SQL;
 		$db->setQuery($sql);
 		$db->execute();
-		echo $db->getErrorMsg();
+				if (version_compare(JVERSION, "4.0", '<')) {
+			echo $db->getErrorMsg();
+		}
 
 
 		// Multi-category Mapping table
@@ -395,7 +414,9 @@ CREATE TABLE IF NOT EXISTS #__jevents_catmap(
 SQL;
 		$db->setQuery($sql);
 		$db->execute();
-		echo $db->getErrorMsg();
+				if (version_compare(JVERSION, "4.0", '<')) {
+			echo $db->getErrorMsg();
+		}
 
 		// Filter module mapping table
 		// Maps filter values to URL keys
@@ -414,7 +435,9 @@ CREATE TABLE IF NOT EXISTS #__jevents_filtermap (
 SQL;
 		$db->setQuery($sql);
 		$db->execute();
-		echo $db->getErrorMsg();
+				if (version_compare(JVERSION, "4.0", '<')) {
+			echo $db->getErrorMsg();
+		}
 
 		/**
 		 * create table if it doesn't exit
@@ -444,14 +467,19 @@ CREATE TABLE IF NOT EXISTS #__jevents_translation (
 SQL;
 		$db->setQuery($sql);
 		$db->execute();
-		echo $db->getErrorMsg();
+				if (version_compare(JVERSION, "4.0", '<')) {
+			echo $db->getErrorMsg();
+		}
 
 	}
 		
 	private function updateTables() {
 
 		$db = JFactory::getDbo();
-		$db->setDebug(0);
+		if (version_compare(JVERSION, "4.0", '<'))
+		{
+			$db->setDebug(0);
+		}
 
 		if (version_compare(JVERSION, "3.3", 'ge')){
 			$charset = ($db->hasUTFSupport()) ?  ' DEFAULT CHARACTER SET `utf8`' : '';

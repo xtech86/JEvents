@@ -83,8 +83,10 @@ JEVHelper::script('select2.full.min.js', 'administrator/components/' . JEV_COM_C
                                     <th width="20" nowrap="nowrap">
 										<?php echo JHtml::_('grid.checkall'); ?>
                                     </th>
-                                    <th class="title" width="30%"
+                                    <th class="title" width="20%"
                                         nowrap="nowrap"><?php echo JText::_('JEV_ICAL_SUMMARY'); ?></th>
+	                                <th class="refreshed" width="10%"
+                                        nowrap="nowrap"><?php echo JText::_('JEV_ICAL_REFRESHED'); ?></th>
                                     <th width="10%" nowrap="nowrap"><?php echo JText::_('JEV_ICAL_TYPE'); ?></th>
                                     <th width="10%"
                                         nowrap="nowrap"><?php echo JText::_('JEV_CATEGORY_NAME'); ?></th>
@@ -118,6 +120,7 @@ JEVHelper::script('select2.full.min.js', 'administrator/components/' . JEV_COM_C
                                                onclick="return listItemTask('cb<?php echo $i; ?>','icals.edit')"
                                                title="<?php echo JText::_('JEV_CLICK_TO_EDIT'); ?>"><?php echo $row->label; ?></a>
                                         </td>
+	                                    <td><?php echo $row->refreshed; ?></td>
                                         <td align="center">
 											<?php
 											$types = array(JText::_('COM_JEVENTS_MANAGE_CALENDARS_OVERVIEW_REMOTE'),

@@ -362,6 +362,26 @@ $toolbar = $bar->getItems() ? $bar->render() : "";
 
 										<a href="#" id="facebook_get_token" class="btn btn-primary" onclick="facebookInit(jQuery('#facebookapp_id').val());">Authorize APP</a>
 									</div>
+									<div class="form-group span12">
+										<label for=""> <?php echo JText::_('JEV_ICAL_IMPORT_STATE'); ?> </label>
+										<?php
+
+										$checked1 = ' checked="checked"';
+										$checked0 = '';
+
+										if (isset($icalparams->import_state) && $icalparams->import_state == 0)
+										{
+											$checked0 = ' checked="checked"';
+											$checked1 = '';
+										}
+										?>
+										<fieldset class="radio btn-group" id="import_state">
+											<input id="import_state0" type="radio" value="0" name="import_state" <?php echo $checked0; ?>/>
+											<label for="import_state0"><?php echo JText::_('JEV_UNPUBLISHED'); ?></label>
+											<input id="import_state1" type="radio" value="1" name="import_state" <?php echo $checked1; ?>/>
+											<label for="import_state1"><?php echo JText::_('JEV_PUBLISHED'); ?></label><br/><br/>
+										</fieldset>
+									</div>
 									<?php
 									if (!isset($this->editItem->autorefresh) || $this->editItem->autorefresh == 0)
 									{

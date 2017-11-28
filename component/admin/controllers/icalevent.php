@@ -549,6 +549,7 @@ class AdminIcaleventController extends JControllerAdmin
 
 		// Are we allowed to edit events within a URL based iCal
 		$params = JComponentHelper::getParams(JEV_COM_COMPONENT);
+
 		if ($params->get("allowedit", 0) && $row->icsid() > 0)
 		{
 			$calsql = 'SELECT * FROM #__jevents_icsfile WHERE ics_id=' . intval($row->icsid());

@@ -261,8 +261,9 @@ class AdminIcalsController extends JControllerForm {
 		// clean this up later - this is a quick fix for frontend reloading
 		$autorefresh = 0;
 		$icsid = $jinput->getInt('icsid', 0);
+
 		if ($icsid>0){
-			$query = "SELECT icsf.* FROM #__jevents_icsfile as icsf WHERE ics_id=$icsid";
+			$query = "SELECT icsf.* FROM #__jevents_icsfile as icsf WHERE ics_id = $icsid";
 			$db	= JFactory::getDbo();
 			$db->setQuery($query);
 			$currentICS = $db->loadObjectList();
@@ -530,7 +531,8 @@ class AdminIcalsController extends JControllerForm {
 				'facebookapp_id' => $jinput->get('facebookapp_id', ''),
 				'facebookapp_token' => $jinput->get('facebookapp_token', ''),
 				'facebookapp_secret' => $jinput->get('facebookapp_secret', ''),
-				'facebookapp_feed_id' => $jinput->getString('facebookapp_feed_id', '')
+				'facebookapp_feed_id' => $jinput->getString('facebookapp_feed_id', ''),
+				'import_state' => $jinput->getString('import_state', 1)
 			));
 
 			// TODO update access and state
@@ -657,7 +659,8 @@ class AdminIcalsController extends JControllerForm {
 				'facebookapp_id' => $jinput->get('facebookapp_id', ''),
 				'facebookapp_token' => $jinput->get('facebookapp_token', ''),
 				'facebookapp_secret' => $jinput->get('facebookapp_secret', ''),
-				'facebookapp_feed_id' => $jinput->getString('facebookapp_feed_id', '')
+				'facebookapp_feed_id' => $jinput->getString('facebookapp_feed_id', ''),
+				'import_state' => $jinput->getString('import_state', 1)
 			));
 
 
@@ -695,7 +698,8 @@ class AdminIcalsController extends JControllerForm {
 			'facebookapp_id' => $jinput->get('facebookapp_id', ''),
 			'facebookapp_token' => $jinput->get('facebookapp_token', ''),
 			'facebookapp_secret' => $jinput->get('facebookapp_secret', ''),
-			'facebookapp_feed_id' => $jinput->getString('facebookapp_feed_id', '')
+			'facebookapp_feed_id' => $jinput->getString('facebookapp_feed_id', ''),
+			'import_state' => $jinput->getString('import_state', 1)
 		));
 
 		if ($jinput->get('facebookapp_id', '') !== '') {
@@ -838,7 +842,8 @@ class AdminIcalsController extends JControllerForm {
             $sinceDate = date("Y-m-d");
 			$res  = $fb->get('/' . $feed_id . '/events?since=' . $sinceDate . '&fields=' . $fields, $app_token);
 			$data = $res->getDecodedBody();
-
+//			echo '<pre>';
+//			var_Dump($data);
 			// Set an import file, handy for debugging etc.
 			$filename = 'jevents_fb_import.csv';
 			$fh = fopen(JPATH_SITE . '/tmp/' . $filename, 'wb+');
@@ -846,7 +851,7 @@ class AdminIcalsController extends JControllerForm {
 			if($f === 0)
 			{
 				// Only Insert for the first feed.
-				$csvData = '"CATEGORIES","SUMMARY","LOCATION","GEO","DESCRIPTION","CONTACT","X-EXTRAINFO","DTSTART","DTEND","TIMEZONE","RRULE","UID","upload_image1","upload_image1_title"';
+				$csvData = '"CATEGORIES","SUMMARY","LOCATION","GEO","DESCRIPTION","CONTACT","X-EXTRAINFO","DTSTART","DTEND","TIMEZONE","RRULE","UID","PUBLISHED","upload_image1","upload_image1_title"';
 			}
 
 			$filesImages = false;
@@ -944,7 +949,7 @@ class AdminIcalsController extends JControllerForm {
 					$x = 1;
 
 					ksort($lcd);
-					var_dump($lcd);
+					//var_dump($lcd);
 					foreach ($lcd as $lkey => $locd) {
 						$location .= $locd;
 							$location .= ',';
@@ -967,20 +972,21 @@ class AdminIcalsController extends JControllerForm {
 				$csvRow['X-EXTRAINFO'] = '""';
 
 				// Times:
-				$csvRow['DTSTART'] = '"' . JevDate::strftime("%Y%m%dT%H%M%S", strtotime($event['start_time'])) . '"';
+				$csvRow['DTSTART'] = '"' . JevDate::strftime("%Y%m%dT%H%M%S", strtotime($event['start_time']), $event['timezone']) . '"';
 				if (isset($event['end_time']))
 				{
-					$csvRow['DTEND'] =  '"' . JevDate::strftime("%Y%m%dT%H%M%S", strtotime($event['end_time'])) . '"';
+					$csvRow['DTEND'] =  '"' . JevDate::strftime("%Y%m%dT%H%M%S", strtotime($event['end_time']), $event['timezone']) . '"';
 				}
 				else
 				{
-					$csvRow['DTEND'] = '"' . JevDate::strftime('%Y-%m-%d 23:59:59', strtotime($event['start_time'])) . '"';
+					$csvRow['DTEND'] = '"' . JevDate::strftime('%Y-%m-%d 23:59:59', strtotime($event['start_time']), $event['timezone']) . '"';
 				}
 
 				$csvRow['timezone'] = '"' . $event['timezone'] . '"';
 
-				$csvRow['rrule'] = '""';
-				$csvRow['uid'] = '"FB' . $event['id'] . '"';
+				$csvRow['rrule']    = '""';
+				$csvRow['uid']      = '"FB' . $event['id'] . '"';
+				$csvRow['PUBLISHED']    = !isset($ical_params->import_state) ? 1  : $ical_params->import_state;
 
 				if($filesImages && isset($event['cover']))
 				{

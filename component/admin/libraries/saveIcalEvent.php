@@ -36,7 +36,7 @@ class SaveIcalEvent {
 		$data = array();
 
 		// TODO add UID to edit form
-		$data["UID"]				= ArrayHelper::getValue( $array,  "uid",md5(uniqid(rand(),true)));
+		$data["UID"]			= ArrayHelper::getValue( $array,  "uid",md5(uniqid(rand(),true)));
 
 		$data["X-EXTRAINFO"]	= ArrayHelper::getValue( $array,  "extra_info","");
 		$data["LOCATION"]		= ArrayHelper::getValue( $array,  "location","");
@@ -141,7 +141,7 @@ class SaveIcalEvent {
 		// minimum access is 1 in Joomla 2.5+
 		$vevent->access = (int) ArrayHelper::getValue( $array,  "access",1);
 
-		$vevent->state =  (int) ArrayHelper::getValue( $array,  "state",0);
+		$vevent->state =  (int) ArrayHelper::getValue( $array,  "state", 0);
 		// Shouldn't really do this like this
 		$vevent->_detail->priority =  (int) ArrayHelper::getValue( $array,  "priority",0);
 

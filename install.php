@@ -128,7 +128,7 @@ class Pkg_JeventsInstallerScript
 
 		echo "<div class='jev_install'>
 				<div class='jev_logo'><img src='https://www.jevents.net/logo/$logo' /></div>
-				<div class='version'><h2>". $inst_text .": ".$parent->get('manifest')->version."</h2></div>
+				<div class='version'><h2>". $inst_text .": ".$parent->getManifest()->version."</h2></div>
 				<div class='installed'>
 					<ul>
 						<li>JEvents Core Component</li>
@@ -226,7 +226,7 @@ class Pkg_JeventsInstallerScript
 		echo "</div>";
 		// Joomla updater special case
 		if (JFactory::getApplication()->input->getCmd("option")=="com_installer" && JFactory::getApplication()->input->getCmd("view")=="update"){
-                    JFactory::getApplication()->enqueueMessage("<div class='jev_logo'><img src='https://www.jevents.net/logo/JeventsTransparent3.png' /></div>".JText::_('JEV_INST_VERSION_UPRG')." :: ". $parent->get('manifest')->version, 'message');
+                    JFactory::getApplication()->enqueueMessage("<div class='jev_logo'><img src='https://www.jevents.net/logo/JeventsTransparent3.png' /></div>".JText::_('JEV_INST_VERSION_UPRG')." :: ". $parent->getManifest()->version, 'message');
 		}
 
 	}

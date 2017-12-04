@@ -382,6 +382,27 @@ $toolbar = $bar->getItems() ? $bar->render() : "";
 											<label for="import_state1"><?php echo JText::_('JEV_PUBLISHED'); ?></label><br/><br/>
 										</fieldset>
 									</div>
+									<div class="form-group span12">
+										<label for=""> <?php echo JText::_('JEV_ICAL_IMPORT_REPLACE_EVENT_TITLE_WITH_FEED_TTLE'); ?> </label>
+										<?php
+
+										$checked0 = ' checked="checked"';
+										$checked1 = '';
+
+										if (isset($icalparams->replaceEventTitle) && $icalparams->replaceEventTitle == 1)
+										{
+											$checked1 = ' checked="checked"';
+											$checked0 = '';
+										}
+										?>
+										<fieldset class="radio btn-group" id="replaceEventTitle">
+											<input id="replaceEventTitle0" type="radio" value="0" name="replaceEventTitle" <?php echo $checked0; ?>/>
+											<label for="replaceEventTitle0"><?php echo JText::_('JEV_NO'); ?></label>
+											<input id="replaceEventTitle1" type="radio" value="1" name="replaceEventTitle" <?php echo $checked1; ?>/>
+											<label for="replaceEventTitle1"><?php echo JText::_('JEV_YES'); ?></label><br/><br/>
+										</fieldset>
+									</div>
+
 									<?php
 									if (!isset($this->editItem->autorefresh) || $this->editItem->autorefresh == 0)
 									{

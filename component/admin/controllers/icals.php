@@ -532,7 +532,8 @@ class AdminIcalsController extends JControllerForm {
 				'facebookapp_token' => $jinput->get('facebookapp_token', ''),
 				'facebookapp_secret' => $jinput->get('facebookapp_secret', ''),
 				'facebookapp_feed_id' => $jinput->getString('facebookapp_feed_id', ''),
-				'import_state' => $jinput->getString('import_state', 1)
+				'import_state' => $jinput->getString('import_state', 1),
+				'replaceEventTitle' => $jinput->getString('replaceEventTitle', 1)
 			));
 
 			// TODO update access and state
@@ -660,7 +661,8 @@ class AdminIcalsController extends JControllerForm {
 				'facebookapp_token' => $jinput->get('facebookapp_token', ''),
 				'facebookapp_secret' => $jinput->get('facebookapp_secret', ''),
 				'facebookapp_feed_id' => $jinput->getString('facebookapp_feed_id', ''),
-				'import_state' => $jinput->getString('import_state', 1)
+				'import_state' => $jinput->getString('import_state', 1),
+				'replaceEventTitle' => $jinput->getString('replaceEventTitle', 1)
 			));
 
 
@@ -699,7 +701,8 @@ class AdminIcalsController extends JControllerForm {
 			'facebookapp_token' => $jinput->get('facebookapp_token', ''),
 			'facebookapp_secret' => $jinput->get('facebookapp_secret', ''),
 			'facebookapp_feed_id' => $jinput->getString('facebookapp_feed_id', ''),
-			'import_state' => $jinput->getString('import_state', 1)
+			'import_state' => $jinput->getString('import_state', 1),
+			'replaceEventTitle' => $jinput->getString('replaceEventTitle', 1)
 		));
 
 		if ($jinput->get('facebookapp_id', '') !== '') {
@@ -881,7 +884,11 @@ class AdminIcalsController extends JControllerForm {
 					$csvRow['cat'] = '"' . $cats[$catid]->title . '"';
 				}
 
-				$csvRow['summary'] =  '"' . $event['name'] . '"';
+				$eventTitle = $event['name'];
+				if($ical_params->replaceEventTitle) {
+					$eventTitle = $ical->label;
+				}
+				$csvRow['summary'] =  $eventTitle;
 
 				$location           = '';
 				$csvRow['location'] = '""';

@@ -533,7 +533,8 @@ class AdminIcalsController extends JControllerForm {
 				'facebookapp_secret' => $jinput->get('facebookapp_secret', ''),
 				'facebookapp_feed_id' => $jinput->getString('facebookapp_feed_id', ''),
 				'import_state' => $jinput->getString('import_state', 1),
-				'replaceEventTitle' => $jinput->getString('replaceEventTitle', 1)
+				'replaceEventTitle' => $jinput->getString('replaceEventTitle', 1),
+				'replaceTimeZone' => $jinput->getString('replaceTimeZone', 1)
 			));
 
 			// TODO update access and state
@@ -662,7 +663,8 @@ class AdminIcalsController extends JControllerForm {
 				'facebookapp_secret' => $jinput->get('facebookapp_secret', ''),
 				'facebookapp_feed_id' => $jinput->getString('facebookapp_feed_id', ''),
 				'import_state' => $jinput->getString('import_state', 1),
-				'replaceEventTitle' => $jinput->getString('replaceEventTitle', 1)
+				'replaceEventTitle' => $jinput->getString('replaceEventTitle', 1),
+				'replaceTimeZone' => $jinput->getString('replaceTimeZone', 1)
 			));
 
 
@@ -702,7 +704,8 @@ class AdminIcalsController extends JControllerForm {
 			'facebookapp_secret' => $jinput->get('facebookapp_secret', ''),
 			'facebookapp_feed_id' => $jinput->getString('facebookapp_feed_id', ''),
 			'import_state' => $jinput->getString('import_state', 1),
-			'replaceEventTitle' => $jinput->getString('replaceEventTitle', 1)
+			'replaceEventTitle' => $jinput->getString('replaceEventTitle', 1),
+			'replaceTimeZone' => $jinput->getString('replaceTimeZone', 1)
 		));
 
 		if ($jinput->get('facebookapp_id', '') !== '') {
@@ -810,6 +813,8 @@ class AdminIcalsController extends JControllerForm {
 		$app_token   = $ical_params->facebookapp_token;
 		$app_secret  = $ical_params->facebookapp_secret;
 		$cats        = JEV_CommonFunctions::getCategoryData();
+		$comParams = JComponentHelper::getParams(JEV_COM_COMPONENT);
+
 
 		$feed_ids   = explode(',', str_replace(' ', '', $ical_params->facebookapp_feed_id));
 
@@ -978,22 +983,33 @@ class AdminIcalsController extends JControllerForm {
 				$csvRow['contact'] = '""';
 				$csvRow['X-EXTRAINFO'] = '""';
 
+				if (!empty($ical_params->replaceTimeZone)) {
+					$timezone = $comParams->get('icaltimezone');
+					$startTime = str_replace('+', '', strstr($event['start_time'], '+', true));
+					$endTime =  str_replace('+', '', strstr($event['end_time'], '+', true));
+				} else {
+					$startTime = $event['start_time'];
+					$endTime = $event['end_time'];
+					$timezone = $event['timezone'];
+				}
+
 				// Times:
-				$csvRow['DTSTART'] = '"' . JevDate::strftime("%Y%m%dT%H%M%S", strtotime($event['start_time']), $event['timezone']) . '"';
+
+				$csvRow['DTSTART'] = '"' . JevDate::strftime("%Y%m%dT%H%M%S", strtotime($startTime), $timezone) . '"';
 				if (isset($event['end_time']))
 				{
-					$csvRow['DTEND'] =  '"' . JevDate::strftime("%Y%m%dT%H%M%S", strtotime($event['end_time']), $event['timezone']) . '"';
+					$csvRow['DTEND'] =  '"' . JevDate::strftime("%Y%m%dT%H%M%S", strtotime($endTime), $timezone) . '"';
 				}
 				else
 				{
-					$csvRow['DTEND'] = '"' . JevDate::strftime('%Y-%m-%d 23:59:59', strtotime($event['start_time']), $event['timezone']) . '"';
+					$csvRow['DTEND'] = '"' . JevDate::strftime('%Y-%m-%d 23:59:59', strtotime($startTime), $timezone) . '"';
 				}
 
-				$csvRow['timezone'] = '"' . $event['timezone'] . '"';
+				$csvRow['timezone'] = $timezone;
 
 				$csvRow['rrule']    = '""';
 				$csvRow['uid']      = '"FB' . $event['id'] . '"';
-				$csvRow['PUBLISHED']    = !isset($ical_params->import_state) ? 1  : $ical_params->import_state;
+				$csvRow['PUBLISHED']    = !isset($ical_params->import_state) ? 1 : $ical_params->import_state;
 
 				if($filesImages && isset($event['cover']))
 				{

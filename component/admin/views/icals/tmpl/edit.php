@@ -402,6 +402,26 @@ $toolbar = $bar->getItems() ? $bar->render() : "";
 											<label for="replaceEventTitle1"><?php echo JText::_('JEV_YES'); ?></label><br/><br/>
 										</fieldset>
 									</div>
+									<div class="form-group span12">
+										<label for=""> <?php echo JText::_('JEV_ICAL_IMPORT_REPLACE_TIMEZONE'); ?> </label>
+										<?php
+
+										$checked0 = ' checked="checked"';
+										$checked1 = '';
+
+										if (isset($icalparams->replaceTimeZone) && $icalparams->replaceTimeZone == 1)
+										{
+											$checked1 = ' checked="checked"';
+											$checked0 = '';
+										}
+										?>
+										<fieldset class="radio btn-group" id="replaceTimeZone">
+											<input id="replaceTimeZone0" type="radio" value="0" name="replaceTimeZone" <?php echo $checked0; ?>/>
+											<label for="replaceTimeZone0"><?php echo JText::_('JEV_NO'); ?></label>
+											<input id="replaceTimeZone1" type="radio" value="1" name="replaceTimeZone" <?php echo $checked1; ?>/>
+											<label for="replaceTimeZone1"><?php echo JText::_('JEV_YES'); ?></label><br/><br/>
+										</fieldset>
+									</div>
 
 									<?php
 									if (!isset($this->editItem->autorefresh) || $this->editItem->autorefresh == 0)
@@ -427,6 +447,8 @@ $toolbar = $bar->getItems() ? $bar->render() : "";
 											<label for="autorefresh1"><?php echo JText::_('JEV_YES'); ?></label><br/><br/>
 										</fieldset>
 									</div>
+
+
 
 									<div class="form-group span12">
 										<?php if ($id === 0)

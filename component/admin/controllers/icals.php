@@ -339,6 +339,7 @@ class AdminIcalsController extends JControllerForm {
 				$ics->load($icsid);
 				$icsFile = $ics->newICSFileFromString($csvData, $icsid, $catid);
 				$icsFile->icaltype = 3;
+				$icsFile->refreshed = date('Y-m-d H-i-s');
 				$icsFile->store();
 
 				$this->setRedirect( "index.php?option=" . JEV_COM_COMPONENT . "&task=$redirect_task", JText::_( 'FACEBOOK_FEED_REFRESHED' ));

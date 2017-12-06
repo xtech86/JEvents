@@ -120,7 +120,7 @@ JEVHelper::script('select2.full.min.js', 'administrator/components/' . JEV_COM_C
                                                onclick="return listItemTask('cb<?php echo $i; ?>','icals.edit')"
                                                title="<?php echo JText::_('JEV_CLICK_TO_EDIT'); ?>"><?php echo $row->label; ?></a>
                                         </td>
-	                                    <td><?php echo $row->refreshed; ?></td>
+	                                    <td><?php echo $row->refreshed === '0000-00-00 00:00:00' ? '' : $row->refreshed; ?></td>
                                         <td align="center">
 											<?php
 											$types = array(JText::_('COM_JEVENTS_MANAGE_CALENDARS_OVERVIEW_REMOTE'),

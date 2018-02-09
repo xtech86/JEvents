@@ -848,8 +848,8 @@ class AdminIcalsController extends JControllerForm {
 
 			$fields = 'id,name,category,description,cover,place,start_time,end_time,timezone';
 			// Lets set the start date we want to get events from.
-            $sinceDate = date("Y-m-d");
-			$res  = $fb->get('/' . $feed_id . '/events?since=' . $sinceDate . '&fields=' . $fields, $app_token);
+            $sinceDate = date('d-m-Y', strtotime("-1 week"));
+			$res  = $fb->get('/' . $feed_id . '/events?since=' . $sinceDate . '&limit=1000&fields=' . $fields, $app_token);
 			$data = $res->getDecodedBody();
 //			echo '<pre>';
 //			var_Dump($data);

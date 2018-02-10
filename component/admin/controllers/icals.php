@@ -851,8 +851,8 @@ class AdminIcalsController extends JControllerForm {
             $sinceDate = date('d-m-Y', strtotime("-1 week"));
 			$res  = $fb->get('/' . $feed_id . '/events?since=' . $sinceDate . '&limit=1000&fields=' . $fields, $app_token);
 			$data = $res->getDecodedBody();
-//			echo '<pre>';
-//			var_Dump($data);
+
+
 			// Set an import file, handy for debugging etc.
 			$filename = 'jevents_fb_import.csv';
 			$fh = fopen(JPATH_SITE . '/tmp/' . $filename, 'wb+');
@@ -894,7 +894,7 @@ class AdminIcalsController extends JControllerForm {
 				if($ical_params->replaceEventTitle) {
 					$eventTitle = $ical->label;
 				}
-				$csvRow['summary'] =  $eventTitle;
+				$csvRow['summary'] = '"' . $eventTitle . '"';
 
 				$location           = '';
 				$csvRow['location'] = '""';
@@ -980,7 +980,7 @@ class AdminIcalsController extends JControllerForm {
 
 				// Description
 
-				$csvRow['description'] = '"' . htmlspecialchars($event['description']) . '"';
+				$csvRow['description'] = '"' . htmlentities($event['description']) . '"';
 				$csvRow['contact'] = '""';
 				$csvRow['X-EXTRAINFO'] = '""';
 
@@ -1006,7 +1006,7 @@ class AdminIcalsController extends JControllerForm {
 					$csvRow['DTEND'] = '"' . JevDate::strftime('%Y-%m-%d 23:59:59', strtotime($startTime), $timezone) . '"';
 				}
 
-				$csvRow['timezone'] = $timezone;
+				$csvRow['timezone'] = '"' . $timezone . '"';
 
 				$csvRow['rrule']    = '""';
 				$csvRow['uid']      = '"FB' . $event['id'] . '"';
@@ -1038,9 +1038,9 @@ class AdminIcalsController extends JControllerForm {
 			$f++;
 		}
 
-		//return JPATH_SITE . '/tmp/' . $filename;
+		JFile::write(PATH_SITE . '/tmp/' . $filename, $csvData);
 
-		//var_Dump($csvData);die;
+		echo $csvData;die;
 		return $csvData;
 		}
 }

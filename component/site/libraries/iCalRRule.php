@@ -20,7 +20,7 @@ class iCalRRule extends JTable  {
 	var $rr_id					= null;
 
 	/**
-	 * This holds the raw data as an array 
+	 * This holds the raw data as an array
 	 *
 	 * @var array
 	 */
@@ -180,8 +180,8 @@ class iCalRRule extends JTable  {
 				return 1;
 			}
 		}
-                
-                // if we are saving a set of irregular repeats initially they have the same time so the duplicatecheck fails 
+
+                // if we are saving a set of irregular repeats initially they have the same time so the duplicatecheck fails
                 // so spoof this for repeat sother than the first
                 if (in_array($repeat, $this->_repetitions)){
                     static $duplicates = 1;
@@ -245,11 +245,11 @@ class iCalRRule extends JTable  {
 	}
 
 	/**
-	 * Technically this is very complicated 
+	 * Technically this is very complicated
 	 * see http://www.w3.org/2002/12/cal/rfc2445 ad search for "BYxxx rule parts modify the recurrence in some manner"
-	 * 
+	 *
 	 * Priority to 'analysis' should therefore be (??)
-	 * 
+	 *
 	 * FREQ=YEARLY
 	 * BYMONTH
 	 * BYWEEKNO
@@ -261,9 +261,9 @@ class iCalRRule extends JTable  {
 	 * FREQ=DAILY ??
 	 * BYHOUR, BYMINUTE, BYSECOND
 	 * BYSETPOS
-	 * 
+	 *
 	 * INTERVAL always applies to FREQ
-	 * 
+	 *
 	 * So if I go over step in freq units adding the BYMONTH to YEARLY etc.
 	 * then restricting DAILY with BYMONTH (do an excessive loop in this situation and test if the rules hols
 	 * until I get some better logic)
@@ -363,7 +363,7 @@ class iCalRRule extends JTable  {
 							}
                                                         // TODO - Fix situation where summer time starts or ends for all day event here!!!
 							$targetEnd = $targetStart + $duration;
-                                                        
+
 							if ($countRepeats >= $this->count) {
 								return  $this->_repetitions;
 							}
@@ -378,7 +378,7 @@ class iCalRRule extends JTable  {
 							}
 						}
 						// now ago to the start of next year
-                                                $maxyear  = (PHP_INT_SIZE === 8) ? 2999 : 2037;                                                
+                                                $maxyear  = (PHP_INT_SIZE === 8) ? 2999 : 2037;
 						if ($currentYear+$this->rinterval>$maxyear) return  $this->_repetitions;
 						$currentYearStart = JevDate::mktime(0,0,0,1,1,$currentYear+$this->rinterval);
 					}
@@ -438,9 +438,9 @@ class iCalRRule extends JTable  {
    within the month, whereas -1MO represents the last Monday of the
    month. If an integer modifier is not present, it means all days of
    this type within the specified frequency. For example, within a
-   MONTHLY rule, MO represents all Mondays within the month.							 
+   MONTHLY rule, MO represents all Mondays within the month.
 				 */
-				
+
 				// annual repeats of the start date - TODO check this
 				else if ($this->byday=="") {
 					$start = $dtstart;
@@ -459,7 +459,7 @@ class iCalRRule extends JTable  {
 				}
 				else {
 					$days = explode(",",str_replace(" ", "", $this->byday));
-					// duplicate where necessary 
+					// duplicate where necessary
 					$extradays = array();
 					foreach ($days as $day) {
 						if (strpos($day, "+")===false && strpos($day, "-")===false ) {
@@ -469,7 +469,7 @@ class iCalRRule extends JTable  {
 						}
 					}
 					$days = array_merge($days, $extradays);
-					
+
 					$start = $dtstart;
 					$end = $dtend;
 					$countRepeats = 0;
@@ -516,7 +516,7 @@ class iCalRRule extends JTable  {
                                                                                 // WE can't just add the duration since if summer time starts/ends within the event length then the end and possibly the date could be wrong
                                                                                 $targetEnd = $targetStart + $duration;
                                                                                 $targetEnd = JevDate::mktime($endHour,$endMin,$endSecond,$currentMonth,$targetstartDay+$durationdays,$currentYear);
-                                                                                
+
 										if ($countRepeats >= $this->count) {
 											return  $this->_repetitions;
 										}
@@ -673,8 +673,8 @@ class iCalRRule extends JTable  {
 						}
 						$days = $newdays ;
 						$this->byday = implode(",",$days);
-					}					
-					
+					}
+
 					$start = $dtstart;
 					$end = $dtend;
 					$countRepeats = 0;
@@ -839,7 +839,7 @@ class iCalRRule extends JTable  {
 							if (!is_int($item)){
 								$item = JevDate::strtotime($item." 00:00:00");
 							}
-						});					
+						});
 					}
 				}
 				if (!is_array($this->irregulardates)){

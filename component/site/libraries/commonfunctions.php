@@ -361,15 +361,14 @@ class JEV_CommonFunctions {
 
 	public static function sendAdminMail( $adminName, $adminEmail, $subject='', $title='', $content='', $day='', $month='', $year='', $start_time='', $end_time='', $author='', $live_site, $modifylink, $viewlink , $event=false, $cc = "") {
 		$config = new JConfig();
-
+		$params = JComponentHelper::getParams(JEV_COM_COMPONENT);
 
 		if (!$adminEmail) return;
 		if ((strpos($adminEmail,'@example.com') !== false)) return;
 
-		$params = JComponentHelper::getParams(JEV_COM_COMPONENT);
-                if ($params->get("com_notifyboth",0)==3){
-                    return; // no notifications
-                }
+		if ($params->get("com_notifyboth",0)==3){
+			return; // no notifications
+		}
 		$messagetemplate = $params->get("notifymessage", JText::_('JEV_DEFAULT_NOTIFYMESSAGE'));
 
 		if (strpos($messagetemplate, "JEV_DEFAULT_NOTIFYMESSAGE")!==false || trim(strip_tags($messagetemplate))=="") {
@@ -387,11 +386,12 @@ class JEV_CommonFunctions {
 
 		$messagetemplate = str_replace("{TITLE}", $title,$messagetemplate);
 		$messagetemplate = str_replace("{DESCRIPTION}", $content,$messagetemplate);
+
 		if ($event){
 			$messagetemplate = str_replace("{CATEGORY}", $event->catname(),$messagetemplate);
 			//$messagetemplate = str_replace("{EXTRA}", $event->extra_info(),$messagetemplate);
-
 		}
+
 		$messagetemplate = str_replace("{LIVESITE}", $live_site,$messagetemplate);
 		$messagetemplate = str_replace("{AUTHOR}", $author,$messagetemplate);
 		$messagetemplate = str_replace("{DAY}", $day,$messagetemplate);
@@ -446,7 +446,6 @@ class JEV_CommonFunctions {
 			$mail->setSender(array(0 => $params->get('sender_email', $adminEmail), 1 => $params->get('sender_name', $adminName)));
 		}
 
-
 		// attach anonymous creator etc.
 		JPluginHelper::importPlugin('jevents');
 
@@ -463,7 +462,6 @@ class JEV_CommonFunctions {
 		}
 
 		$mail->addRecipient($recipient);
-
 
 		//Leave old replacements in place for now, and now run through default loadedfromtemplate
 		// if there is an event!

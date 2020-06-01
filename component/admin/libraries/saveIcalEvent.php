@@ -251,9 +251,8 @@ class SaveIcalEvent {
             JFactory::getApplication()->enqueueMessage(JTExt::_("JEV_CHECK_OVERLAPPING_REPEATS"), "warning");
         }
 
-		// If not authorised to publish in the frontend then notify the administrator
+        // If not authorised to publish in the frontend then notify the administrator
 		if (!$dryrun && $success && $notifyAdmin) {
-
 
 			JLoader::register('JEventsCategory',JEV_ADMINPATH."/libraries/categoryClass.php");
 			$cat = new JEventsCategory($db);
@@ -323,6 +322,7 @@ class SaveIcalEvent {
 			JEV_CommonFunctions::sendAdminMail( $sitename, $adminEmail, $subject, $title, $content, $day, $month, $year, $start_time, $end_time, $created_by, JURI::root(), $modifylink, $viewlink , $testevent, $cc);
 
 		}
+
 		if ($success){
 			return $vevent;
 		}

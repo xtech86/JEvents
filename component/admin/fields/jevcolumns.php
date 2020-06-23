@@ -56,8 +56,8 @@ class JFormFieldJevcolumns extends JFormFieldText
 		$collist[] = array(JText::_("JEV_FIELD_ENDTIME",true), "ENDTIME");
 		$collist[] = array(JText::_("JEV_FIELD_ISOENDTIME",true), "ISOEND");
 		$collist[] = array(JText::_("JEV_FIELD_MULTIENDDATE",true), "MULTIENDDATE");
-                $collist[] = array(JText::_("JEV_FIRSTREPEATSTART",true), "FIRSTREPEATSTART");
-                $collist[] = array(JText::_("JEV_LASTREPEATEND",true), "LASTREPEATEND");
+		$collist[] = array(JText::_("JEV_FIRSTREPEATSTART",true), "FIRSTREPEATSTART");
+		$collist[] = array(JText::_("JEV_LASTREPEATEND",true), "LASTREPEATEND");
 		$collist[] = array(JText::_("JEV_FIELD_DURATION",true), "DURATION");
 		$collist[] = array(JText::_("JEV_FIELD_PREVIOUSNEXT",true), "PREVIOUSNEXT");
 		$collist[] = array(JText::_("JEV_FIELD_FIRSTREPEAT",true), "FIRSTREPEAT");
@@ -87,6 +87,8 @@ class JFormFieldJevcolumns extends JFormFieldText
 		$collist[] = array(JText::_("JEV_ACCESS_LEVEL",true), "ACCESS");
 		$collist[] = array(JText::_("JEV_EVENT_PRIORITY",true), "PRIORITY");
 		$collist[] = array(JText::_("JEV_FIELD_ICALBUTTON",true), "ICALBUTTON");
+		$collist[] = array(JText::_("JEV_FIELD_TODAY",true), "TODAY");
+		$collist[] = array(JText::_("JEV_FIELD_TOMORROW",true), "TOMORROW");
 
 		// get list of enabled plugins
 		$jevplugins = JPluginHelper::getPlugin("jevents");

@@ -981,6 +981,18 @@ function DefaultLoadedFromTemplate($view, $template_name, $event, $mask, $templa
 				}
 				break;
 
+            case "{{TODAY}}" :
+            case "{{TOMORROW}}" :
+				if(strtotime($event->startDate()) === strtotime(date( 'Y-m-d'))) {
+					$search[]   = '{{TODAY}}';
+					$replace[]  = JText::_('JEV_EVENT_TODAY');
+				}
+
+				if(strtotime($event->startDate()) === strtotime(date( 'Y-m-d') . '+1 day')) {
+					$search[]   = '{{TOMORROW}}';
+					$replace[]  = JText::_('JEV_EVENT_TOMORROW');
+				}
+                break;
 			case "{{REPEATSUMMARY}}":
 			case "{{STARTDATE}}":
 			case "{{ENDDATE}}":
